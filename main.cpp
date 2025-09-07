@@ -30,37 +30,6 @@ using namespace CSUTILS;
 using namespace CSUIMAN;
 
 
-// Identifiants des contr�les
-#define ID_PATH_LISTBOX 100
-#define ID_MODEL_LISTBOX 101
-#define ID_COMBOBOX 102
-#define ID_BTN_ADD 201
-#define ID_BTN_REMOVE 202
-#define ID_BTN_GENERATE 203
-#define ID_RADIO_W1 204
-#define ID_RADIO_W2 205
-
-#define ID_CODE_VIEWER1 300
-#define ID_CODE_VIEWER2 301
-
-/*********************dark titlebar *******************/
-
-
-typedef struct EDITBOX_EVENT
-{
-    bool scrolled;
-    POINT spos, oldSpos;
-    int lineCount;
-    int oldlineCount;
-};
-
-typedef struct LINENUMBER_STYLE
-{
-    COLORREF backgroundColor;
-    COLORREF borderColor;
-    COLORREF textColor;
-};
-
 typedef struct ADATA
 {
     CSARITHMETIC::csRNUMBER number, root, outRoot, error;
@@ -72,19 +41,6 @@ typedef struct ADATA
 vector<ADATA> adata;
 
 extern int CAPTION_AREA_SIZE;
-
-/*********************dark titlebar *******************/
-
-void pathListSectionFill(CSARGS Args);
-void pathSaveListSectionFill(CSARGS Args);
-void modelListSectionFill(CSARGS Args);
-
-void rightSectionFill(CSARGS Args);
-void leftSectionFill(CSARGS Args);
-void middleBottomSectionFill(CSARGS Args);
-
-
-void rootSubProc(CSARGS Args);
 
 CSARGS forceEventArgs(0);
 void forceEventFunction(CSARGS Args);
@@ -107,7 +63,7 @@ int smy = GetSystemMetrics(SM_CYSCREEN);
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
     CSUIMAN::_CSIGMA_INIT_(hInstance, forceEventFunction, &forceEventArgs);
-    
+
     CSUIMAN::setSaveAppSizes(0);
     //float dimFact = GetSystemMetrics(SM_CXSCREEN)*GetSystemMetrics(SM_CYSCREEN)/(1366.0*768);
     float dimFact = 1.5;
@@ -121,10 +77,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     bool* updateMiddleBottomSectionLineNumbers = csAlloc<bool>(1,0);
     bool* updateRightSectionLineNumbers = csAlloc<bool>(1,0);
     //addAction(ROOT, rootSubProc,2,updateMiddleBottomSectionLineNumbers, updateRightSectionLineNumbers);
-    
+
     /******************************** Tips popup **************************************** */
     CSUICONTROLS::createTipsPupop(RGB(40,40,40));
-    
+
     /*************************************** MIDDLE_TOP_SECTION ************************************ */
 
     CAPTION_AREA_SIZE *= 1.5;
@@ -164,8 +120,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     bd = {MIDDLE_BOTTOM_SECTION, {0,0,-0.5,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
     bindGeometry(LEFT_SECTION, bd);
 
-    EDITBOX_EVENT* ede1 = csAlloc<EDITBOX_EVENT>(1, {0,{0},{0},0,0});
-    //addAction(MIDDLE_BOTTOM_SECTION, middleBottomSectionFill,2, ede1, updateMiddleBottomSectionLineNumbers);
     /*************************************** MIDDLE_TOP_SECTION ************************************ */
 
     RIGHT_SECTION = createSection(MIDDLE_SECTION, {515/2,23,515/2-1,395+25},  RGB(30,30,30), {1,0,0,0});
@@ -190,8 +144,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     CSUIMAN::updateAfterReceivingResizeMessage(RIGHT_SECTION);
 
-    EDITBOX_EVENT* ede2 = csAlloc<EDITBOX_EVENT>(1, {0,{0,0},{0,0},0,0});
-    
     /**************************************************************************************************** */
 
     NR_SECTION = createSection(MIDDLE_TOP_SECTION, {2,0,148+136/3,19},  RGB(25,25,25), {0,0,0,0});
@@ -200,7 +152,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     bd = {NR_SECTION, {0,0,0.5,0}, 0,0,BIND_DEST_RIGHT_EDGE,0};
     bindGeometry(ROOT, bd);
     CSUIMAN::updateAfterReceivingResizeMessage(NR_SECTION);
-    
+
     CS_NUMERIC_INCREMENTER_PARAMS nrIds01 = CSUICONTROLS::numericIncrementerExt(NR_SECTION, {2,2,70,15}, L"10", L"1", INPUT_FORMAT_INTERGER);
     CS_NUMERIC_INCREMENTER_PARAMS nrIds02 = CSUICONTROLS::numericIncrementerExt(NR_SECTION, {2+73,2,70,15}, L"12", L"1", INPUT_FORMAT_INTERGER);
     CS_NUMERIC_INCREMENTER_PARAMS nrIds03 = CSUICONTROLS::numericIncrementerExt(NR_SECTION, {2+73*2,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
@@ -276,10 +228,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     fontSizeInc.setMinBound("8");
     fontSizeInc.setMaxBound("30");
     CSUIMAN::setBorderColorAndThick(fontSizeInc.idSection, RGB(60,60,60), 1);
-    
+
     void setFontSize(CSARGS Args);
     csSetUpdatingFunction(fontSizeInc.idText, setFontSize, 2, &MIDDLE_BOTTOM_SECTION, &fontSizeInc.idSection);
-    
+
     CSDYNAMIC_SIMPLE_TEXT tipsMessage0;
     tipsMessage0.marg = {10,10,10,10};
     tipsMessage0.updateGASize = 1;
@@ -293,7 +245,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage0.pSpace.push_back(5);
     CSUIMAN::addTips(fontSizeInc.idSection, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bRBottom=1}, 3, 0, tipsMessage0);
-    
+
     /********************************************************************************** */
     CSUICONTROLS::addTitle(ROOT, L"CSIGMA LIB TEST\0",{150,CAPTION_AREA_SIZE/dimFact}, "img/icon.bmp\0", 22);
 
@@ -408,7 +360,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage1.pSpace.push_back(5);
     CSUIMAN::addTips(externPrec.idSection, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMessage1);
-    
+
 
     CS_NUMERIC_INCREMENTER_PARAMS Nnb = CSUICONTROLS::numericIncrementerExt1(LEFT_SECTION, {5,5+total*2,65,h}, L"500", L"1", INPUT_FORMAT_INTERGER);
     Nnb.setMinBound("1");
@@ -425,7 +377,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage2.pSpace.push_back(5);
     CSUIMAN::addTips(Nnb.idSection, {0,0,200/dimFact, 170/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMessage2);
-    
+
     /********************************************************************************** */
     //BTN_NEW_OUTPUT = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"New Output\0", {5,5+total*1,65,h});
     CS_NUMERIC_INCREMENTER_PARAMS minDigit = CSUICONTROLS::numericIncrementerExt1(LEFT_SECTION, {5,5+total*3,65,h}, L"0", L"1", INPUT_FORMAT_INTERGER);
@@ -444,21 +396,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage3.pSpace.push_back(5);
     CSUIMAN::addTips(minDigit.idSection, {0,0,200/dimFact, 170/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMessage3);
-    
+
     /********************************************************************************** */
     //BTN_REMOVE_FILE = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Remove File\0", {5,5+total*2,65,h});
-    
+
     CS_NUMERIC_INCREMENTER_PARAMS maxDigit = CSUICONTROLS::numericIncrementerExt1(LEFT_SECTION, {5,5+total*4,65,h}, L"9", L"1", INPUT_FORMAT_INTERGER);
     maxDigit.setMinBound("0");
     maxDigit.setMaxBound("9");
 
     CSUIMAN::addTips(maxDigit.idSection, {0,0,200/dimFact, 170/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMessage3);
     /********************************************************************************** */
-    
+
     void getRandomData(CSARGS Args);
     BNT_RANDOM_NUMBER = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Random\0", {5,5+total*5,65,h});
     CSUIMAN::addAction(BNT_RANDOM_NUMBER, getRandomData, 4, &Nnb.idSection, &minDigit.idSection, &maxDigit.idSection, &MIDDLE_BOTTOM_SECTION);
-    
+
     CSDYNAMIC_SIMPLE_TEXT tipsMSG;
     tipsMSG.marg = {10,10,10,10};
     tipsMSG.updateGASize = 1;
@@ -492,8 +444,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     CS_NUMERIC_INCREMENTER_PARAMS activeNum = CSUICONTROLS::numericIncrementerExt2(LEFT_SECTION, {5,5+total*7,65,h}, L"0", L"1", INPUT_FORMAT_INTERGER);
     activeNum.setMinBound("0");
     activeNum.setMaxBound("9");
-    
-    CS_STRING_INCREMENTER_PARAMS strInc = CSUICONTROLS::stringIncrementer(LEFT_SECTION, {5,5+total*8,65,h}, L"string 1", 1, 1, 
+
+    CS_STRING_INCREMENTER_PARAMS strInc = CSUICONTROLS::stringIncrementer(LEFT_SECTION, {5,5+total*8,65,h}, L"string 1", 1, 1,
                                                             {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0});
     strInc.newItem(L"string 2");
     strInc.newItem(L"string 3");
@@ -504,7 +456,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     strInc.newItem(L"string 8");
     strInc.newItem(L"string 9");
     //BTN_REMOVE_UNDO_1 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Undo 1\0", {5,5+total*9,65,h});
-    
+
     BTN_REMOVE_REDO_1 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Redo 1\0", {5,5+total*10,65,h});
     /********************************************************************************** */
     BTN_REMOVE_SAVE_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Save 2\0", {5,5+total*12,65,h});
@@ -580,7 +532,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     lbm->setDefaultFont(L"calibri",{12,0});
     lbm->setItemAlign(CS_ALIGN_VERTICAL);
     lbm->setOffset({1,1});
-    
+
     lbm->setIcon(0, L"img\\search02.bmp",L"img\\search02.bmp", L"img\\search01.bmp", L"img\\search01.bmp");
     //lbm->newItem(L"Locked",{0},1,L"img\\search02.bmp", L"img\\search02.bmp", L"img\\search01.bmp");
     lbm->setMaxTextWidth(150);
@@ -654,8 +606,8 @@ void getRandomData(CSARGS Args)
             char mn = strtod(wcharPtrToCharPtr(sTitle(idMinSection).Text).c_str(), 0);
             char mx = strtod(wcharPtrToCharPtr(sTitle(idMaxSection).Text).c_str(), 0);
 
-            
-            
+
+
             if(mn > mx)
             {
                 char t = mn;
@@ -666,7 +618,7 @@ void getRandomData(CSARGS Args)
             number.random(n, mn, mx);
 
             int idGaphicArea = *(int*)Args[3];
-            
+
 
 
 
