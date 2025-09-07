@@ -1,0 +1,181 @@
+# depslib dependency file v1.0
+1757213774 source:d:\projects\csigma\main.cpp
+	<windows.h>
+	<windowsx.h>
+	<commdlg.h>
+	<vector>
+	<string>
+	<sstream>
+	<iostream>
+	<fstream>
+	<stdexcept>
+	<codecvt>
+	<locale>
+	"csSection.h"
+	"csUIControls.h"
+	"csStrUtils.h"
+	"csSubClasses.h"
+	"readwfile.h"
+	"csListBoxMin.h"
+
+1752807816 d:\projects\csigma\include\cssection.h
+	<dwmapi.h>
+	"csUtils.h"
+	"csUIFx.h"
+	<thread>
+	<functional>
+
+1757214678 d:\projects\csigma\include\csutils.h
+	"csArgs.h"
+	"csUIFx.h"
+	"csTypes.h"
+	<wchar.h>
+	"csStrUtils.h"
+
+1748871792 d:\projects\csigma\include\csargs.h
+	<windows.h>
+	<windowsx.h>
+	<iostream>
+	"csTypes.h"
+
+1757166362 d:\projects\csigma\include\cstypes.h
+	<windows.h>
+	<windowsx.h>
+	<iostream>
+	<vector>
+	<math.h>
+	<csArithmetic/csARITHMETIC.h>
+
+1752759201 d:\projects\csigma\include\csarithmetic\csarithmetic.h
+	<cstddef>
+	<math.h>
+	<time.h>
+	<random>
+	<iostream>
+	<string.h>
+	<complex>
+	<cstddef>
+	<cstdio>
+	<cstdlib>
+	<cstring>
+	<functional>
+	<iostream>
+	<numeric>
+	<cxxabi.h>
+	<experimental/source_location>
+	"csArithUtils.h"
+
+1752760749 d:\projects\csigma\include\csarithmetic\csarithutils.h
+	<iostream>
+
+1752836821 d:\projects\csigma\include\csuifx.h
+	<windows.h>
+	<vector>
+	<iostream>
+	<thread>
+	"csGraphics.h"
+
+1757044724 d:\projects\csigma\include\csgraphics.h
+	"csTypes.h"
+	"csUtils.h"
+
+1756709055 d:\projects\csigma\include\csuicontrols.h
+	"csSection.h"
+	"csScrollbar.h"
+
+1756924231 d:\projects\csigma\include\csscrollbar.h
+	"csUtils.h"
+	"csSection.h"
+
+1757129935 d:\projects\csigma\include\csstrutils.h
+	<iostream>
+	<sstream>
+	<vector>
+	<string>
+	<fstream>
+	<stdexcept>
+	<codecvt>
+	<windows.h>
+
+1752811854 d:\projects\csigma\include\cssubclasses.h
+	<windows.h>
+	<richedit.h>
+	<commctrl.h>
+	<uxtheme.h>
+	<vssym32.h>
+	<uxtheme.h>
+	"csStrUtils.h"
+	"csArgs.h"
+	"csUtils.h"
+	"readwfile.h"
+
+1748873480 d:\projects\csigma\include\readwfile.h
+
+1757010309 d:\projects\csigma\include\cslistboxmin.h
+	"csSection.h"
+	"csUtils.h"
+	"csLIST.h"
+	"csGraphics.h"
+
+1756978410 d:\projects\csigma\include\cslist.h
+	<iostream>
+
+1757089596 source:d:\projects\csigma\src\csargs.cpp
+	"csTypes.h"
+
+1757169329 source:d:\projects\csigma\src\csgraphics.cpp
+	"csGraphics.h"
+	"math.h"
+
+1756978364 source:d:\projects\csigma\src\cslist.cpp
+	"csList.h"
+	"csUtils.h"
+	<string.h>
+	<iostream>
+	<windows.h>
+
+1749390102 source:d:\projects\csigma\src\cslistbox.cpp
+	"csLISTBOX.h"
+
+1749389585 d:\projects\csigma\include\cslistbox.h
+	"csSection.h"
+	"csUtils.h"
+	"csTypes.h"
+
+1757049554 source:d:\projects\csigma\src\cslistboxmin.cpp
+	"csListBoxMin.h"
+	"readwfile.h"
+
+1757206957 source:d:\projects\csigma\src\csscrollbar.cpp
+	"csScrollBar.h"
+
+1757214407 source:d:\projects\csigma\src\cssection.cpp
+	"csSection.h"
+	"csUIFx.h"
+	<mutex>
+
+1757130053 source:d:\projects\csigma\src\csstrutils.cpp
+	"csStrUtils.h"
+	<windows.h>
+	<fstream>
+	<vector>
+	<string>
+
+1756695737 source:d:\projects\csigma\src\cssubclasses.cpp
+	"csSubClasses.h"
+	"csGraphics.h"
+
+1757205928 source:d:\projects\csigma\src\csuicontrols.cpp
+	"csUIControls.h"
+	"readwfile.h"
+	"csArithmetic/csArithUtils.h"
+
+1757188189 source:d:\projects\csigma\src\csuifx.cpp
+	"csUIFx.h"
+
+1757214665 source:d:\projects\csigma\src\csutils.cpp
+	"csUtils.h"
+	"math.h"
+	<dwmapi.h>
+	"readwfile.h"
+

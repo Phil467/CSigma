@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="CSigma" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="Debug">
+				<Option output="bin/Debug/CSigma" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-g" />
+					<Add directory="include" />
+					<Add directory="include/csArithmetic" />
+					<Add directory="include/csParallelTask" />
+				</Compiler>
+				<ResourceCompiler>
+					<Add option="-D_UNICODE -DUNICODE" />
+				</ResourceCompiler>
+				<Linker>
+					<Add option="-ldwmapi" />
+					<Add option="-lgdi32" />
+					<Add option="-luser32" />
+					<Add option="-lkernel32" />
+					<Add option="-lcomctl32" />
+					<Add option="-lcomdlg32" />
+					<Add option="-luxtheme" />
+					<Add option="-lmsimg32" />
+					<Add library="libs/libcsArithmetic.dll.a" />
+					<Add library="libs/libcsParallelTask.dll.a" />
+					<Add library="libs/libreadwfile.dll.a" />
+					<Add directory="libs" />
+				</Linker>
+			</Target>
+			<Target title="Release">
+				<Option output="bin/Release/CSigma" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Release/" />
+				<Option type="0" />
+				<Option compiler="gcc" />
+				<Compiler>
+					<Add option="-O2" />
+				</Compiler>
+				<Linker>
+					<Add option="-s" />
+				</Linker>
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+		</Compiler>
+		<Linker>
+			<Add library="gdi32" />
+			<Add library="user32" />
+			<Add library="kernel32" />
+			<Add library="comctl32" />
+		</Linker>
+		<Unit filename="include/csArgs.h" />
+		<Unit filename="include/csArithmetic/csARITHMETIC.h" />
+		<Unit filename="include/csArithmetic/csArithUtils.h" />
+		<Unit filename="include/csArithmetic/csSQRT.h" />
+		<Unit filename="include/csGraphics.h" />
+		<Unit filename="include/csLIST.h" />
+		<Unit filename="include/csLISTBOX.h" />
+		<Unit filename="include/csListBoxMin.h" />
+		<Unit filename="include/csParallelTask/csPARALLEL.h" />
+		<Unit filename="include/csParallelTask/csPARGS.h" />
+		<Unit filename="include/csParallelTask/csPERF_MEASUREMENT.h" />
+		<Unit filename="include/csScrollBar.h" />
+		<Unit filename="include/csSection.h" />
+		<Unit filename="include/csStrUtils.h" />
+		<Unit filename="include/csSubClasses.h" />
+		<Unit filename="include/csTypes.h" />
+		<Unit filename="include/csUIControls.h" />
+		<Unit filename="include/csUIFx.h" />
+		<Unit filename="include/csUtils.h" />
+		<Unit filename="include/readwfile.h" />
+		<Unit filename="main.cpp" />
+		<Unit filename="src/csArgs.cpp" />
+		<Unit filename="src/csGraphics.cpp" />
+		<Unit filename="src/csLIST.cpp" />
+		<Unit filename="src/csLISTBOX.cpp" />
+		<Unit filename="src/csListBoxMin.cpp" />
+		<Unit filename="src/csScrollBar.cpp" />
+		<Unit filename="src/csSection.cpp" />
+		<Unit filename="src/csStrUtils.cpp" />
+		<Unit filename="src/csSubClasses.cpp" />
+		<Unit filename="src/csUIControls.cpp" />
+		<Unit filename="src/csUIFx.cpp" />
+		<Unit filename="src/csUtils.cpp" />
+		<Extensions />
+	</Project>
+</CodeBlocks_project_file>
