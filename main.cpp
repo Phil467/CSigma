@@ -71,25 +71,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     /***************************** Root ********************************** */
 
     ROOT = createSection(-1, {100,25,600,500},  RGB(30,30,30), {1,1,1,1,1,1,1,1});
-    setIcon(sHandle(ROOT), L"icon.ico", L"icon2.ico");
+    setIcon(sHandle(ROOT), L"icon.ico", L"icon.ico");
     CSUIMAN::enableDarkEdge(ROOT);
-
-    bool* updateMiddleBottomSectionLineNumbers = csAlloc<bool>(1,0);
-    bool* updateRightSectionLineNumbers = csAlloc<bool>(1,0);
-    //addAction(ROOT, rootSubProc,2,updateMiddleBottomSectionLineNumbers, updateRightSectionLineNumbers);
+    /********************************************************************************** */
+    CSUICONTROLS::addTitle(ROOT, L"CSIGMA LIB TEST\0",{150,CAPTION_AREA_SIZE/dimFact}, "img/icon.bmp\0", 22);
 
     /******************************** Tips popup **************************************** */
     CSUICONTROLS::createTipsPupop(RGB(40,40,40));
 
-    /*************************************** MIDDLE_TOP_SECTION ************************************ */
+    /*************************************** LEFT_SECTION ************************************ */
 
     CAPTION_AREA_SIZE *= 1.5;
     LEFT_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/dimFact,75,450},  RGB(20,20,20), {0,0,1,0});
 
     BIND_GEOM_PARAMS bd = {LEFT_SECTION, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE, 0, BIND_DEST_BOTTOM_EDGE}};
     bindGeometry(ROOT, 1, bd); // C version
-    //addAction(LEFT_SECTION, leftSectionFill,0);
-    /*************************************** MIDDLE_TOP_SECTION ************************************ */
+    
+    /*************************************** MIDDLE_SECTION ************************************ */
 
     MIDDLE_SECTION = createSection(ROOT, {77,CAPTION_AREA_SIZE/dimFact,515,450+20},  RGB(10,40,30), {0,0,0,0});
 
@@ -97,6 +95,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     bindGeometry(LEFT_SECTION, 1, bd);
     bd = {MIDDLE_SECTION, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE,BIND_DEST_BOTTOM_EDGE,BIND_DEST_RIGHT_EDGE,BIND_DEST_BOTTOM_EDGE}};
     bindGeometry(ROOT, bd); // cpp version
+
     /*************************************** MIDDLE_TOP_SECTION ************************************ */
 
     MIDDLE_TOP_SECTION = createSection(MIDDLE_SECTION, {1,1,517,21},  RGB(30,30,30), {0,0,0,1});
@@ -107,7 +106,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     bd = {MIDDLE_TOP_SECTION, {-1,0,1,0}, {BIND_DEST_RIGHT_EDGE,0,BIND_DEST_RIGHT_EDGE,0}};
     bindGeometry(ROOT, bd); // cpp version
 
-    /************************************************************************** */
+    /***********************************MIDDLE_BOTTOM_SECTION *************************************** */
 
     MIDDLE_BOTTOM_SECTION = createSection(MIDDLE_SECTION, {1,23,515/2-2,395+25},  RGB(25,25,25), {0,0,0,0});
 
@@ -120,7 +119,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     bd = {MIDDLE_BOTTOM_SECTION, {0,0,-0.5,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
     bindGeometry(LEFT_SECTION, bd);
 
-    /*************************************** MIDDLE_TOP_SECTION ************************************ */
+    /*************************************** RIGHT_SECTION ************************************ */
 
     RIGHT_SECTION = createSection(MIDDLE_SECTION, {515/2,23,515/2-1,395+25},  RGB(30,30,30), {1,0,0,0});
 
@@ -219,6 +218,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     BUTTON_SEARCH = CSUICONTROLS::iconButton01(STATIC_SEARCH, "img/search02.bmp\0", "img/search01.bmp\0", {200-14-1,1,14,14});
 
     int redit = csCreateRichEdit(STATIC_SEARCH, {4,4,35,4}, L"Search...", 0, 0);
+
     /********************************************************************************** */
 
     CSSYSCOMMAND_SECTION SYS_CMD= CSUICONTROLS::addSysCommand(ROOT, {600});
@@ -246,8 +246,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMessage0.pSpace.push_back(5);
     CSUIMAN::addTips(fontSizeInc.idSection, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bRBottom=1}, 3, 0, tipsMessage0);
 
-    /********************************************************************************** */
-    CSUICONTROLS::addTitle(ROOT, L"CSIGMA LIB TEST\0",{150,CAPTION_AREA_SIZE/dimFact}, "img/icon.bmp\0", 22);
 
     /********************************************************************************** */
     int cy = CAPTION_AREA_SIZE/dimFact-2;
@@ -424,7 +422,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMSG.pSpace.push_back(5);
     CSUIMAN::addTips(BNT_RANDOM_NUMBER, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG);
+
     /********************************************************************************** */
+
     BTN_ADD_TO_DATA_LIST = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Add\0", {5,5+total*6,65,h});
     CSDYNAMIC_SIMPLE_TEXT tipsMSG1;
     tipsMSG1.marg = {10,10,10,10};
@@ -455,10 +455,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     strInc.newItem(L"string 7");
     strInc.newItem(L"string 8");
     strInc.newItem(L"string 9");
+
     //BTN_REMOVE_UNDO_1 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Undo 1\0", {5,5+total*9,65,h});
 
     BTN_REMOVE_REDO_1 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Redo 1\0", {5,5+total*10,65,h});
-    /********************************************************************************** */
     BTN_REMOVE_SAVE_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Save 2\0", {5,5+total*12,65,h});
     BTN_REMOVE_UNDO_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Undo 2\0", {5,5+total*13,65,h});
     BTN_REMOVE_REDO_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Redo 2\0", {5,5+total*14,65,h});
@@ -528,7 +528,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     hscroll2.setPositionRatio(0);
     vscroll2.setPosition(100);
 
-    /*CSLISTBOXMIN* lbm = csNewMinimalListBoxPtr(&RIGHT_SECTION_CHILD, 100, 85);
+    CSLISTBOXMIN* lbm = csNewMinimalListBoxPtr(&RIGHT_SECTION_CHILD, 100, 85);
     lbm->setDefaultFont(L"calibri",{12,0});
     lbm->setItemAlign(CS_ALIGN_VERTICAL);
     lbm->setOffset({1,1});
@@ -543,18 +543,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     lbm->setDefaultTitle(L"Param");
     lbm->newItem(0,30,1);
 
-    lbm->newFilePath(L"Bitmap 24-bits\0*.bmp\0");
+    //lbm->newFilePath(L"Bitmap 24-bits\0*.bmp\0");
 
     lbm->setActiveItem(0);
-    lbm->create();*/
-/*extern float xdimFact;
-extern float ydimFact;
-    xdimFact = 1;
-    ydimFact = 1;*/
-    //CSUIMAN::saveAppSizes(L"geometry.txt");
-    /*vector<RECT> vr = CSUIMAN::getAppSizes(L"geometry.txt");
-    CSUIMAN::setAppSizes(vr);
-    vr.clear();*/
+    lbm->create();
+
     return CSUIMAN::_CSIGMA_SOFTWARE_();
 }
 
