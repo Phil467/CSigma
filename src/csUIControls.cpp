@@ -168,15 +168,16 @@ int CSUICONTROLS::darkTextButton02(int idp, wchar_t*title, RECT r, int fontSize)
     return BUTTON;
 }
 
-CSSYSCOMMAND_SECTION CSUICONTROLS::addSysCommand(int& id, SIZE size)
+CSSYSCOMMAND_SECTION CSUICONTROLS::addSysCommand(int& id, POINT pos)
 {
     CSSYSCOMMAND_SECTION sc;
-    int width = (GetSystemMetrics(SM_CYCAPTION)-2)/dimFact;
-    sc.SYSCOMMAND_SECTION = CSUIMAN::createSection(id, {size.cx-3*width-10-2,0,3*width,GetSystemMetrics(SM_CYCAPTION)/dimFact},  RGB(5,5,5), {0,0,0,0});
+    int width = (GetSystemMetrics(SM_CYCAPTION))/dimFact;
+    sc.SYSCOMMAND_SECTION = CSUIMAN::createSection(id, {pos.x-3*width-10-2,pos.y/dimFact,3*width,width},  RGB(5,5,5), {0,0,0,0});
     BIND_GEOM_PARAMS bd = {sc.SYSCOMMAND_SECTION, {-1,0,1,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
     CSUIMAN::bindGeometry(id, bd);
     CSUIMAN::setBorderColorAndThick(sc.SYSCOMMAND_SECTION, RGB(20,20,20), 1);
 
+    width -= 1;
     sc.SYS_MIN = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_min02.bmp\0", "img/_min01.bmp\0", {1,1,width,width});
     sc.SYS_MAX = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_max02.bmp\0", "img/_max01.bmp\0", {1+width,1,width,width});
     sc.SYS_CLOSE = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_close02.bmp\0", "img/_close01.bmp\0", {1+width*2,1,width,width});

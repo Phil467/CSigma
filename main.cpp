@@ -56,25 +56,27 @@ int SYSCOMMAND_SECTION, SYS_CLOSE, SYS_MAX, SYS_MIN, TITLE_SECTION, RIGHT_SECTIO
 
 int ABOUT_UI, ABOUT_UI_CLIENT, ABOUT_UI_BOTTOM, ABOUT_SUB_MENU, ABOUT_P1, ABOUT_P2, ABOUT_P3, ABOUT_P4, ABOUT_PTITLE, ABOUT_PINDEX;
 
+int GA_CLIENT;
 
 int smx = GetSystemMetrics(SM_CXSCREEN);
 int smy = GetSystemMetrics(SM_CYSCREEN);
 // WinMain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
+    CSUIMAN::setSaveAppSizes(0);
     CSUIMAN::_CSIGMA_INIT_(hInstance, forceEventFunction, &forceEventArgs);
 
-    CSUIMAN::setSaveAppSizes(0);
     //float dimFact = GetSystemMetrics(SM_CXSCREEN)*GetSystemMetrics(SM_CYSCREEN)/(1366.0*768);
     float dimFact = 1.5;
     setSizeFactor(dimFact);
     /***************************** Root ********************************** */
 
     ROOT = createSection(-1, {100,25,600,500},  RGB(30,30,30), {1,1,1,1,1,1,1,1});
-    setIcon(sHandle(ROOT), L"icon.ico", L"icon.ico");
+    int ICON_ROOT  = setIcon(ROOT, L"icon.ico", L"icon.ico");
     CSUIMAN::enableDarkEdge(ROOT);
-    /********************************************************************************** */
-    CSUICONTROLS::addTitle(ROOT, L"CSIGMA LIB TEST\0",{150,CAPTION_AREA_SIZE/dimFact}, "img/icon.bmp\0", 22);
+
+    CSUICONTROLS::addTitle(ROOT, L"CSIGMA LIB TEST\0",{150,(CAPTION_AREA_SIZE+10)/dimFact}, "img/icon.bmp\0", 22, L"Arial black");
+    CSSYSCOMMAND_SECTION SYS_CMD = CSUICONTROLS::addSysCommand(ROOT, {600});
 
     /******************************** Tips popup **************************************** */
     CSUICONTROLS::createTipsPupop(RGB(40,40,40));
@@ -89,7 +91,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     
     /*************************************** MIDDLE_SECTION ************************************ */
 
-    MIDDLE_SECTION = createSection(ROOT, {77,CAPTION_AREA_SIZE/dimFact,515,450+20},  RGB(10,40,30), {0,0,0,0});
+    MIDDLE_SECTION = createSection(ROOT, {77,CAPTION_AREA_SIZE/dimFact,515,450+20},  RGB(40,5,5), {0,0,0,0});
 
     bd = {MIDDLE_SECTION, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE|BIND_DEST_RIGHT_EDGE,0}};
     bindGeometry(LEFT_SECTION, 1, bd);
@@ -108,7 +110,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     /***********************************MIDDLE_BOTTOM_SECTION *************************************** */
 
-    MIDDLE_BOTTOM_SECTION = createSection(MIDDLE_SECTION, {1,23,515/2-2,395+25},  RGB(25,25,25), {0,0,0,0});
+    MIDDLE_BOTTOM_SECTION = createSection(MIDDLE_SECTION, {1,23,440,395+25},  RGB(25,25,25), {0,0,0,0});
 
     bd = {MIDDLE_BOTTOM_SECTION, {0,0,0,1}, {0,0, 0, BIND_DEST_TOP_EDGE|BIND_DEST_BOTTOM_EDGE}};
     bindGeometry(MIDDLE_TOP_SECTION, 1, bd);
@@ -116,29 +118,29 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     bindGeometry(ROOT, bd);
     bd = {MIDDLE_BOTTOM_SECTION, {0,0,1,0}, {BIND_DEST_RIGHT_EDGE,0,BIND_DEST_RIGHT_EDGE,0}};
     bindGeometry(MIDDLE_SECTION, bd);
-    bd = {MIDDLE_BOTTOM_SECTION, {0,0,-0.5,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
+    bd = {MIDDLE_BOTTOM_SECTION, {0,0,-1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
     bindGeometry(LEFT_SECTION, bd);
 
     /*************************************** RIGHT_SECTION ************************************ */
 
-    RIGHT_SECTION = createSection(MIDDLE_SECTION, {515/2,23,515/2-1,395+25},  RGB(30,30,30), {1,0,0,0});
+    RIGHT_SECTION = createSection(MIDDLE_SECTION, {442,23,70,395+25},  RGB(30,30,30), {1,0,0,0});
 
     bd = {MIDDLE_BOTTOM_SECTION, {1,0,0,0}, BIND_DEST_RIGHT_EDGE,0,0,0};
     bindGeometry(RIGHT_SECTION, bd);
     bd = {MIDDLE_TOP_SECTION, {0,0,1,0}, 0,0,BIND_DEST_RIGHT_EDGE,0};
     bindGeometry(ROOT, bd);
-    bd = {MIDDLE_BOTTOM_SECTION, {0,0,1,0}, 0,0,BIND_DEST_RIGHT_EDGE,0};
+    bd = {MIDDLE_BOTTOM_SECTION, {-1,0,1,0}, BIND_DEST_RIGHT_EDGE,0,BIND_DEST_RIGHT_EDGE,0};
     bindGeometry(ROOT, bd);
-    bd = {MIDDLE_SECTION, {0,0,1,0}, 0,0,BIND_DEST_RIGHT_EDGE,0};
-    bindGeometry(ROOT, bd);
+    /*bd = {MIDDLE_SECTION, {0,0,1,0}, 0,0,BIND_DEST_RIGHT_EDGE,0};
+    bindGeometry(ROOT, bd);*/
     bd = {RIGHT_SECTION, {0,0,0,1}, {0,0, 0, BIND_DEST_TOP_EDGE|BIND_DEST_BOTTOM_EDGE}};
     bindGeometry(MIDDLE_TOP_SECTION, 1, bd);
-    bd = {RIGHT_SECTION, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE,BIND_DEST_BOTTOM_EDGE,
+    bd = {RIGHT_SECTION, {-1,-1,1,1}, {BIND_DEST_LEFT_EDGE,BIND_DEST_BOTTOM_EDGE,
                                        BIND_DEST_LEFT_EDGE,BIND_DEST_BOTTOM_EDGE
                                       }
          };
     bindGeometry(ROOT, bd);
-    bd = {RIGHT_SECTION, {0,0,-0.5,0}, {0,0,BIND_DEST_RIGHT_EDGE_OPP|BIND_DEST_LEFT_EDGE,0}};
+    bd = {RIGHT_SECTION, {0,0,-1,0}, {0,0,BIND_DEST_LEFT_EDGE,0}};
     bindGeometry(LEFT_SECTION, bd);
 
     CSUIMAN::updateAfterReceivingResizeMessage(RIGHT_SECTION);
@@ -221,8 +223,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     /********************************************************************************** */
 
-    CSSYSCOMMAND_SECTION SYS_CMD= CSUICONTROLS::addSysCommand(ROOT, {600});
-
     CS_NUMERIC_INCREMENTER_PARAMS fontSizeInc = CSUICONTROLS::numericIncrementerExt1(ROOT, {600-120,0,65,16}, L"16", L"1", INPUT_FORMAT_INTERGER,
                                                             {-1,0,1,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0});
     fontSizeInc.setMinBound("8");
@@ -263,7 +263,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     //ABOUT_UI = createSection(-1, {100,25,600,500},  RGB(0,0,0), {1,1,1,1,1,1,1,1}, 1, 1);
     ABOUT_UI = createSection(0, {100,25,600,500},  RGB(40,40,40), {1,1,1,1,1,1,1,1}, 0, 1, 0);
     CSUIMAN::enableDarkEdge(ABOUT_UI);
-    CSUICONTROLS::addTitle(ABOUT_UI, L"About",{60,CAPTION_AREA_SIZE/dimFact}, "img/About01.bmp");
+    CSUIMAN::setIcon(ABOUT_UI, ICON_ROOT);
+    CSUICONTROLS::addTitle(ABOUT_UI, L"About",{60,CAPTION_AREA_SIZE/dimFact}, "img/About01.bmp", 20, L"Arial black");
 
     ABOUT_UI_CLIENT = createSection(ABOUT_UI, {10/dimFact,CAPTION_AREA_SIZE/dimFact,590-10/dimFact,500-CAPTION_AREA_SIZE/dimFact-10-20},  RGB(0,0,0), {0}, 1);
     bd = {ABOUT_UI_CLIENT, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE, BIND_DEST_BOTTOM_EDGE,
@@ -275,7 +276,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
                                         BIND_DEST_RIGHT_EDGE, BIND_DEST_TOP_EDGE}};
     bindGeometry(ABOUT_UI, bd);
 
-    CSUIMAN::setTitle(ABOUT_UI_BOTTOM, CSTEXT{.Text=L"Resume 1 : Mining ingineer", .Font=L"calibri", .FontSize = 16, .Italic=0,
+    CSUIMAN::setTitle(ABOUT_UI_BOTTOM, CSTEXT{.Text=L"CSigma logo", .Font=L"calibri", .FontSize = 16, .Italic=0,
                                    .Bold=0, .Color={180,180,180},
                                    .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1});
 
@@ -489,46 +490,51 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     dst.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri light", .FontSize = 16, .Italic=0,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     dst.pSpace.push_back(12);
-    dst.view = 1;
+    dst.view = 0;
     csGraphics::setDynamicSimpleText(MIDDLE_BOTTOM_SECTION, dst);
 
+    GA_CLIENT = MIDDLE_BOTTOM_SECTION;
+    
+    int idImg1 = csGraphics::loadImage(GA_CLIENT, L"img/csigma logo.bmp", {1,1}, {0,0});
+    SIZE size1 = csGraphics::getImageSize(GA_CLIENT, idImg1);
+    SIZE newSize1 = {size1.cx-200*4, size1.cy-200*4};
+    csGraphics::setImageSize(GA_CLIENT, idImg1, newSize1);
+    csGraphics::setImagePos(GA_CLIENT, idImg1, {200, 200});
+    csGraphics::showImage(GA_CLIENT, idImg1, {0,0}, newSize1);
+
+    int idImg2 = csGraphics::loadImage(GA_CLIENT, L"img/search02.bmp", {0,0}, {0,0});
+    SIZE size2 = csGraphics::getImageSize(GA_CLIENT, idImg2);
+    SIZE newSize2 = {size2.cx*10, size2.cy*10};
+    csGraphics::setImageSize(GA_CLIENT, idImg2, newSize2);
+    csGraphics::showImage(GA_CLIENT, idImg2);
+
+    int fact = std::max(ceil(1.0*size1.cx/smx), ceil(1.0*size1.cy/smy));
+    SIZE gaSize = {fact*smx, fact*smy};
+    csGraphics::setGraphicAreaColor(GA_CLIENT, {10,10,10}, {0});
+    csGraphics::setGraphicAreaSize(GA_CLIENT, gaSize);
+    csGraphics::updateGraphicArea(GA_CLIENT, 1);
+
+    //csGraphics::showImage(GA_CLIENT, idImg1, {0}, {0}, 0);
+    //csGraphics::showImage(GA_CLIENT, idImg2, {0}, {0}, 0);
 
     /*********************************************************** */
 
     //RIGHT_SECTION_CHILD = createSection(RIGHT_SECTION, {5,0,1500/dimFact,1000/dimFact},  RGB(30,30,30), {0,0,0,0});
-    RIGHT_SECTION_CHILD = RIGHT_SECTION;
 
-    CSSCROLLBAR hscroll2 = CSUICONTROLS::addHScrollBar(&RIGHT_SECTION, &RIGHT_SECTION_CHILD, 0, 10);
-    CSSCROLLBAR vscroll2 = CSUICONTROLS::addVScrollBar(&RIGHT_SECTION, &RIGHT_SECTION_CHILD, 0, 10);
+    CSSCROLLBAR hscroll2 = CSUICONTROLS::addHScrollBar(&RIGHT_SECTION, &RIGHT_SECTION, 0, 10);
+    CSSCROLLBAR vscroll2 = CSUICONTROLS::addVScrollBar(&RIGHT_SECTION, &RIGHT_SECTION, 0, 10);
 
     hscroll2.setViewFrameBottomMarging(10);
     vscroll2.setViewFrameRightMarging(10);
-    csGraphics::setHzoom(RIGHT_SECTION_CHILD, 1);
-    csGraphics::setVzoom(RIGHT_SECTION_CHILD, 1);
-
-    int idImg1 = csGraphics::loadImage(RIGHT_SECTION_CHILD, L"img/csigma logo.bmp", {1,1}, {0,0});
-    SIZE size1 = csGraphics::getImageSize(RIGHT_SECTION_CHILD, idImg1);
-    SIZE newSize1 = {size1.cx-200*4, size1.cy-200*4};
-    csGraphics::setImageSize(RIGHT_SECTION_CHILD, idImg1, newSize1);
-    csGraphics::setImagePos(RIGHT_SECTION_CHILD, idImg1, {200, 200});
-    csGraphics::showImage(RIGHT_SECTION_CHILD, idImg1, {200,200}, newSize1);
-
-    int idImg2 = csGraphics::loadImage(RIGHT_SECTION_CHILD, L"img/search02.bmp", {300,500}, {0,0});
-    SIZE size2 = csGraphics::getImageSize(RIGHT_SECTION_CHILD, idImg2);
-    SIZE newSize2 = {size2.cx*10, size2.cy*10};
-    csGraphics::setImageSize(RIGHT_SECTION_CHILD, idImg2, newSize2);
-    csGraphics::showImage(RIGHT_SECTION_CHILD, idImg2);
-
-    int fact = std::max(ceil(1.0*size1.cx/smx), ceil(1.0*size1.cy/smy));
-    SIZE gaSize = {fact*smx, fact*smy};
-    csGraphics::setGraphicAreaColor(RIGHT_SECTION_CHILD, {10,10,10}, {0});
-    csGraphics::setGraphicAreaSize(RIGHT_SECTION_CHILD, gaSize);
-    csGraphics::updateGraphicArea(RIGHT_SECTION_CHILD, 1);
+    csGraphics::setHzoom(RIGHT_SECTION, 1);
+    csGraphics::setVzoom(RIGHT_SECTION, 1);
 
     hscroll2.setPositionRatio(0);
     vscroll2.setPosition(100);
 
-    CSLISTBOXMIN* lbm = csNewMinimalListBoxPtr(&RIGHT_SECTION_CHILD, 100, 85);
+
+
+    CSLISTBOXMIN* lbm = csNewMinimalListBoxPtr(&RIGHT_SECTION, 100, 85);
     lbm->setDefaultFont(L"calibri",{12,0});
     lbm->setItemAlign(CS_ALIGN_VERTICAL);
     lbm->setOffset({1,1});
@@ -645,3 +651,4 @@ void setFontSize(CSARGS Args)
         csGraphics::updateGraphicArea(idGaphicArea,0);
     }
 }
+

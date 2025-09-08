@@ -236,7 +236,9 @@ bool CSUIMAN::addAction(int id, void(*f)(CSARGS), int nbArgs, ...)
     return 1;
 }
 
-void CSUIMAN::setIcon(HWND hwnd, wchar_t*pathSmallIcon, wchar_t*pathBigIcon)
+extern vector<CSAPP_ICON> appIcon;
+
+int CSUIMAN::setIcon(int id, wchar_t*pathSmallIcon, wchar_t*pathBigIcon)
 {
     HICON hIcon = (HICON)LoadImageW(
                       NULL,
@@ -252,11 +254,23 @@ void CSUIMAN::setIcon(HWND hwnd, wchar_t*pathSmallIcon, wchar_t*pathBigIcon)
                        0, 0,                   // Taille (0 = taille par d�faut)
                        LR_LOADFROMFILE | LR_DEFAULTSIZE | LR_SHARED
                    );
-    if (hIcon)
+
+    if (hIcon && hIcon2)
     {
-        SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-        SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon2);
+        SendMessage(SECTION[id], WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+        SendMessage(SECTION[id], WM_SETICON, ICON_BIG, (LPARAM)hIcon2);
+
+        appIcon.push_back({hIcon, hIcon2});
+
     }
+    
+    return appIcon.size()-1;
+}
+
+void CSUIMAN::setIcon(int id, int idIcon)
+{
+    SendMessage(SECTION[id], WM_SETICON, ICON_SMALL, (LPARAM)appIcon[idIcon].smallIcon);
+    SendMessage(SECTION[id], WM_SETICON, ICON_BIG, (LPARAM)appIcon[idIcon].bigIcon);
 }
 
 HWND CSUIMAN::sHandle(int id)

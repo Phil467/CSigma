@@ -14,7 +14,7 @@ extern vector<CSTEXT> TITLE;
 extern bool CLICK_EFFECT_BOOL;
 
 HFONT font = CreateFontW(
-                 -16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+                 -14, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
                  ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
                  DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, L"Segoe UI Emoji" //Segoe UI Emoji
                  );

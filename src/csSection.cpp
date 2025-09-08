@@ -103,8 +103,9 @@ vector<vector<CSARGS>> GROUPED_EVENTS_ARGS;
 vector<CSDYNAMIC_SIMPLE_TEXT> dynSimpleText;
 vector<CSZOOM_PARAMS> zoomParams;
 vector<bool> updateAfterResizeMsg;
-
+vector<CSAPP_ICON> appIcon;
 extern vector<bool> updateTitleSectionBool;
+
 
 HINSTANCE _hInstance;
 HWND hwndBtnDown;
@@ -1409,6 +1410,8 @@ void endSizeMove(int id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n)
     unSetSizeMoveWaitList(sizeBind);
 }
 
+int delayVal = 500;
+
 void geometryBinding(int& _id)
 {
     if(SECTION[_id] == hwndBtnDown)
@@ -1436,7 +1439,7 @@ void geometryBinding(int& _id)
                     sizeMoveCore(*id, lSizeBind[*id], n, deltaPos.x);
                     endThread(id, lSizeBind[*id], n, a);
 
-                    delay(1000);
+                    delay(delayVal);
                 }
 
             }
@@ -1466,7 +1469,7 @@ void geometryBinding(int& _id)
 
                     sizeMoveCore(*id, tSizeBind[*id], n, deltaPos.y);
                     endThread(id, tSizeBind[*id], n, a);
-                    delay(1000);
+                    delay(delayVal+5);
                 }
 
             }
@@ -1496,7 +1499,7 @@ void geometryBinding(int& _id)
 
                         sizeMoveCore(*id, rSizeBind[*id], n, deltaSize.cx);
                         endThread(id, rSizeBind[*id], n, a);
-                        delay(1000);
+                        delay(delayVal-1);
                     }
 
                 }
@@ -1525,7 +1528,7 @@ void geometryBinding(int& _id)
                     POINT deltaPos = DELTAPOS[*id];
                     sizeMoveCore(*id, bSizeBind[*id], n, deltaSize.cy);
                     endThread(id, bSizeBind[*id], n, a);
-                    delay(1000);
+                    delay(delayVal-2);
                 }
 
             }
@@ -1577,7 +1580,7 @@ void sizeMoveWaitListExecute(int id)
                     break;
                 }
             }
-            delay(1000);
+            delay(delayVal+1);
         }
     }
     );

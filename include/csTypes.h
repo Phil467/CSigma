@@ -387,6 +387,11 @@ typedef struct
     char* minBound, *maxBound;
 }CS_RICHEDIT_NUMERIC_BOUNDS;
 
+typedef struct
+{
+    HICON smallIcon, bigIcon;
+}CSAPP_ICON;
+
 template<class T> vector<T> newVector()
 {
     vector<T> v;

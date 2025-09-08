@@ -38,7 +38,7 @@ void updateBackground(int id);
 
 CSGRAPHIC_CONTEXT viewImage(int id, wchar_t*path, POINT position, SIZE size);
 int loadImage(int id, wchar_t*path, POINT position, SIZE size);
-void showImage(int id, int idEnt, POINT posCrop={0}, SIZE sizeCrop={0});
+void showImage(int id, int idEnt, POINT posCrop={0}, SIZE sizeCrop={0}, bool show=1);
 POINT getImagePos(int id, int idEnt);
 SIZE getImageSize(int id, int idEnt);
 SIZE getImageOriginalSize(int id, int idEnt);
