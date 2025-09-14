@@ -40,7 +40,7 @@ class CSTRANSLATOR
 };
 
 class CSJSONPARSER 
-{
+{   
     private:
     std::string jsonData;
     size_t pos;
@@ -119,11 +119,11 @@ class CSAITRANSLATOR
     std::string performTranslation(const std::string& text, const TranslationConfig& config);
 
     private:
-    std::string CSAITRANSLATOR::prepareEnrichedText(const std::string& originalText, const TranslationConfig& config);
-    std::string CSAITRANSLATOR::sendHttpRequest(const std::string& endpoint, const std::string& jsonData);
-    std::string CSAITRANSLATOR::readHttpResponse(HINTERNET hRequest);
-    std::string CSAITRANSLATOR::postProcessTranslation(const std::string& translatedText);
-    void CSAITRANSLATOR::parseUrl(const std::string& url, std::string& hostname, std::string& path, int& port);
+    std::string prepareEnrichedText(const std::string& originalText, const TranslationConfig& config);
+    std::string sendHttpRequest(const std::string& endpoint, const std::string& jsonData);
+    std::string readHttpResponse(HINTERNET hRequest);
+    std::string postProcessTranslation(const std::string& translatedText);
+    void parseUrl(const std::string& url, std::string& hostname, std::string& path, int& port);
 
 };
 

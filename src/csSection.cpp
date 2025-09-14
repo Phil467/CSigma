@@ -67,7 +67,7 @@ vector<CSRGBA> hdcontextExtBkgColor;
 vector<CSRGBA> hdcontextExtBrdColor;
 vector<vector<CSGRAPHIC_CONTEXT>> imageGradients;
 vector<vector<CSGRAPHIC_ENTITY>> entity;
-vector<CSENTITY_ID_MAP> map;
+vector<CSENTITY_ID_MAP> entityMap;
 vector<bool> bltUpdate;
 vector<bool> attached;
 
@@ -219,7 +219,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
     CLICKGRADIENTCOUNT.push_back(INT_MAX);
     cursor.push_back(LoadCursor(0,IDC_ARROW));
     entity.push_back(newVector<CSGRAPHIC_ENTITY>());
-    map.push_back({newVector<long>(),0,0});
+    entityMap.push_back({newVector<long>(),0,0});
     bltUpdate.push_back(0);
 
 

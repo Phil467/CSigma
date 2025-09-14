@@ -539,12 +539,12 @@ void CSAITRANSLATOR::setUserInstructions(const std::string& instructions)
 
 // Méthode principale de traduction avec configuration détaillée
 std::string CSAITRANSLATOR::translate(const std::string& text, 
-                        const std::string& sourceLang = "auto",
-                        const std::string& targetLang = "en",
-                        const std::string& customInstructions = "",
-                        const std::string& tone = "general",
-                        const std::string& domain = "general",
-                        bool preserveFormatting = true) {
+                        const std::string& sourceLang,
+                        const std::string& targetLang,
+                        const std::string& customInstructions,
+                        const std::string& tone,
+                        const std::string& domain,
+                        bool preserveFormatting) {
     
     TranslationConfig config;
     config.sourceLanguage = sourceLang;
@@ -570,7 +570,7 @@ std::string CSAITRANSLATOR::translateContextual(const std::string& text,
                                 const std::string& sourceLang,
                                 const std::string& targetLang,
                                 const std::string& context,
-                                const std::string& domain = "general") {
+                                const std::string& domain) {
     
     std::string contextualInstructions = "Contexte: " + context + 
                                         ". Domaine: " + domain + 

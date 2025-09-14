@@ -22,7 +22,7 @@ extern vector<SIZE> hdcSize;
 extern vector<HBITMAP> hdBmpExt;
 extern vector<CSRGBA> hdcontextExtBkgColor;
 extern vector<CSRGBA> hdcontextExtBrdColor;
-extern vector<CSENTITY_ID_MAP> map;
+extern vector<CSENTITY_ID_MAP> entityMap;
 extern vector<vector<CSGRAPHIC_ENTITY>> entity;
 
 extern vector<float> hZoom;
@@ -545,14 +545,14 @@ void csGraphics::setMap(int id, SIZE size)
     
     int n = size.cx*size.cy;
 
-    map[id].ids = vector<long>(n,-1);
-    map[id].size = size;
+    entityMap[id].ids = vector<long>(n,-1);
+    entityMap[id].size = size;
 }
 
 void csGraphics::mapImageEntity(int id, int idEnt)
 {
     
-    if(map[id].ids.size())
+    if(entityMap[id].ids.size())
     {
         int idImg = entity[id][idEnt].tid;
         SIZE size = loadedImage[id][idImg].outSize;
@@ -562,13 +562,13 @@ void csGraphics::mapImageEntity(int id, int idEnt)
         int ny = size.cy;
         long l;
 
-        //int n = map[id].size.cx * map[id].size.cy;
-        int nxm = map[id].size.cx;
-        int nym = map[id].size.cy;
+        //int n = entityMap[id].size.cx * entityMap[id].size.cy;
+        int nxm = entityMap[id].size.cx;
+        int nym = entityMap[id].size.cy;
         int px = position.x;
         int py = position.y;
 
-        vector<long>& v = map[id].ids;
+        vector<long>& v = entityMap[id].ids;
         
         for(int j=py; j<ny; j++)
         {

@@ -1,5 +1,6 @@
 #include "csFilesMan.h"
 #include "readwfile.h"
+#include "csTranslator.h"
 
 extern vector<HWND> SECTION;
 extern vector<RECT> RECTPARREFSAVED;
@@ -10,7 +11,7 @@ wchar_t* appSizesFilePath = L"appSizes.txt\0";
 extern bool saveAppSizes;
 
 wchar_t* appTitleParamsFilePath = L"lang/titles/prm.txt\0";
-wchar_t* appTitleFilePath = L"lang/titles/ZH-CN.txt\0";
+wchar_t* appTitleFilePath = L"lang/titles/tr.txt\0";
 vector<CSTEXT> TITLEFILE;
 vector<bool> setTitleInit;
 bool saveAppTitles;
