@@ -342,8 +342,8 @@ void csLISTBOX::_drawText(HDC dc, wchar_t* text, POINT pos, CSRGBA color, csLIST
 {
     HFONT font = CreateFontW(
     fontPar.size, 0, fontPar.angle, 0, fontPar.weight, fontPar.italic, fontPar.underlined, FALSE,
-    ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-    DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, fontPar.name //Segoe UI Emoji
+    DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+    DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, fontPar.name //Segoe UI Emoji
     );
     SelectFont(dc, font);
     SetBkMode(dc, TRANSPARENT);

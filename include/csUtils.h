@@ -52,8 +52,8 @@ using namespace  std;
 namespace CSUIMAN
 {
 
-void _CSIGMA_INIT_(HINSTANCE hInstance, void(*forceEventFunc)(CSARGS)=0, CSARGS* forceEventArgs=0);
-int _CSIGMA_SOFTWARE_();
+void _CSIGMA_APP_INIT_(HINSTANCE hInstance, void(*forceEventFunc)(CSARGS)=0, CSARGS* forceEventArgs=0);
+int _CSIGMA_APP_CREATE_();
 void __setAllRects();
 int createSection(int id, RECT geom,  COLORREF color, BOOL_RECT edgeResize, bool show=1, bool isRoot=0, bool attach=1);
 bool addAction(int id, void(*f)(CSARGS), CSARGS& args);
@@ -68,7 +68,7 @@ RECT sRectParentContextStatic(int id);
 RECT sRectClient(int id);
 POINT sDeltaPos(int id);
 SIZE sDeltaSize(int id);
-void setTitle(int id, CSTEXT title);
+void setTitle(int id, CSTEXT title, bool textOnly=0);
 void setBorderThick(int id, int thick);
 void setBorderColorAndThick(int id, COLORREF color, int thick);
 void inert(int id, BYTE alphaLevel=255);
@@ -113,12 +113,9 @@ void setLockable(int id, CSLOCKED_MODE lm);
 void updateAfterReceivingResizeMessage(int id);
 void addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT message);
 void enableDarkEdge(int id);
-void __saveAppSizes(wchar_t* filePath);
-void __getAppSizes(wchar_t* filePath);
-void __setAppSizes();
+
 void _updateApp(int id);
 
-void setSaveAppSizes(bool b);
 }
 
 namespace CSUTILS
@@ -148,11 +145,9 @@ int unilineTextToPolylineText(wchar_t*_str, HFONT hf, int maxLength, vector<wcha
 bool signExtraction(char*& strNumeric);
 bool signExtraction(const char* strNumeric, char*& ret);
 
-wchar_t* makeWcharString(const wchar_t* str);
-
 void drawGDIRectangle(HDC dc, COLORREF brush, COLORREF pen, int border, RECT r);
 CSRGBA toRGBA(long color);
-bool fileExists(const wchar_t* filename);
+
 bool directoryExists(const wchar_t* dirname) ;
 bool pathExists(const wchar_t* path) ;
 

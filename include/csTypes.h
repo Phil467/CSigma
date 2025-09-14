@@ -172,6 +172,11 @@ typedef struct
         Text = (wchar_t*)realloc(Text, (strlen(str)+1)*sizeof(wchar_t));
         wsprintf(Text, L"%s\0", str);
     }*/
+   void clear()
+   {
+        free(Text);
+        free(Font);
+   }
 } CSTEXT;
 
 typedef struct BOOL_RECT

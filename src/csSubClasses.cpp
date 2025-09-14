@@ -15,8 +15,8 @@ extern bool CLICK_EFFECT_BOOL;
 
 HFONT font = CreateFontW(
                  -14, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
-                 ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
-                 DEFAULT_QUALITY, DEFAULT_PITCH | FF_SWISS, L"Segoe UI Emoji" //Segoe UI Emoji
+                 DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS,
+                 DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"Segoe UI Emoji" //Segoe UI Emoji
                  );
 
 int getId(HWND hwnd, vector<HWND> v)

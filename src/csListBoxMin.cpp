@@ -35,6 +35,8 @@ void startCutPaste(CSARGS Args);
 void endCutPaste(CSARGS Args);
 void makeCutPaste(CSARGS Args);
 
+using namespace CSSTRUTILS;
+
 CSLISTBOXMIN* csNewMinimalListBoxPtr(int* idp, int gridStyle, int _gridWidth)
 {
     CSLISTBOXMIN rb(idp, gridStyle, _gridWidth);
@@ -283,17 +285,17 @@ void CSLISTBOXMIN::setTitles(wchar_t* ids[], wchar_t* _title[], int n)
 void CSLISTBOXMIN::setFont(int id, wchar_t* fnt, SIZE size)
 {
     if(textOrientation == CS_RDBTN_TEXT_H)
-        font[id] = CreateFontW(getAdjustedFontSizeX(size.cx),getAdjustedFontSizeY(size.cy), 0, 0, FW_THIN,FALSE,FALSE,FALSE,ANSI_CHARSET,
-                            OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
-                          DEFAULT_PITCH|FF_SWISS, (LPCWSTR)fnt);
+        font[id] = CreateFontW(getAdjustedFontSizeX(size.cx),getAdjustedFontSizeY(size.cy), 0, 0, FW_THIN,FALSE,FALSE,FALSE,DEFAULT_CHARSET,
+                            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+                          DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)fnt);
     else if(textOrientation == CS_RDBTN_TEXT_V1)
-        font[id] = CreateFontW(getAdjustedFontSizeX(size.cx),getAdjustedFontSizeY(size.cy), 900, 0, FW_THIN,FALSE,FALSE,FALSE,ANSI_CHARSET,
-                            OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
-                          DEFAULT_PITCH|FF_SWISS, (LPCWSTR)fnt);
+        font[id] = CreateFontW(getAdjustedFontSizeX(size.cx),getAdjustedFontSizeY(size.cy), 900, 0, FW_THIN,FALSE,FALSE,FALSE,DEFAULT_CHARSET,
+                            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+                          DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)fnt);
     else if(textOrientation == CS_RDBTN_TEXT_V2)
-        font[id] = CreateFontW(getAdjustedFontSizeX(size.cx),getAdjustedFontSizeY(size.cy), -900, 0, FW_THIN,FALSE,FALSE,FALSE,ANSI_CHARSET,
-                            OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
-                          DEFAULT_PITCH|FF_SWISS, (LPCWSTR)fnt);
+        font[id] = CreateFontW(getAdjustedFontSizeX(size.cx),getAdjustedFontSizeY(size.cy), -900, 0, FW_THIN,FALSE,FALSE,FALSE,DEFAULT_CHARSET,
+                            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+                          DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)fnt);
     fontSize = size;
 }
 
@@ -301,17 +303,17 @@ void CSLISTBOXMIN::setDefaultFont(wchar_t* fnt, SIZE size)
 {
     DeleteFont(dfltFont);
     if(textOrientation == CS_RDBTN_TEXT_H)
-        dfltFont = CreateFontW(getAdjustedFontSizeX(size.cx),getAdjustedFontSizeY(size.cy), 0, 0, FW_THIN,FALSE,FALSE,FALSE,ANSI_CHARSET,
-                            OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
-                          DEFAULT_PITCH|FF_SWISS, (LPCWSTR)fnt);
+        dfltFont = CreateFontW(getAdjustedFontSizeX(size.cx),getAdjustedFontSizeY(size.cy), 0, 0, FW_THIN,FALSE,FALSE,FALSE,DEFAULT_CHARSET,
+                            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+                          DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)fnt);
     else if(textOrientation == CS_RDBTN_TEXT_V1)
-        dfltFont = CreateFontW(getAdjustedFontSizeX(size.cx),getAdjustedFontSizeY(size.cy), 900, 0, FW_THIN,FALSE,FALSE,FALSE,ANSI_CHARSET,
-                            OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
-                          DEFAULT_PITCH|FF_SWISS, (LPCWSTR)fnt);
+        dfltFont = CreateFontW(getAdjustedFontSizeX(size.cx),getAdjustedFontSizeY(size.cy), 900, 0, FW_THIN,FALSE,FALSE,FALSE,DEFAULT_CHARSET,
+                            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+                          DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)fnt);
     else if(textOrientation == CS_RDBTN_TEXT_V2)
-        dfltFont = CreateFontW(getAdjustedFontSizeX(size.cx),getAdjustedFontSizeY(size.cy), -900, 0, FW_THIN,FALSE,FALSE,FALSE,ANSI_CHARSET,
-                            OUT_OUTLINE_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
-                          DEFAULT_PITCH|FF_SWISS, (LPCWSTR)fnt);
+        dfltFont = CreateFontW(getAdjustedFontSizeX(size.cx),getAdjustedFontSizeY(size.cy), -900, 0, FW_THIN,FALSE,FALSE,FALSE,DEFAULT_CHARSET,
+                            OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_QUALITY,
+                          DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)fnt);
     fontSize = size;
 }
 
@@ -839,7 +841,7 @@ void CSLISTBOXMIN::newFilePath(wchar_t* filter, unsigned iconId)
         wchar_t* p = szFile + n + 1;
         if (*p == '\0')
         {
-            filePath.insertEnd(CSUTILS::makeWcharString(szFile));
+            filePath.insertEnd(makeWcharString(szFile));
             csLIST<wchar_t> chlist = filePath.toListW(filePath.size()-1);
             int i = chlist.findLast('\\');
             if(i > -1)
@@ -856,7 +858,7 @@ void CSLISTBOXMIN::newFilePath(wchar_t* filter, unsigned iconId)
             while (*p)
             {
                 std::wstring fullPath = folder + L"\\" + p;
-                filePath.insertEnd(CSUTILS::makeWcharString(fullPath.c_str()));
+                filePath.insertEnd(makeWcharString(fullPath.c_str()));
                 filePathID.insertEnd(title.size());
                 newItem(p,1,iconId);
                 p += wcslen(p) + 1;

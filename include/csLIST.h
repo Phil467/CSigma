@@ -42,13 +42,13 @@ template<class TYPE> class csLIST
 {
     private:
         TYPE*DataTab;
-        int length, iLength, inc;
+        int memSize, tabSize, inc;
     public:
         csLIST()
         {
             DataTab=0;
-            length=0;
-            iLength=0;
+            memSize=0;
+            tabSize=0;
             inc=2;
         }
         /*~csLIST()
@@ -58,11 +58,11 @@ template<class TYPE> class csLIST
         }*/
     int size()
     {
-        return iLength;
+        return tabSize;
     }
     int*sizePtr()
     {
-        return &iLength;
+        return &tabSize;
     }
     TYPE & operator[](int i)
     {
@@ -75,31 +75,31 @@ template<class TYPE> class csLIST
     void init(int memsize, int _inc=2)
     {
         DataTab=0;
-        length=0;
-        iLength=0;
+        memSize=0;
+        tabSize=0;
         inc=_inc;
 
         if(memsize>0)
-        {   iLength=0;
+        {   tabSize=0;
             DataTab = (TYPE*)malloc(memsize*sizeof(TYPE));
             if(!DataTab) std::cout<<"Memory allocation error!\n";
-            else length=memsize;
+            else memSize=memsize;
         }
         else std::cout<<"The size most be upper than 0!\n";
     }
     void initForce(int memsize, int _inc=2)
     {
         DataTab=0;
-        length=0;
-        iLength=0;
+        memSize=0;
+        tabSize=0;
         inc=_inc;
 
         if(memsize>0)
-        {   iLength=memsize;
+        {   tabSize=memsize;
             int l;
             DataTab = (TYPE*)malloc((l = memsize+_inc)*sizeof(TYPE));
             if(!DataTab) std::cout<<"Memory allocation error!\n";
-            else length = l;
+            else memSize = l;
         }
         else std::cout<<"The size most be upper than 0!\n";
     }
@@ -111,49 +111,49 @@ template<class TYPE> class csLIST
             if(!DataTab) std::cout<<"Memory allocation error!\n";
             else
             {
-                length=size;
+                memSize=size;
                 for(int i=0; i<size; i++)
                 {
                     DataTab[i] = data;
                 }
-                iLength=size;
+                tabSize=size;
             }
         }
         else std::cout<<"The size most be upper than 0!\n";
     }
     void insertEnd(TYPE data)
     {
-        if(!length) init(1);
-        if(iLength>=length)
-        {   length+=inc;
+        if(!memSize) init(1);
+        if(tabSize>=memSize)
+        {   memSize+=inc;
 
-            TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+            TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
             if(!tmp)
             {
                 free(DataTab);
             }
             else DataTab=tmp;
         }
-        DataTab[iLength++]=data;
+        DataTab[tabSize++]=data;
     }
     void insertEnd2(TYPE data, size_t memsz)
     {
-        if(!length) init(1);
-        if(iLength>=length)
-        {   length+=memsz;
-            TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+        if(!memSize) init(1);
+        if(tabSize>=memSize)
+        {   memSize+=memsz;
+            TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
             if(!tmp)
                 free(DataTab);
             else DataTab=tmp;
         }
-        DataTab[iLength++]=data;
+        DataTab[tabSize++]=data;
     }
     void insertBegin(TYPE data)
     {
-        if(!length) init(1);
-        if(iLength>=length)
-        {   length+=inc;
-            TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+        if(!memSize) init(1);
+        if(tabSize>=memSize)
+        {   memSize+=inc;
+            TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
             if(!tmp)
             {   free(DataTab);
                 std::cout<<"Memory allocation error!\n";
@@ -161,143 +161,143 @@ template<class TYPE> class csLIST
             else DataTab=tmp;
         }
 
-        for(int i=iLength-1; i>=0; i--)
+        for(int i=tabSize-1; i>=0; i--)
         {   DataTab[i+1]=DataTab[i];
         }
         DataTab[0]=data;
-        iLength++;
+        tabSize++;
     }
     void insertAt(TYPE data, int position)
     {
-        if(!length) init(1);
-        if(position<=iLength)
-        {   if(iLength>=length)
-            {   length+=inc;
-                TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+        if(!memSize) init(1);
+        if(position<=tabSize)
+        {   if(tabSize>=memSize)
+            {   memSize+=inc;
+                TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
                 if(!tmp)
                 {   free(DataTab);
                     std::cout<<"Memory allocation error!\n";
                 }
                 else DataTab=tmp;
             }
-            for(int i=iLength-1; i>=position; i--)
+            for(int i=tabSize-1; i>=position; i--)
                 DataTab[i+1]=DataTab[i];
 
             DataTab[position]=data;
-            iLength++;
+            tabSize++;
         }
         else
         {
-            length+=position-iLength+1;
-            TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+            memSize+=position-tabSize+1;
+            TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
             if(!tmp)
             {   free(DataTab);
                 std::cout<<"Memory allocation error!\n";
             }
             else DataTab=tmp;
 
-            /*for(int i=iLength; i<position; i++)
+            /*for(int i=tabSize; i<position; i++)
                 DataTab[i]=zero;*/
 
             DataTab[position]=data;
-            iLength = position +1;
+            tabSize = position +1;
             std::cout<<"Warning : Position larger than table size.\n";
             std::cout<<"This could cause problems!\n";
         }
     }
     void insertTableAt(TYPE* data, int position, int size)
     {
-        if(!length) init(1);
-        if(position<=iLength)
+        if(!memSize) init(1);
+        if(position<=tabSize)
         {
-            if(iLength>=length-size)
+            if(tabSize>=memSize-size)
             {
-                //iLength = iLength|1; // si iLength = 0, iLength = 1;
-                length = iLength + size +1;
-                TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+                //tabSize = tabSize|1; // si tabSize = 0, tabSize = 1;
+                memSize = tabSize + size +1;
+                TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
                 if(!tmp)
                 {   free(DataTab);
                     std::cout<<"Memory allocation error!\n";
                 }
                 else DataTab=tmp;
             }
-            if(iLength == 0)
+            if(tabSize == 0)
             {
                 for(int i=0, j=0; i<size; i++, j++)
                     DataTab[i]=data[j];
-                iLength+=size;
+                tabSize+=size;
             }
             else
             {
-                for(int i=iLength-1; i>=position; i--)
+                for(int i=tabSize-1; i>=position; i--)
                     DataTab[i+size]=DataTab[i];
 
                 int sz=position+size;
                 for(int i=position, j=0; i<sz; i++, j++)
                     DataTab[i]=data[j];
-                iLength+=size;
+                tabSize+=size;
             }
         }
         else
         {
-            if(!length) init(1);
-            length+=position-iLength+size+1;
-            TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+            if(!memSize) init(1);
+            memSize+=position-tabSize+size+1;
+            TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
             if(!tmp)
             {   free(DataTab);
                 std::cout<<"Memory allocation error!\n";
             }
             else DataTab=tmp;
 
-            /*for(int i=iLength; i<position; i++)
+            /*for(int i=tabSize; i<position; i++)
                 DataTab[i]=zero;*/
 
             int sz=position+size;
             for(int i=position; i<sz; i++)
                 DataTab[i]=data[i-position];
-            iLength = position + size;
+            tabSize = position + size;
             std::cout<<"Warning : Position larger than table size.\n";
             std::cout<<"This could cause problems!\n";
         }
     }
     void insertTablePartAt(int position, TYPE* data, int begin, int size)
     {
-        if(!length) init(1);
-        if(position<=iLength)
-        {   if(iLength>=length-size)
-            {   length+=size+1;
-                TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+        if(!memSize) init(1);
+        if(position<=tabSize)
+        {   if(tabSize>=memSize-size)
+            {   memSize+=size+1;
+                TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
                 if(!tmp)
                 {   free(DataTab);
                     std::cout<<"Memory allocation error!\n";
                 }
                 else DataTab=tmp;
             }
-            for(int i=iLength; i>=position; i--)
+            for(int i=tabSize; i>=position; i--)
             {   DataTab[i+size]=DataTab[i];
             }
             int sz=position+size;
             for(int i=position, j=begin; i<sz; i++, j++)
                 DataTab[i]=data[j];
-            iLength+=size;
+            tabSize+=size;
         }
         else
         {
-            length+=position-iLength+size+1;
-            TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+            memSize+=position-tabSize+size+1;
+            TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
             if(!tmp)
             {   free(DataTab);
                 std::cout<<"Memory allocation error!\n";
             }
             else DataTab=tmp;
 
-            /*for(int i=iLength; i<position; i++)
+            /*for(int i=tabSize; i<position; i++)
                 DataTab[i]=zero;*/
 
             int sz=position+size, pos = begin-position;
             for(int i=position, j=begin; i<sz; i++, j++)
                 DataTab[i]=data[j];
-            iLength = position + size;
+            tabSize = position + size;
             std::cout<<"Warning : Position larger than table size.\n";
             std::cout<<"This could cause problems!\n";
         }
@@ -360,9 +360,9 @@ template<class TYPE> class csLIST
             DataTab[to] = data;
         }
     }*/
-    int find(TYPE data)
+    int findFirst(TYPE data)
     {
-        for(int i=0; i<iLength; i++)
+        for(int i=0; i<tabSize; i++)
         {
             if(DataTab[i] == data)
             {
@@ -371,9 +371,20 @@ template<class TYPE> class csLIST
         }
         return -1;
     }
+    int findNext(TYPE data, int pos)
+    {
+        for(int i=pos; i<tabSize; i++)
+        {
+            if(DataTab[i] == data)
+            {
+                return i;
+            }
+        }
+        return tabSize;
+    }
     int findLast(TYPE data)
     {
-        for(int i=iLength-1; i>=0; i--)
+        for(int i=tabSize-1; i>=0; i--)
         {
             if(DataTab[i] == data)
             {
@@ -385,7 +396,7 @@ template<class TYPE> class csLIST
     
     void slightSearch(TYPE data, csSEARCH_PARAMS* sp)
     {
-        if(sp->incr < iLength || sp->incr != sp->pos)
+        if(sp->incr < tabSize || sp->incr != sp->pos)
         {
             if(DataTab[sp->incr] == data)
                 sp->pos = sp->incr;
@@ -400,8 +411,8 @@ template<class TYPE> class csLIST
     }
     void deleteEnd()
     {
-        length=iLength--;
-        TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+        memSize=tabSize--;
+        TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
         if(!tmp)
         {   free(DataTab);
             std::cout<<"Memory allocation error!\n";
@@ -411,14 +422,14 @@ template<class TYPE> class csLIST
     }
     void deleteEndSafe()
     {
-        length=iLength--;
-        if(length == 0)
+        memSize=tabSize--;
+        if(memSize == 0)
         {
             clear();
         }
         else
         {
-            TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+            TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
             if(!tmp)
             {   free(DataTab);
                 std::cout<<"Memory allocation error!\n";
@@ -429,11 +440,11 @@ template<class TYPE> class csLIST
     }
     void deleteBegin()
     {
-        for(int i=0; i<iLength-1; i++)
+        for(int i=0; i<tabSize-1; i++)
         {   DataTab[i]=DataTab[i+1];
         }
-        length=--iLength;
-        TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+        memSize=--tabSize;
+        TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
         if(!tmp)
         {   free(DataTab);
             std::cout<<"Memory allocation error!\n";
@@ -442,15 +453,15 @@ template<class TYPE> class csLIST
     }
     void deleteAt(int position)
     {
-        if(position<iLength)
+        if(position<tabSize)
         {
-            if(iLength>1)
+            if(tabSize>1)
             {
-                for(int i=position; i<iLength-1; i++)
+                for(int i=position; i<tabSize-1; i++)
                 DataTab[i]=DataTab[i+1];
 
-                length=--iLength;
-                TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+                memSize=--tabSize;
+                TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
                 if(!tmp)
                 {   free(DataTab);
                     std::cout<<"Memory allocation error!\n";
@@ -463,12 +474,12 @@ template<class TYPE> class csLIST
     }
     void deleteTableAtBegining(int size)
     {
-        if(size<iLength)
+        if(size<tabSize)
         {
-            for(int i=size; i<iLength; i++)
+            for(int i=size; i<tabSize; i++)
                 DataTab[i-size]=DataTab[i];
-            length=(iLength-=size);
-            TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+            memSize=(tabSize-=size);
+            TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
             if(!tmp)
             {   free(DataTab);
                 std::cout<<"Memory allocation error!\n";
@@ -480,13 +491,13 @@ template<class TYPE> class csLIST
     void deleteTableAt(int position, int size)
     {
         int sz=position+size;
-        if(sz<iLength)
+        if(sz<tabSize)
         {
-            for(int i=sz; i<iLength; i++)
+            for(int i=sz; i<tabSize; i++)
                 DataTab[i-size]=DataTab[i];
 
-            length=(iLength-=size);
-            TYPE* tmp=(TYPE*)realloc(DataTab, length*sizeof(TYPE));
+            memSize=(tabSize-=size);
+            TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
             if(!tmp)
             {   free(DataTab);
                 std::cout<<"Memory allocation error!\n";
@@ -495,7 +506,7 @@ template<class TYPE> class csLIST
         }
         else
         {
-            if(position==0&&size>=iLength)
+            if(position==0&&size>=tabSize)
                 clear();
             else
                 std::cout<<"Position larger than table size!\n";
@@ -503,11 +514,11 @@ template<class TYPE> class csLIST
     }
     void minMaxSortD()
     {
-        if(iLength>0)
+        if(tabSize>0)
         {
             double mn, mx;
-            for(int j=0; j<iLength; j++)
-            for(int i=1; i<iLength; i++)
+            for(int j=0; j<tabSize; j++)
+            for(int i=1; i<tabSize; i++)
             {
                 mx=(double)DataTab[i];
                 mn =(double)DataTab[i-1];
@@ -523,11 +534,11 @@ template<class TYPE> class csLIST
     }
     void maxMinSortD()
     {
-        if(iLength>0)
+        if(tabSize>0)
         {
             double mn, mx;
-            for(int j=0; j<iLength; j++)
-            for(int i=1; i<iLength; i++)
+            for(int j=0; j<tabSize; j++)
+            for(int i=1; i<tabSize; i++)
             {
                 mx=(double)DataTab[i];
                 mn =(double)DataTab[i-1];
@@ -543,11 +554,11 @@ template<class TYPE> class csLIST
     }
     void minMaxSortL()
     {
-        if(iLength>0)
+        if(tabSize>0)
         {
             long mn, mx;
-            for(int j=0; j<iLength; j++)
-            for(int i=1; i<iLength; i++)
+            for(int j=0; j<tabSize; j++)
+            for(int i=1; i<tabSize; i++)
             {
                 mx = DataTab[i];
                 mn = DataTab[i-1];
@@ -563,11 +574,11 @@ template<class TYPE> class csLIST
     }
     void maxMinSortL()
     {
-        if(iLength>0)
+        if(tabSize>0)
         {
             long mn, mx;
-            for(int j=0; j<iLength; j++)
-            for(int i=1; i<iLength; i++)
+            for(int j=0; j<tabSize; j++)
+            for(int i=1; i<tabSize; i++)
             {
                 mx = DataTab[i];
                 mn = DataTab[i-1];
@@ -593,14 +604,14 @@ template<class TYPE> class csLIST
     void printAll(const char*title="")
     {
         std::cout<<title<<"\n{ ";
-        for(int i=0; i<iLength; i++)
+        for(int i=0; i<tabSize; i++)
             print(i);
         std::cout<<"}\n";
     }
     void printAllD(const char*title="")
     {
         std::cout<<title<<"\n{ ";
-        for(int i=0; i<iLength; i++)
+        for(int i=0; i<tabSize; i++)
             printD(i);
         std::cout<<"}\n";
     }
@@ -611,7 +622,7 @@ template<class TYPE> class csLIST
     /*TYPE& operator+=(const TYPE data[], size_t n)
     {
         if(sizeof(data))
-            insertTableAt(data, iLength, sizeof(data)/sizeof(data[0]));
+            insertTableAt(data, tabSize, sizeof(data)/sizeof(data[0]));
         return *this;
     }*/
     void operator+=(csLIST_DATA<TYPE> data)
@@ -640,12 +651,12 @@ template<class TYPE> class csLIST
     }
     void clear()
     {
-        if(iLength)
+        if(tabSize)
         {
             free(DataTab);
             DataTab=NULL;
-            iLength=0;
-            length=0;
+            tabSize=0;
+            memSize=0;
         }
     }
 };

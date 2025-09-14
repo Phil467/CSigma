@@ -91,20 +91,16 @@ typedef enum
     DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 = -4
 } DPI_AWARENESS_CONTEXT;*/
 
-wchar_t* appSizesFilePath = L"appSizes.txt\0";
-extern bool saveAppSizes;
+extern vector<CSTEXT> TITLEFILE;
+extern vector<bool> setTitleInit;
 
-void CSUIMAN::_CSIGMA_INIT_(HINSTANCE hInstance, void(*forceEventFunc)(CSARGS), CSARGS *forceEventArgs)
+void CSUIMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, void(*forceEventFunc)(CSARGS), CSARGS *forceEventArgs)
 {
     _hInstance = hInstance;
 
     xdimFact = 1.0*GetSystemMetrics(SM_CXSCREEN)/(1920);
     ydimFact = 1.0*GetSystemMetrics(SM_CYSCREEN)/(1080);
     
-    if(CSUTILS::fileExists(appSizesFilePath) && saveAppSizes)
-    {
-        __getAppSizes(appSizesFilePath);
-    }
 
     hReditLib = LoadLibraryW(L"riched20.dll");
 
@@ -133,12 +129,9 @@ void CSUIMAN::_CSIGMA_INIT_(HINSTANCE hInstance, void(*forceEventFunc)(CSARGS), 
 
 extern bool CLICK_EFFECT_BOOL;
 
-int CSUIMAN::_CSIGMA_SOFTWARE_()
+int CSUIMAN::_CSIGMA_APP_CREATE_()
 {
     HHOOK mhook = setHook();
-
-    /*if(!CSUTILS::fileExists(appSizesFilePath))
-        CSUIMAN::saveAppSizes(appSizesFilePath);*/
 
     while (GetMessage(&Messages, nullptr, 0, 0))
     {
@@ -393,14 +386,45 @@ void CSUIMAN::setBorderColorAndThick(int id, COLORREF color, int thick)
     BORDERTHICK[id] = thick;
 }
 
-void CSUIMAN::setTitle(int id, CSTEXT title)
+void CSUIMAN::setTitle(int id, CSTEXT title, bool textOnly)
 {
     if(title.Text)
     {
-        //cout<<" ....1....\n";
-        TITLE[id] = title;
-        //TITLE[id].Text = csAlloc<wchar_t>((wcslen(title.Text)+1)*sizeof(wchar_t));
-        //wsprintf(TITLE[id].Text, L"%s\0", title.Text);
+        if(TITLE[id].Text);
+        {
+            free(TITLE[id].Text);
+            free(TITLE[id].Font);
+        }
+        if(TITLEFILE.size())
+        {
+            if(!setTitleInit[id])
+            {
+                TITLE[id] = TITLEFILE[id];
+                setTitleInit[id] = 1;
+            }
+            else
+            {
+                if(!textOnly)
+                    TITLE[id] = title;
+                int l;
+                TITLE[id].Text = csAlloc<wchar_t>((l=wcslen(title.Text)+1));
+                wcscpy_s(TITLE[id].Text, l, title.Text);
+                TITLE[id].Font = csAlloc<wchar_t>((l=wcslen(title.Font)+1));
+                wcscpy_s(TITLE[id].Font, l, title.Font);
+            }
+        }
+        else
+        {
+            if(!textOnly)
+                TITLE[id] = title;
+            int l;
+            TITLE[id].Text = csAlloc<wchar_t>((l=wcslen(title.Text)+1));
+            wcscpy_s(TITLE[id].Text, l, title.Text);
+            TITLE[id].Font = csAlloc<wchar_t>((l=wcslen(title.Font)+1));
+            wcscpy_s(TITLE[id].Font, l, title.Font);
+
+        }
+        
         if(!hdStackContext[id])
         {
             hdStackContext[id] = (CreateCompatibleDC(hdcontext[id]));
@@ -408,17 +432,6 @@ void CSUIMAN::setTitle(int id, CSTEXT title)
             SelectBitmap(hdStackContext[id], hStackBmp[id]);
         }
         SetWindowTextW(SECTION[id], title.Text);
-        /*TITLE[id].Align = title.Align;
-        TITLE[id].Bold = title.Bold;
-        TITLE[id].Charset = title.Charset;
-        TITLE[id].Color = title.Color;
-        TITLE[id].Font = title.Font;
-        TITLE[id].FontSize = title.FontSize;
-        TITLE[id].Italic = title.Italic;
-        TITLE[id].Marging = title.Marging;
-        TITLE[id].Orientation = title.Orientation;
-        TITLE[id].Show = title.Show;
-        TITLE[id].TextRect = title.TextRect;*/
     }
 }
 
@@ -445,8 +458,8 @@ void CSUIMAN::setTransparency(int id, char level)
 
 void CSUIMAN::_drawTitle(int id, HDC dc)
 {
-    CSTEXT& Title = TITLE[id];
-    if(Title.Text && Title.Show)
+   CSTEXT& Title = TITLE[id];
+   if(Title.Text && Title.Show)
     {
 
         RECT rc = RECTCL[id];
@@ -456,8 +469,8 @@ void CSUIMAN::_drawTitle(int id, HDC dc)
         SetBkMode(dc,TRANSPARENT);
         HFONT hf = CreateFontW(CSUTILS::getAdjustedFontSizeX(Title.FontSize.cx),
                               CSUTILS::getAdjustedFontSizeY(Title.FontSize.cy),
-                              Title.Orientation, 0, Title.Bold,Title.Italic,Title.Underline,0,/*ANSI_CHARSET*/0,
-                              OUT_OUTLINE_PRECIS,CLIP_STROKE_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH|FF_SWISS, Title.Font);
+                              Title.Orientation, 0, Title.Bold,Title.Italic,Title.Underline,0,DEFAULT_CHARSET,
+                              OUT_DEFAULT_PRECIS,CLIP_STROKE_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH|FF_DONTCARE, Title.Font);
         SelectFont(dc,hf);
         SetTextColor(dc,RGB(Title.Color.r, Title.Color.g,Title.Color.b));
 
@@ -532,10 +545,9 @@ void CSUIMAN::_drawTitle(int id, HDC dc)
         Title.TextRect.bottom += (Title.TextRect.top + 20);
 
         DeleteFont(hf);
-        /*RECT r = {0,0,rc.right,lps->cy};
-        InvalidateRect(sHandle(id), &r, 0);*/
-        //wcout<<title<<"\n";
         free(lps);
+
+        //wcout<<TITLE[id].Text<<"\n";
 
         if(!Title.ShowEntierText)
             free(title);
@@ -550,7 +562,9 @@ void CSUIMAN::setAsCloseButton(int id, int& id_close)
         if(UINT(Args) == WM_LBUTTONUP)
         {
             if(*(int*)Args[0] == 0)
+            {
                 SendMessage(SECTION[0], WM_DESTROY, 0, 0);
+            }
             else
                 ShowWindow(SECTION[*(int*)Args[0]], 0);
         }
@@ -751,67 +765,6 @@ void CSUIMAN::enableDarkEdge(int id)
                  );
 }
 
-#include "readwfile.h"
-
-void CSUIMAN::__saveAppSizes(wchar_t* filePath)
-{
-    FILE* f = _wfopen(filePath,L"w+");
-    //FILE* f = fopen(wcharPtrToCharPtr(filePath).c_str(),"w+");
-
-    int n = SECTION.size();
-
-    fwprintf(f, L"%ld %ld\n", (long)GetSystemMetrics(SM_CXSCREEN), (long)GetSystemMetrics(SM_CYSCREEN));
-
-    for(int i=0; i<n; i++)
-    {
-        //RECT r = CSUTILS::rectInParentRef(i);
-        RECT r = RECTPARREFSAVED[i];
-        fwprintf(f, L"%ld %ld %ld %ld\n", r.left, r.top, r.right-r.left, r.bottom-r.top);
-    }
-    fclose(f);
-}
-void CSUIMAN::__getAppSizes(wchar_t* filePath)
-{
-    FILE* f = _wfopen(filePath,L"r");
-    wchar_t str[1001];
-
-    fgetws(str, 1000, f);
-    vector<wstring> words = splitWords(str);
-    vector<long> v = wordsToLong(words);
-
-    long cxmax = v[0], cymax = v[1];
-    words.clear();
-    v.clear();
-
-    float xcf = 1.0*GetSystemMetrics(SM_CXSCREEN)/cxmax;
-    float ycf = 1.0*GetSystemMetrics(SM_CYSCREEN)/cymax;
-    
-    //xdimFact = xcf;
-    //ydimFact = ycf;
-
-    cout<<"xcf = "<<xcf<<"-------------------------------------\n";
-
-    while(fgetws(str, 1000, f) != NULL)
-    {
-        words = splitWords(str);
-        v = wordsToLong(words);
-        RECT r = {v[0]*xcf,v[1]*ycf, v[2]*xcf, v[3]*ycf};
-        //CSUIMAN::printRect(r, "r = ");
-        RF.push_back(r);
-        words.clear();
-        v.clear();
-    }
-    //fclose(f);  // bug
-}
-void CSUIMAN::__setAppSizes()
-{
-    int n = SECTION.size();
-    for(int i=0; i<n; i++)
-    {
-        RECT r = RF[i];
-        MoveWindow(SECTION[i], r.left, r.top, r.right, r.bottom, 1);
-    }
-}
 
 extern int SMX;
 extern int SMY;
@@ -903,10 +856,7 @@ void CSUIMAN::_updateApp(int id)
     }
 }
 
-void CSUIMAN::setSaveAppSizes(bool b)
-{
-    saveAppSizes = b;
-}
+
 
 /*********************************************************************************************************** */
 
@@ -1397,15 +1347,6 @@ bool CSUTILS::signExtraction(const char* strNumeric, char*& ret)
 }
 
 
-wchar_t*  CSUTILS::makeWcharString(const wchar_t* _str)
-{
-    int len = wcslen(_str)+1;
-    wchar_t* str = csAlloc<wchar_t>(len);
-    wcscpy_s(str, len, _str);
-    return str;
-}
-
-
 void CSUTILS::drawGDIRectangle(HDC dc, COLORREF brush, COLORREF pen, int border, RECT r)
 {
     HBRUSH hb = CreateSolidBrush(brush);
@@ -1421,15 +1362,6 @@ void CSUTILS::drawGDIRectangle(HDC dc, COLORREF brush, COLORREF pen, int border,
 CSRGBA CSUTILS::toRGBA(long color)
 {
     return {color&0xffff, (color>>8)&0xffff, (color>>16)&0xffff};
-}
-
-bool CSUTILS::fileExists(const wchar_t* filename) 
-{
-    DWORD attributes = GetFileAttributesW(filename);
-    
-    // Vérifier que le fichier existe ET que ce n'est pas un répertoire
-    return (attributes != INVALID_FILE_ATTRIBUTES && 
-            !(attributes & FILE_ATTRIBUTE_DIRECTORY));
 }
 
 bool CSUTILS::directoryExists(const wchar_t* dirname) 

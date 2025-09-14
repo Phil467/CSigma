@@ -11,6 +11,11 @@ extern wchar_t* appSizesFilePath;
 extern vector<RECT> RF;
 bool saveAppSizes;
 
+extern wchar_t* appTitleFilePath;
+extern vector<wchar_t*> TITLEFILE;
+extern vector<bool> setTitleInit;
+extern bool saveAppTitles;
+
 vector<HWND> SECTION;
 vector<HWND> PAR;
 vector<int> PARID;
@@ -106,6 +111,8 @@ vector<bool> updateAfterResizeMsg;
 vector<CSAPP_ICON> appIcon;
 extern vector<bool> updateTitleSectionBool;
 
+extern bool __translateTitles();
+
 
 HINSTANCE _hInstance;
 HWND hwndBtnDown;
@@ -129,13 +136,34 @@ void _blitDynamicSimpleText(int id);
 
 using namespace CSUIMAN;
 using namespace CSUTILS;
+using namespace CSFILESMAN;
 
 int SMX, SMY;
+
+#include "csTranslator.h"
 
 int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeResize, bool show, bool isRoot, bool attach)
 {
     int i = SECTION.size();
     RECT geom = r(_geom.left*dimFact, _geom.top*dimFact, _geom.right*dimFact, _geom.bottom*dimFact, i);
+    if(i == 1)
+    {
+        if((saveAppTitles && !CSFILESMAN::fileExists(appTitleFilePath)))
+        {
+            if(__translateTitles())
+                __getAppTitles(); // executer apres la creation de la premiere fenete pour eviter les bogues
+        }
+        else if((saveAppTitles && CSFILESMAN::fileExists(appTitleFilePath)))
+        {
+            __getAppTitles();
+        }
+        __getAppSizes();
+
+        if(saveAppSizes && CSFILESMAN::fileExists(appSizesFilePath))
+        {
+            MoveWindow(SECTION[0], RF[0].left, RF[0].top, RF[0].right, RF[0].bottom, 1);
+        }
+    }
     CSUIMAN::printRect(geom);
     RESIZE_EDGE.push_back(edgeResize);
     RECTPARREF.push_back({0});
@@ -182,7 +210,9 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
     mhgradient.push_back(mhg);
     mouseLeaveRemoveBkg.push_back(0);
     lockedMode.push_back({0});
+    //TITLE.push_back(CSTEXT{.Text=csAlloc<wchar_t>(1,'\0')}); // dont do that
     TITLE.push_back({0});
+    setTitleInit.push_back(0);
     hdStackContext.push_back(0);
     hStackBmp.push_back(0);
     clkGradient.push_back({0});
@@ -240,7 +270,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
         wc->hCursor = LoadCursor (NULL, IDC_ARROW);
         wc->lpfnWndProc = sectionProc;
         wc->hInstance = _hInstance;
-        wc->lpszClassName = L"CSigmaWindow";
+        wc->lpszClassName = L"CSigmaWindow\0";
         wc->style = CS_DBLCLKS;                 /* Catch double-clicks */
         //wc->hbrBackground = CreateSolidBrush(color);
         wc->cbSize = sizeof(WNDCLASSEX);
@@ -254,7 +284,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
     {
         SECTIONSTYLE.push_back(0);
         hPopup = CreateWindowExW(
-                     WS_EX_APPWINDOW, wndClass[0]->lpszClassName, L"CSigma Root", WS_POPUPWINDOW|WS_BORDER|WS_THICKFRAME|WS_MINIMIZEBOX/*|WS_MAXIMIZEBOX*/,
+                     WS_EX_APPWINDOW, wndClass[0]->lpszClassName, L"CSigma Root\0", WS_POPUPWINDOW|WS_BORDER|WS_THICKFRAME|WS_MINIMIZEBOX/*|WS_MAXIMIZEBOX*/,
                      geom.left, geom.top, geom.right, geom.bottom,
                      par, 0, _hInstance, nullptr
                  );
@@ -286,8 +316,8 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
 
     RegisterTouchWindow(hPopup, TWF_WANTPALM);
 
+    
     InvalidateRect(hPopup,0,1);
-
     if(show)
         ShowWindow(hPopup, SW_SHOWNORMAL);
     UpdateWindow(hPopup);
@@ -311,6 +341,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
     Rectangle(hdBkgContext[i], 0,0, hdcSize[i].cx, hdcSize[i].cy);
 
     BitBlt(hdcontext[i],0,0,hdcSize[i].cx, hdcSize[i].cy, hdBkgContext[i], 0,0, SRCCOPY);
+
     /*
     BOOL isDwmEnabled = FALSE;
     MARGINS shadow = {1, 1, 1, 1}; // petite extension = effet d’ombre subtil
@@ -769,10 +800,8 @@ cout<<"gesture\n";
         {
             KillTimer(hwnd, 0);
             CSUIMAN::__setAllRects();
-            if(saveAppSizes)
-            {
-                CSUIMAN::__saveAppSizes(appSizesFilePath);
-            }
+            CSFILESMAN::__saveAppSizes();
+            CSFILESMAN::__saveAppTitles();
             PostQuitMessage(0);
             return 0;
         }
@@ -857,6 +886,30 @@ cout<<"gesture\n";
                 }
                 LAST_TASKBAR_POS = taskbarInfo.edge;
             }
+
+            ///***************************************************************** */
+            /*RECT rc;
+
+            GetClientRect(hwnd, &rc);
+
+            RECT rp;
+            if(GetParent(hwnd) == 0)
+            {
+                rp.right = GetSystemMetrics(SM_CXSCREEN);
+                rp.bottom = GetSystemMetrics(SM_CYSCREEN);
+            }
+            else
+            {
+                GetClientRect(GetParent(hwnd), &rp);
+            }
+            if(RECTPARREF[id].left >= rp.right || RECTWND[id].top >= rp.bottom ||
+                RECTPARREF[id].right <= 0 || RECTWND[id].bottom <= 0)
+            {
+                
+
+                SetWindowPos(hwnd,0, (rp.right-rc.right)/2, (rp.bottom-rc.bottom)/2, 0, 0, SWP_NOZORDER|SWP_NOSIZE);
+            }*/
+            /***************************************************************************** */
 
             CSUIMAN::_updateApp(0);
 
@@ -1410,7 +1463,7 @@ void endSizeMove(int id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n)
     unSetSizeMoveWaitList(sizeBind);
 }
 
-int delayVal = 500;
+int delayVal = 750;
 
 void geometryBinding(int& _id)
 {

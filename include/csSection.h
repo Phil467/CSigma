@@ -4,6 +4,7 @@
 #include <dwmapi.h>
 #include "csUtils.h"
 #include "csUIFx.h"
+#include "csFilesMan.h"
 #include <thread>
 #include <functional>
 

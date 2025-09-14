@@ -194,8 +194,8 @@ int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, char*iconPath, int
     {
         HFONT hf = CreateFontW(CSUTILS::getAdjustedFontSizeX(fontSize),
                               0,
-                              0, 0, 0, 0,0,0,0,
-                              OUT_OUTLINE_PRECIS,CLIP_STROKE_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH|FF_SWISS, fontName);
+                              0, 0, 0, 0,0,0,DEFAULT_CHARSET,
+                              OUT_DEFAULT_PRECIS,CLIP_STROKE_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH|FF_DONTCARE, fontName);
         LPSIZE lps = CSUTILS::textExtentW(SECTION[0], hf, title);
         size = {lps->cx/dimFact, lps->cy/dimFact};
         free(lps);
@@ -561,7 +561,7 @@ void CSUICONTROLS::createTipsPupop(COLORREF color)
 {
     if(SECTION.size())
     {
-        TIPS_POPUP = CSUIMAN::createSection(-1, {0,0,200/dimFact,200/dimFact}, color, {0}, 0, 1, 0);
+        TIPS_POPUP = CSUIMAN::createSection(0, {0,0,200/dimFact,200/dimFact}, color, {0}, 0, 1, 0);
         CSUIMAN::enableDarkEdge(TIPS_POPUP);
     }
 }

@@ -37,7 +37,7 @@ template<> void csLIST<char*>::moveCharPtr(int from, int to)
 
 template<> void csLIST<csLIST<POINT> >::duplicatePointList(int from, int to)
 {
-    if(iLength)
+    if(tabSize)
     {
         int n = DataTab[from].size();
         csLIST<POINT> data;
@@ -56,8 +56,8 @@ template<> char* csLIST<char>::toString(int from, int to)
     if(from < to)
     {
         int end = to + 1;
-        if(to >= iLength)
-            end = iLength;
+        if(to >= tabSize)
+            end = tabSize;
         ret = (char*)malloc(end - from+1);
         sprintf(ret,"\0");
         char c[2];
@@ -73,8 +73,8 @@ template<> char* csLIST<char>::toString(int from, int to)
     else
     {
         int end = from + 1;
-        if(from >= iLength)
-            end = iLength;
+        if(from >= tabSize)
+            end = tabSize;
         ret = (char*)malloc(end - to+1);
         sprintf(ret,"\0");
         char c[2];
@@ -96,8 +96,8 @@ template<> wchar_t* csLIST<wchar_t>::toStringW(int from, int to)
     if(from < to)
     {
         int end = to + 1;
-        if(to >= iLength)
-            end = iLength;
+        if(to >= tabSize)
+            end = tabSize;
         ret = (wchar_t*)malloc(end - from+1);
         wsprintf(ret,L"\0");
         wchar_t c[2];
@@ -113,8 +113,8 @@ template<> wchar_t* csLIST<wchar_t>::toStringW(int from, int to)
     else
     {
         int end = from + 1;
-        if(from >= iLength)
-            end = iLength;
+        if(from >= tabSize)
+            end = tabSize;
         ret = (wchar_t*)malloc(end - to+1);
         wsprintf(ret,L"\0");
         wchar_t c[2];
@@ -164,12 +164,12 @@ template<class T> csLIST<T> csLIST<T>::breakList(int from, int to)
     int begin, end; 
     if(from < to)
     {
-        end = (to < iLength) ? to+1 : iLength;
+        end = (to < tabSize) ? to+1 : tabSize;
         begin = (from < 0) ? 0 : from;
     }
     else
     {
-        end = (from < iLength) ? from+1 : iLength;
+        end = (from < tabSize) ? from+1 : tabSize;
         begin = (to < 0) ? 0 : to;
     }
     int len = end-begin;
@@ -182,7 +182,7 @@ template<class T> csLIST<T> csLIST<T>::breakList(int from, int to)
 /*template<class T> int csLIST<T>::find(T data)
 {
     int id = -1;
-    for(int i=0; i<iLength; i++)
+    for(int i=0; i<tabSize; i++)
     {
         if(DataTab[i] == data)
         {

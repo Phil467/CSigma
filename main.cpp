@@ -11,6 +11,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <fcntl.h>
 
 #include <fstream>
 #include <stdexcept>
@@ -24,10 +25,12 @@
 #include "csSubClasses.h"
 #include "readwfile.h"
 #include "csListBoxMin.h"
+#include "csTranslator.h"
 
 using namespace std;
 using namespace CSUTILS;
 using namespace CSUIMAN;
+using namespace CSSTRUTILS;
 
 
 typedef struct ADATA
@@ -63,8 +66,13 @@ int smy = GetSystemMetrics(SM_CYSCREEN);
 // WinMain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
-    CSUIMAN::setSaveAppSizes(0);
-    CSUIMAN::_CSIGMA_INIT_(hInstance, forceEventFunction, &forceEventArgs);
+    //_setmode(_fileno(stdout), _O_U8TEXT); // utf8 console
+    //_setmode(_fileno(stdout), _O_U16TEXT);
+    //example();
+
+    CSFILESMAN::setSaveAppTitles(1);
+    CSFILESMAN::setSaveAppSizes(1);
+    CSUIMAN::_CSIGMA_APP_INIT_(hInstance, forceEventFunction, &forceEventArgs);
 
     //float dimFact = GetSystemMetrics(SM_CXSCREEN)*GetSystemMetrics(SM_CYSCREEN)/(1366.0*768);
     float dimFact = 1.5;
@@ -75,7 +83,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     int ICON_ROOT  = setIcon(ROOT, L"icon.ico", L"icon.ico");
     CSUIMAN::enableDarkEdge(ROOT);
 
-    CSUICONTROLS::addTitle(ROOT, L"CSIGMA LIB TEST\0",{150,(CAPTION_AREA_SIZE+10)/dimFact}, "img/icon.bmp\0", 22, L"Arial black");
+    CSUICONTROLS::addTitle(ROOT, L"CSIGMA LIB TEST",{150,(CAPTION_AREA_SIZE+10)/dimFact}, "img/icon.bmp\0", 22, L"Arial Black");
     CSSYSCOMMAND_SECTION SYS_CMD = CSUICONTROLS::addSysCommand(ROOT, {600});
 
     /******************************** Tips popup **************************************** */
@@ -254,9 +262,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     bindGeometry(ROOT, bd);
     int cx = 70;
 
-    MENU_NS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"CSigma Menu 1\0", "img/Settings01.bmp", "img/Settings01.bmp", {1,0,cx*1.5,cy-1}, 16);
-    MENU_BIS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"CS Menu 2\0", "img/Settings01.bmp", "img/Settings01.bmp", {1+cx*1.5,0,cx,cy-1}, 16);
-    MENU_CS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"CS Menu 3\0", "img/Settings01.bmp", "img/Settings01.bmp", {1+cx*2.5,0,cx,cy-1}, 16);
+    MENU_NS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"Preferences\0", "img/Settings01.bmp", "img/Settings01.bmp", {1,0,cx*1.5,cy-1}, 16);
+    MENU_BIS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"Edition\0", "img/Settings01.bmp", "img/Settings01.bmp", {1+cx*1.5,0,cx,cy-1}, 16);
+    MENU_CS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"Models\0", "img/Settings01.bmp", "img/Settings01.bmp", {1+cx*2.5,0,cx,cy-1}, 16);
     //MENU_PREFERENCES = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"PREFERENCES\0", "img/Settings01.bmp", "img/Settings01.bmp", {1+cx*3,0,cx*1.5,cy-1}, 16);
     MENU_ABOUT = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"About\0", "img/About01.bmp", "img/About01.bmp", {1+cx*3.5,0,cx,cy-1}, 16);
 
@@ -446,23 +454,23 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     activeNum.setMinBound("0");
     activeNum.setMaxBound("9");
 
-    CS_STRING_INCREMENTER_PARAMS strInc = CSUICONTROLS::stringIncrementer(LEFT_SECTION, {5,5+total*8,65,h}, L"string 1", 1, 1,
+    CS_STRING_INCREMENTER_PARAMS strInc = CSUICONTROLS::stringIncrementer(LEFT_SECTION, {5,5+total*8,65,h}, L"string 1\0", 1, 1,
                                                             {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0});
-    strInc.newItem(L"string 2");
-    strInc.newItem(L"string 3");
-    strInc.newItem(L"string 4");
-    strInc.newItem(L"string 5");
-    strInc.newItem(L"string 6");
-    strInc.newItem(L"string 7");
-    strInc.newItem(L"string 8");
-    strInc.newItem(L"string 9");
+    strInc.newItem(L"string 2\0");
+    strInc.newItem(L"string 3\0");
+    strInc.newItem(L"string 4\0");
+    strInc.newItem(L"string 5\0");
+    strInc.newItem(L"string 6\0");
+    strInc.newItem(L"string 7\0");
+    strInc.newItem(L"string 8\0");
+    strInc.newItem(L"string 9\0");
 
     //BTN_REMOVE_UNDO_1 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Undo 1\0", {5,5+total*9,65,h});
 
-    BTN_REMOVE_REDO_1 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Redo 1\0", {5,5+total*10,65,h});
-    BTN_REMOVE_SAVE_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Save 2\0", {5,5+total*12,65,h});
-    BTN_REMOVE_UNDO_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Undo 2\0", {5,5+total*13,65,h});
-    BTN_REMOVE_REDO_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Redo 2\0", {5,5+total*14,65,h});
+    BTN_REMOVE_REDO_1 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Redo 1", {5,5+total*10,65,h});
+    BTN_REMOVE_SAVE_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Save 2", {5,5+total*12,65,h});
+    BTN_REMOVE_UNDO_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Undo 2", {5,5+total*13,65,h});
+    BTN_REMOVE_REDO_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Redo 2", {5,5+total*14,65,h});
     // Boucle principale
 
 
@@ -517,7 +525,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     //csGraphics::showImage(GA_CLIENT, idImg1, {0}, {0}, 0);
     //csGraphics::showImage(GA_CLIENT, idImg2, {0}, {0}, 0);
 
-    /*********************************************************** */
+    // /*********************************************************** */
 
     //RIGHT_SECTION_CHILD = createSection(RIGHT_SECTION, {5,0,1500/dimFact,1000/dimFact},  RGB(30,30,30), {0,0,0,0});
 
@@ -530,7 +538,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     csGraphics::setVzoom(RIGHT_SECTION, 1);
 
     hscroll2.setPositionRatio(0);
-    vscroll2.setPosition(100);
+    vscroll2.setPositionRatio(0.5);
 
 
 
@@ -554,7 +562,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     lbm->setActiveItem(0);
     lbm->create();
 
-    return CSUIMAN::_CSIGMA_SOFTWARE_();
+    return CSUIMAN::_CSIGMA_APP_CREATE_();
 }
 
 

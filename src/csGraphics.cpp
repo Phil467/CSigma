@@ -588,8 +588,8 @@ void csGraphics::viewText(int id, wchar_t* text, CSRGBA color, POINT pos, wchar_
     SetBkMode(dc,TRANSPARENT);
     HFONT hf = CreateFontW(CSUTILS::getAdjustedFontSizeX(fontSize),
                             0,
-                            0, 0, weight,italic,0,0,0,
-                            OUT_OUTLINE_PRECIS,CLIP_STROKE_PRECIS, ANTIALIASED_QUALITY, VARIABLE_PITCH|FF_SWISS, fontName);
+                            0, 0, weight,italic,0,0,DEFAULT_CHARSET,
+                            OUT_DEFAULT_PRECIS,CLIP_STROKE_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH|FF_DONTCARE, fontName);
     SelectFont(dc,hf);
     SetTextColor(dc,RGB(color.r, color.g, color.b));
     if(width)
@@ -636,9 +636,9 @@ void viewDynamicSimpleText(int id, vector<CSTEXT> paragraph, vector<int> pSpace,
     for(int i=0; i<n; i++)
     {
         hf[i] = CreateFontW(CSUTILS::getAdjustedFontSizeX(paragraph[i].FontSize.cx),0,0,paragraph[i].Underline,
-                            paragraph[i].Bold, paragraph[i].Italic,FALSE,FALSE,ANSI_CHARSET,
-                          OUT_OUTLINE_PRECIS, CLIP_MASK, ANTIALIASED_QUALITY,
-                          VARIABLE_PITCH, paragraph[i].Font);
+                            paragraph[i].Bold, paragraph[i].Italic,FALSE,FALSE,DEFAULT_CHARSET,
+                          OUT_DEFAULT_PRECIS, CLIP_MASK, CLEARTYPE_QUALITY,
+                          DEFAULT_PITCH, paragraph[i].Font);
 
         
         h0[i] = CSUTILS::unilineTextToPolylineText(paragraph[i].Text, hf[i], sz.cx, lines[i]);
