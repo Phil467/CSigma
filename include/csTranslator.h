@@ -13,6 +13,10 @@
 #include <thread>
 #include <chrono>
 #include <map>
+#include "csLIST.h"
+#include "csStrUtils.h"
+
+using namespace std;
 
 class CSTRANSLATOR
 {
@@ -22,6 +26,7 @@ class CSTRANSLATOR
         : inputFile(input), outputFile(output), sourceLang(source), targetLang(target) {};
     
     bool translate() ;
+    std::vector<wchar_t*> translate(std::vector<wchar_t*> v);
     bool translateFileAsSingleString(wchar_t* linesDelims);
 
     private:

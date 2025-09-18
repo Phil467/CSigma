@@ -16,6 +16,9 @@ extern vector<wchar_t*> TITLEFILE;
 extern vector<bool> setTitleInit;
 extern bool saveAppTitles;
 
+extern wchar_t* appTipsFilePath;
+extern bool saveAppTips;
+
 vector<HWND> SECTION;
 vector<HWND> PAR;
 vector<int> PARID;
@@ -112,6 +115,8 @@ vector<CSAPP_ICON> appIcon;
 extern vector<bool> updateTitleSectionBool;
 
 extern bool __translateTitles();
+extern bool __translateTips(char* inputLanguage);
+
 
 
 HINSTANCE _hInstance;
@@ -146,6 +151,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
 {
     int i = SECTION.size();
     RECT geom = r(_geom.left*dimFact, _geom.top*dimFact, _geom.right*dimFact, _geom.bottom*dimFact, i);
+    
     if(i == 1)
     {
         if((saveAppTitles && !CSFILESMAN::fileExists(appTitleFilePath)))
@@ -157,6 +163,16 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
         {
             __getAppTitles();
         }
+
+        if((saveAppTips && !CSFILESMAN::fileExists(appTipsFilePath)))
+        {
+            __translateTips("en");
+        }
+        else if((saveAppTips && CSFILESMAN::fileExists(appTipsFilePath)))
+        {
+            __getAppTips();
+        }
+
         __getAppSizes();
 
         if(saveAppSizes && CSFILESMAN::fileExists(appSizesFilePath))
@@ -355,6 +371,15 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
     SetWindowLongPtr(hPopup, GWL_STYLE, style);
     SetWindowPos(hPopup, NULL, 0, 0, 0, 0,
              SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE);*/
+
+    //if(SECTIONSTYLE[i])
+    {
+        GetWindowRect(SECTION[i], &RECTWND[i]);
+        GetWindowRect(SECTION[i], &RECTWNDSAVED[i]);
+        GetClientRect(SECTION[i], &RECTCL[i]);
+        RECTPARREFSAVED[i] = CSUTILS::rectInParentRef(i);
+        RECTPARREF[i] = RECTPARREFSAVED[i];
+    }
              
     return SECTION.size()-1;
 }
@@ -802,6 +827,7 @@ cout<<"gesture\n";
             CSUIMAN::__setAllRects();
             CSFILESMAN::__saveAppSizes();
             CSFILESMAN::__saveAppTitles();
+            CSFILESMAN::__saveAppTips();
             PostQuitMessage(0);
             return 0;
         }

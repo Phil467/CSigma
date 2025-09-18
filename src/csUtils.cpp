@@ -308,7 +308,7 @@ SIZE CSUIMAN::sDeltaSize(int id)
 
 void CSUIMAN::printRect(RECT r, char*title)
 {
-    cout<<title<<" : "<<r.left<<" "<<r.top<<" "<<r.right<<" "<<r.bottom<<"\n";
+    wcout<<title<<L" : "<<r.left<<L" "<<r.top<<L" "<<r.right<<L" "<<r.bottom<<L"\n";
 }
 
 
@@ -712,12 +712,33 @@ TASKBAR_INFO CSUIMAN::getTaskbarInfo()
 }
 
 extern int TIPS_POPUP;
+extern bool saveAppTips;
+extern vector<vector<vector<wchar_t*>>> TIPSFILE;
+
+
 void CSUIMAN::addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT message)
 {
     TIPS_POPUP_PARAMS tpp;
     tpp.Ids.push_back(TIPS_POPUP);
     tpp.Geometry.push_back({0,0,rTips.right*dimFact, rTips.bottom*dimFact});
     tpp.Bpos.push_back(pb);
+    if(TIPSFILE.size() && saveAppTips)
+    {
+        int n = message.paragraph.size();
+        for(int i=0; i<n; i++)
+        {
+            //wcout<<TIPSFILE[id][TipsPopupParams[id].message.size()][i]<<L"\n";
+            message.paragraph[i].Text = CSSTRUTILS::makeWcharString(TIPSFILE[id][TipsPopupParams[id].message.size()][i]);
+        }
+    }
+    else
+    {
+        int n = message.paragraph.size();
+        for(int i=0; i<n; i++)
+        {
+            message.paragraph[i].Text = CSSTRUTILS::makeWcharString(message.paragraph[i].Text);
+        }
+    }
     tpp.message.push_back(message);
     tpp.Lock = locked;
     tpp.Delay = delay;
@@ -1246,7 +1267,7 @@ int CSUTILS::unilineTextToPolylineText(wchar_t*_str, HFONT hf, int maxLength, ve
 
     while (i<n)
     {
-        res = csAlloc<wchar_t>(n);
+        res = csAlloc<wchar_t>(n+1);
         wsprintf(res,L"");
         j = 0;
 

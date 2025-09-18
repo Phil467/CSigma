@@ -633,6 +633,7 @@ void viewDynamicSimpleText(int id, vector<CSTEXT> paragraph, vector<int> pSpace,
     vector<wchar_t*> lines[n];
     int h0[n];
 
+
     for(int i=0; i<n; i++)
     {
         hf[i] = CreateFontW(CSUTILS::getAdjustedFontSizeX(paragraph[i].FontSize.cx),0,0,paragraph[i].Underline,
@@ -646,7 +647,6 @@ void viewDynamicSimpleText(int id, vector<CSTEXT> paragraph, vector<int> pSpace,
 
         sz.cy += h0[i]*lines[i].size() + pSpace[i]*dimFact;
     }
-
 
     CSGRAPHIC_CONTEXT dc = csGraphics::createGraphicContext(sz);
 

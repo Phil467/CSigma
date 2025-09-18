@@ -205,6 +205,37 @@ template<class TYPE> class csLIST
             std::cout<<"This could cause problems!\n";
         }
     }
+    void insertTableEnd(TYPE* data, int size)
+    {
+        if(!memSize) init(1);
+        if(tabSize>=memSize-size)
+        {
+            //tabSize = tabSize|1; // si tabSize = 0, tabSize = 1;
+            memSize = tabSize + size +1;
+            TYPE* tmp=(TYPE*)realloc(DataTab, memSize*sizeof(TYPE));
+            if(!tmp)
+            {   free(DataTab);
+                std::cout<<"Memory allocation error!\n";
+            }
+            else DataTab=tmp;
+        }
+        if(tabSize == 0)
+        {
+            for(int i=0, j=0; i<size; i++, j++)
+                DataTab[i]=data[j];
+            tabSize+=size;
+        }
+        else
+        {
+            for(int i=tabSize-1; i>=tabSize; i--)
+                DataTab[i+size]=DataTab[i];
+
+            int sz=tabSize+size;
+            for(int i=tabSize, j=0; i<sz; i++, j++)
+                DataTab[i]=data[j];
+            tabSize+=size;
+        }
+    }
     void insertTableAt(TYPE* data, int position, int size)
     {
         if(!memSize) init(1);

@@ -3,6 +3,7 @@
 
 #pragma comment(lib, "wininet.lib")
 
+extern int MAX_TRANSLATION_TEXT_LENGTH_REQUESTED;
 
 std::wstring utf8_to_utf16(const std::string& utf8) 
 {
@@ -263,6 +264,90 @@ void CSTRANSLATOR::writeLineUtf16(std::wofstream& file, const std::string& line)
     file << wline << std::endl;
 }
 
+
+std::vector<wchar_t*> CSTRANSLATOR::translate(std::vector<wchar_t*> lines)
+{
+    int totalLines = lines.size();
+    std::vector<wchar_t*> ret;
+    csLIST<wchar_t> line;
+    int lineCount = 0;
+    for (int i=0; i<totalLines; i++) 
+    {
+        int n = wcslen(lines[i]);
+        line.insertTableEnd(lines[i], n);
+        lineCount++;
+        
+        /*if (line.size() == 0) {
+            std::wcout << L"Ligne " << lineCount << "/" << totalLines 
+                        << L": (ligne vide) - conservee" << std::endl;
+            ret.push_back(0);
+        }
+        else if (wcscmp(line.getTable(), L"-") == 0) {
+            std::wcout << L"Ligne " << lineCount << "/" << totalLines 
+                        << L": - '-' non traduite" << std::endl;
+            ret.push_back(CSSTRUTILS::makeWcharString(L"-"));
+        }
+        else */
+        {
+            int len = (i==totalLines-1 ? -1 : wcslen(lines[i+1]));
+            
+            if(len > -1 && (line.size() + len) < MAX_TRANSLATION_TEXT_LENGTH_REQUESTED)
+            {
+                line.insertEnd('\n');
+                continue;
+            }
+            line.insertEnd('\0');
+
+            /*wchar_t* part=0;
+            std::wstring preview = line.size() > 50 ? 
+                wstring(part=line.toStringW(0, 50)) + L"..." : line.getTable();
+            std::wcout << L"Ligne " << lineCount << L"/" << totalLines 
+                        << L": " << preview << std::endl;
+            if(part) free(part);*/
+            wcout<<L"\n"<<line.getTable() << L"    path = ---------------------------------------------" <<L"\n";
+            
+            // Construire l'URL de l'API
+            std::string encodedText = urlEncode(utf16_to_utf8(line.getTable()));
+            std::string url = "https://api.mymemory.translated.net/get?q=" + 
+                            encodedText + "&langpair=" + sourceLang + "|" + targetLang;
+            
+            // Effectuer la requête
+            std::string response = httpRequest(url);
+            std::string translation = extractTranslation(response);
+            
+            if (!translation.empty() && translation != "null") 
+            {
+                vector<wstring> vline = CSSTRUTILS::splitWords(utf8_to_utf16(translation).c_str(), L"\n");
+                int n = vline.size();
+                for(int i=0; i<n; i++)
+                {
+                    ret.push_back(CSSTRUTILS::makeWcharString(vline[i].c_str()));
+                }
+                vline.clear();
+            } 
+            else 
+            {
+                std::wcout << L"Erreur de traduction, conservation du texte original" << std::endl;
+                vector<wstring> vline = CSSTRUTILS::splitWords((const wchar_t*)line.getTable(), L"\n");
+                int n = vline.size();
+                for(int i=0; i<vline.size(); i++)
+                {
+                    ret.push_back(CSSTRUTILS::makeWcharString(vline[i].c_str()));
+                }
+                vline.clear();
+            }
+            
+            // Pause d'1 seconde
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+
+            line.clear();
+        }
+    }
+    
+    
+    return ret;
+    
+}
 
 bool CSTRANSLATOR::translate() 
 {

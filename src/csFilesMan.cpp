@@ -6,22 +6,26 @@ extern vector<HWND> SECTION;
 extern vector<RECT> RECTPARREFSAVED;
 extern vector<CSTEXT> TITLE;
 extern  vector<RECT> RF;
+extern vector<TIPS_POPUP_PARAMS> TipsPopupParams;
 
 wchar_t* appSizesFilePath = L"appSizes.txt\0";
 extern bool saveAppSizes;
 
 wchar_t* appTitleParamsFilePath = L"lang/titles/prm.txt\0";
-wchar_t* appTitleFilePath = L"lang/titles/tr.txt\0";
+wchar_t* appTitleFilePath = L"lang/titles/ar.txt\0";
 vector<CSTEXT> TITLEFILE;
 vector<bool> setTitleInit;
 bool saveAppTitles;
+
+wchar_t* appTipsFilePath = L"lang/tips/ar.txt\0";
+vector<vector<vector<wchar_t*>>> TIPSFILE;
+bool saveAppTips;
 
 using namespace CSSTRUTILS;
 
 bool CSFILESMAN::fileExists(const wchar_t* filename) 
 {
     DWORD attributes = GetFileAttributesW(filename);
-    
     // Vérifier que le fichier existe ET que ce n'est pas un répertoire
     return (attributes != INVALID_FILE_ATTRIBUTES && 
             !(attributes & FILE_ATTRIBUTE_DIRECTORY));
@@ -47,6 +51,7 @@ void CSFILESMAN::__saveAppSizes()
     }
     fclose(f);
 }
+
 void CSFILESMAN::__getAppSizes()
 {
     if(!(fileExists(appSizesFilePath) && saveAppSizes))
@@ -166,12 +171,9 @@ void CSFILESMAN::__saveAppTitles()
         }
 
         if(TITLE[i].Text)
-        //fwrite(TITLE[i].Text, sizeof(wchar_t), lstrlenW(TITLE[i].Text), f);
-        titles += wstring(TITLE[i].Text) + L"|";
+            titles += wstring(TITLE[i].Text) + L"|";
         else
-        titles += L"-|";
-        //fwrite(L"-", sizeof(wchar_t), 6, f);
-        //fwrite(L"\n", sizeof(wchar_t), 1, f);
+            titles += L"-|";
     }
     if(titles.size())
     {
@@ -185,7 +187,7 @@ void CSFILESMAN::__saveAppTitles()
 #include <fcntl.h>
 void CSFILESMAN::__getAppTitles()
 {   
-    _setmode(_fileno(stdout), _O_U16TEXT);
+   // _setmode(_fileno(stdout), _O_U16TEXT);
     if(!(saveAppTitles && fileExists(appTitleFilePath) && fileExists(appTitleParamsFilePath)))
         return;
 
@@ -417,6 +419,202 @@ bool __translateTitles()
         std::cout << "Échec de la traduction" << std::endl;
         return 0;
     }
+    
+    return 1;
+}
+
+void CSFILESMAN::__saveAppTips(wchar_t* path)
+{
+    if(!saveAppTips)
+        return;
+
+    wchar_t* _path = path != 0 ? path : appTipsFilePath;
+
+    FILE *f = _wfopen(_path,L"wb+");
+    // Lire le BOM (Byte Order Mark)
+    unsigned char bom[2] = {0xFF,0xFE};
+    fwrite(bom, 1, 2, f);
+
+    int n = SECTION.size();
+
+    csLIST<wchar_t> str; 
+    csLIST<wchar_t> strStruct;
+    for(int i=0; i<n; i++)
+    {
+        int m = TipsPopupParams[i].message.size();
+        
+        wstring tmp= (to_wstring(m)+L" ");
+        strStruct.insertTableAt((wchar_t*)tmp.c_str(), strStruct.size(), tmp.size());
+        for(int j=0; j<m; j++)
+        {
+            int o = TipsPopupParams[i].message[j].paragraph.size();
+            wstring tmp= (to_wstring(o)+L" ");
+            strStruct.insertTableAt((wchar_t*)tmp.c_str(), strStruct.size(), tmp.size());
+            int pos = 0;
+            for(int k=0; k<o; k++)
+            {
+                wchar_t* t = TipsPopupParams[i].message[j].paragraph[k].Text;
+                str.insertTableAt(t, str.size(), wcslen(t));
+                str.insertEnd('|');
+
+            }
+        }
+        strStruct.deleteEnd();
+        strStruct.insertEnd(L'|');
+    }
+    str.deleteEnd();
+    strStruct.deleteEnd();
+    
+    str.insertEnd('\0');
+    strStruct.insertEnd('\n');
+    strStruct.insertEnd('\0');
+    
+    wstring tmp=(to_wstring(strStruct.size())+L"\n");
+    fwrite((tmp).c_str(), sizeof(wchar_t), tmp.size(), f);
+    fwrite(strStruct.getTable(), sizeof(wchar_t), strStruct.size()-1, f);
+    tmp = (to_wstring(str.size())+L"\n");
+    fwrite((tmp).c_str(), sizeof(wchar_t), tmp.size(), f);
+    fwrite(str.getTable(), sizeof(wchar_t), str.size()-1, f);
+
+    str.clear();
+    strStruct.clear();
+
+    fclose(f);
+}
+
+bool CSFILESMAN::__getAppTips(wchar_t* path)
+{
+    wchar_t* _path = path != 0 ? path : appTipsFilePath;
+    //wcout<<L"path = " <<fileExists(_path)<<L"\n";
+    if(!(saveAppTips && fileExists(_path)))
+        return 0;
+
+    FILE *f = _wfopen(_path,L"rb+");
+    
+    // Lire le BOM (Byte Order Mark)
+    unsigned char bom[2];
+    fread(bom, 1, 2, f);
+
+    if (!(bom[0] == 0xFF && bom[1] == 0xFE)) {
+        wprintf(L"Attention: pas de BOM UTF-16 LE détecté\n");
+        rewind(f); // revenir au début si pas de BOM
+    }
+
+    wchar_t strStructSize[30];
+    fgetws(strStructSize, 30, f);
+
+    wchar_t*t;
+    int sz;
+    wchar_t strStruct[(sz=wcstol(strStructSize, &t, 10))+1];
+    fgetws(strStruct, sz, f);
+
+    wchar_t strSize[30];
+    fgetws(strSize, 30, f);
+
+    wchar_t str[(sz=wcstol(strSize, &t, 10))+1];
+    fgetws(str, sz, f);
+
+    vector<wstring> vstruct = splitWords(strStruct, L"|");
+    vector<wstring> vstr = splitWords(str, L"|");
+    int n = vstruct.size();
+
+    long strIter = 0;
+    for(int i=0; i<n; i++)
+    {
+        vector<vector<wchar_t*>> v;
+        vector<wstring> pstruct = splitWords(vstruct[i].c_str());
+        int psz;
+        if((psz = pstruct.size()) > 1)
+        {
+            int groupNum = wcstol(pstruct[0].c_str(), &t, 10);
+            for(int j=1; j<=groupNum; j++)
+            {
+                vector<wchar_t*> pragGroup;
+                int paragNum = wcstol(pstruct[j].c_str(), &t, 10);
+                for(int k=0; k<paragNum; k++)
+                {
+                    pragGroup.push_back(makeWcharString((wchar_t*)vstr[strIter].c_str()));
+                    //wcout<<vstr[strIter]<<L"\n";
+                    strIter++;
+                }
+                v.push_back(pragGroup);
+            }
+        }
+        pstruct.clear();
+        TIPSFILE.push_back(v);
+    }
+
+    fclose(f);
+
+    return 1;
+}
+
+void CSFILESMAN::setSaveAppTips(bool b)
+{
+    saveAppTips = b;
+}
+
+
+bool __translateTips(char* inputLanguage) 
+{
+    
+    std::string INPUT_FILE = string("lang\\tips\\") + inputLanguage + ".txt";
+    std::string OUTPUT_FILE = wcharPtrToCharPtr(appTipsFilePath); 
+    
+    if(!TIPSFILE.size())
+    {
+        if(!CSFILESMAN::__getAppTips((wchar_t*)charPtrtoWcharPtr(INPUT_FILE.c_str()).c_str()))
+        {
+            wcout<< L"Pas de fichier à traduire. Veuillez créer un fichier de langue initial.\n";
+            return 0;
+        }
+    }
+
+    csLIST<char*> l1;
+    l1.insertEnd((char*)OUTPUT_FILE.c_str());
+    csLIST<char> l2 = l1.toList(0);
+    int i1 = l2.findLast('/') ; if(i1 == -1) i1 = l2.findLast('\\') ; if(i1 == -1) i1 = 0;
+    int i2 = l2.findLast('.');
+    char* tar = l2.toString(i1+1, i2-1);
+
+    l1.clear();
+    l2.clear();
+
+    if (!tar)
+    {
+        return 0;
+    }
+    
+    //std::cout<<"\n"<<tar<<"    -----\n";
+
+    std::string SOURCE_LANG = "en";
+    std::string TARGET_LANG = tar;
+    // =============================
+    
+    
+    CSTRANSLATOR translator(INPUT_FILE, OUTPUT_FILE, SOURCE_LANG, TARGET_LANG);
+
+    int m = TIPSFILE.size();
+    for(int i=0; i<m; i++)
+    {
+        if(TIPSFILE[i].size())
+        {
+            int n = TIPSFILE[i].size();
+            for(int j=0; j<n; j++)
+            {
+                vector<wchar_t*> ret;
+                ret = translator.translate(TIPSFILE[i][j]);
+
+                int o = ret.size();
+                for(int k=0; k<o; k++)
+                {
+                    free(TIPSFILE[i][j][k]);
+                    TIPSFILE[i][j][k] = ret[k];
+                }
+            }
+        }
+    }
+    std::wcout << std::endl << L"Traduction terminee ! " << std::endl;
     
     return 1;
 }

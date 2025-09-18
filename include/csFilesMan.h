@@ -16,6 +16,10 @@ void setSaveAppSizes(bool b);
 void __saveAppTitles();
 void __getAppTitles();
 void setSaveAppTitles(bool b);
+
+void __saveAppTips(wchar_t* path=0);
+bool __getAppTips(wchar_t* path=0);
+void setSaveAppTips(bool b);
 };
 
 #endif // CSFILESMAN_H
