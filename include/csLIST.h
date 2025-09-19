@@ -359,6 +359,8 @@ template<class TYPE> class csLIST
     void duplicatePointList(int from, int to);
     char* toString(int from, int to);
     wchar_t* toStringW(int from, int to);
+    void endString();
+    void endStringW();
     csLIST<char> toList(int id);
     csLIST<wchar_t> toListW(int id);
     csLIST<TYPE> breakList(int from, int to);

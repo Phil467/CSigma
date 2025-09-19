@@ -71,14 +71,14 @@ vector<long> CSSTRUTILS::wordsToLong(vector<wstring> words)
 }
 
 
-wchar_t* CSSTRUTILS::makeWcharString(const wchar_t* _str)
+wchar_t* CSSTRUTILS::makeWString(const wchar_t* _str)
 {
     int len = wcslen(_str)+1;
     wchar_t* str = (wchar_t*)malloc(sizeof(wchar_t)*len);
     wcscpy_s(str, len, _str);
     return str;
 }
-wchar_t* CSSTRUTILS::makeWcharString(const char* _str)
+wchar_t* CSSTRUTILS::makeWString(const char* _str)
 {
     int len = strlen(_str)+1;
     wchar_t* str = (wchar_t*)malloc(sizeof(wchar_t)*len);

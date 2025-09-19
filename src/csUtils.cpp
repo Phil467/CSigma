@@ -728,7 +728,7 @@ void CSUIMAN::addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, C
         for(int i=0; i<n; i++)
         {
             //wcout<<TIPSFILE[id][TipsPopupParams[id].message.size()][i]<<L"\n";
-            message.paragraph[i].Text = CSSTRUTILS::makeWcharString(TIPSFILE[id][TipsPopupParams[id].message.size()][i]);
+            message.paragraph[i].Text = CSSTRUTILS::makeWString(TIPSFILE[id][TipsPopupParams[id].message.size()][i]);
         }
     }
     else
@@ -736,7 +736,7 @@ void CSUIMAN::addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, C
         int n = message.paragraph.size();
         for(int i=0; i<n; i++)
         {
-            message.paragraph[i].Text = CSSTRUTILS::makeWcharString(message.paragraph[i].Text);
+            message.paragraph[i].Text = CSSTRUTILS::makeWString(message.paragraph[i].Text);
         }
     }
     tpp.message.push_back(message);

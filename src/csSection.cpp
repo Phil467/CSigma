@@ -166,7 +166,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
 
         if((saveAppTips && !CSFILESMAN::fileExists(appTipsFilePath)))
         {
-            __translateTips("en");
+            __translateTips("en-us");
         }
         else if((saveAppTips && CSFILESMAN::fileExists(appTipsFilePath)))
         {

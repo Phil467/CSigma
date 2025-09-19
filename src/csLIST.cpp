@@ -5,7 +5,6 @@
 #include <windows.h>
 
 
-
 template<> void csLIST<char*>::moveCharPtr(int from, int to)
 {
     char*data = csAlloc<char>(strlen((const char*)DataTab[from])+1);
@@ -64,8 +63,6 @@ template<> char* csLIST<char>::toString(int from, int to)
         int j=0;
         for(int i=from; i<end; i++, j++)
         {
-            /*sprintf(c, "%c\0", DataTab[i]);
-            strcat(ret,c);*/
             ret[j] = DataTab[i];
         }
         ret[j] = '\0';
@@ -81,8 +78,6 @@ template<> char* csLIST<char>::toString(int from, int to)
         int j=0;
         for(int i=end-1; i>=to; i--, j++)
         {
-            //sprintf(c, "%c\0", DataTab[i]);
-            //strcat(ret,c);
             ret[j] = DataTab[i];
         }
         ret[j] = '\0';
@@ -104,8 +99,6 @@ template<> wchar_t* csLIST<wchar_t>::toStringW(int from, int to)
         int j=0;
         for(int i=from; i<end; i++, j++)
         {
-            /*sprintf(c, "%c\0", DataTab[i]);
-            strcat(ret,c);*/
             ret[j] = DataTab[i];
         }
         ret[j] = '\0';
@@ -121,13 +114,31 @@ template<> wchar_t* csLIST<wchar_t>::toStringW(int from, int to)
         int j=0;
         for(int i=end-1; i>=to; i--, j++)
         {
-            //sprintf(c, "%c\0", DataTab[i]);
-            //strcat(ret,c);
             ret[j] = DataTab[i];
         }
         ret[j] = '\0';
     }
     return ret;
+}
+
+template<> void csLIST<char>::endString()
+{
+    if(tabSize >= memSize)
+    {
+        memSize += inc;
+        DataTab = (char*)realloc(DataTab, memSize*sizeof(char));
+    }
+    DataTab[tabSize] = '\0';
+}
+
+template<> void csLIST<wchar_t>::endStringW()
+{
+    if(tabSize >= memSize)
+    {
+        memSize += inc;
+        DataTab = (wchar_t*)realloc(DataTab, memSize*sizeof(wchar_t));
+    }
+    DataTab[tabSize] = '\0';
 }
 
 

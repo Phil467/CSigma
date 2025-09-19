@@ -841,7 +841,7 @@ void CSLISTBOXMIN::newFilePath(wchar_t* filter, unsigned iconId)
         wchar_t* p = szFile + n + 1;
         if (*p == '\0')
         {
-            filePath.insertEnd(makeWcharString(szFile));
+            filePath.insertEnd(makeWString(szFile));
             csLIST<wchar_t> chlist = filePath.toListW(filePath.size()-1);
             int i = chlist.findLast('\\');
             if(i > -1)
@@ -858,7 +858,7 @@ void CSLISTBOXMIN::newFilePath(wchar_t* filter, unsigned iconId)
             while (*p)
             {
                 std::wstring fullPath = folder + L"\\" + p;
-                filePath.insertEnd(makeWcharString(fullPath.c_str()));
+                filePath.insertEnd(makeWString(fullPath.c_str()));
                 filePathID.insertEnd(title.size());
                 newItem(p,1,iconId);
                 p += wcslen(p) + 1;

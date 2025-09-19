@@ -77,17 +77,60 @@ std::string CSTRANSLATOR::httpRequest(const std::string& url)
     return result;
 }
 
+size_t findLastOccurence(const char* str, const char* source, size_t sourceSize, bool includeStr)
+{
+    size_t pos, strSize1 = strlen(str)-1;
+    bool b;
+    for(int i=sourceSize-1; i>=0; i--)
+    {
+        b = 1;
+        if(source[i] == str[strSize1])
+        {
+            int k=1;
+            for(int j=strSize1-1; j>=0; j--, k++)
+            {
+                if(source[i-k] != str[j])
+                {
+                    b = 0;
+                    break;
+                }
+            }
+            
+            if(b) 
+            {
+                if(includeStr) return i-k+1;
+                else return i+1;
+            }
+        }
+    }
+
+    return MAXLONG;
+}
+
 // Parser JSON simple pour extraire translatedText
 std::string CSTRANSLATOR::extractTranslation(const std::string& jsonResponse) 
 {
-    // Recherche simple de "translatedText":"..."
+    // Recherche simple de "translatedText":"..." // ------ moins sure
     std::string searchStr = "\"translatedText\":\"";
     size_t start = jsonResponse.find(searchStr);
     if (start == std::string::npos) return "";
     
     start += searchStr.length();
-    size_t end = jsonResponse.find("\"", start);
-    if (end == std::string::npos) return "";
+    size_t end;
+    if(jsonResponse.substr(start, 7) != "<entry>")
+    {
+        end = jsonResponse.find("\"", start);
+        if (end == std::string::npos) return "";
+    }
+    else // pour contourner le bug du a l'apparition des balises xml dans le resultat de "translatedText"
+    {
+        // Recherche simple de "translated":"..." // ------ plus sure
+        start = findLastOccurence("\"translation\":\"", jsonResponse.c_str(), jsonResponse.size(), 0);
+        if (start == MAXLONG) return "";
+        
+        end = findLastOccurence("\",\"source\"", jsonResponse.c_str(), jsonResponse.size(), 1);
+        if (end == MAXLONG) return "";
+    }
     
     std::string translation = jsonResponse.substr(start, end - start);
     
@@ -285,7 +328,7 @@ std::vector<wchar_t*> CSTRANSLATOR::translate(std::vector<wchar_t*> lines)
         else if (wcscmp(line.getTable(), L"-") == 0) {
             std::wcout << L"Ligne " << lineCount << "/" << totalLines 
                         << L": - '-' non traduite" << std::endl;
-            ret.push_back(CSSTRUTILS::makeWcharString(L"-"));
+            ret.push_back(CSSTRUTILS::makeWString(L"-"));
         }
         else */
         {
@@ -293,10 +336,10 @@ std::vector<wchar_t*> CSTRANSLATOR::translate(std::vector<wchar_t*> lines)
             
             if(len > -1 && (line.size() + len) < MAX_TRANSLATION_TEXT_LENGTH_REQUESTED)
             {
-                line.insertEnd('\n');
+                line.insertEnd(L'\n');
                 continue;
             }
-            line.insertEnd('\0');
+            line.endStringW();
 
             /*wchar_t* part=0;
             std::wstring preview = line.size() > 50 ? 
@@ -317,11 +360,12 @@ std::vector<wchar_t*> CSTRANSLATOR::translate(std::vector<wchar_t*> lines)
             
             if (!translation.empty() && translation != "null") 
             {
+                cout<<response<<"\n";
                 vector<wstring> vline = CSSTRUTILS::splitWords(utf8_to_utf16(translation).c_str(), L"\n");
                 int n = vline.size();
                 for(int i=0; i<n; i++)
                 {
-                    ret.push_back(CSSTRUTILS::makeWcharString(vline[i].c_str()));
+                    ret.push_back(CSSTRUTILS::makeWString(vline[i].c_str()));
                 }
                 vline.clear();
             } 
@@ -332,7 +376,7 @@ std::vector<wchar_t*> CSTRANSLATOR::translate(std::vector<wchar_t*> lines)
                 int n = vline.size();
                 for(int i=0; i<vline.size(); i++)
                 {
-                    ret.push_back(CSSTRUTILS::makeWcharString(vline[i].c_str()));
+                    ret.push_back(CSSTRUTILS::makeWString(vline[i].c_str()));
                 }
                 vline.clear();
             }

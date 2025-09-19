@@ -12,12 +12,12 @@ wchar_t* appSizesFilePath = L"appSizes.txt\0";
 extern bool saveAppSizes;
 
 wchar_t* appTitleParamsFilePath = L"lang/titles/prm.txt\0";
-wchar_t* appTitleFilePath = L"lang/titles/ar.txt\0";
+wchar_t* appTitleFilePath = L"lang/titles/he.txt\0";
 vector<CSTEXT> TITLEFILE;
 vector<bool> setTitleInit;
 bool saveAppTitles;
 
-wchar_t* appTipsFilePath = L"lang/tips/ar.txt\0";
+wchar_t* appTipsFilePath = L"lang/tips/he.txt\0";
 vector<vector<vector<wchar_t*>>> TIPSFILE;
 bool saveAppTips;
 
@@ -276,7 +276,7 @@ void CSFILESMAN::__getAppTitles()
         int i = 0;
         t.TextRect = {tl(w[i++]), tl(w[i++]), tl(w[i++]), tl(w[i++])};
         
-        t.Font = makeWcharString(w[i++].c_str()); //------------------------------------- memory...
+        t.Font = makeWString(w[i++].c_str()); //------------------------------------- memory...
         if(wcsicmp(t.Font, L"-")==0)
         {
             free(t.Font);
@@ -298,6 +298,7 @@ void CSFILESMAN::__getAppTitles()
         
         w.clear();
     }
+    //wcout<<"title file size : "<<TITLEFILE.size()<<"\n";
     if (ferror(f)) {
         wprintf(L"Erreur de lecture du fichier\n");
     }
@@ -323,7 +324,7 @@ void CSFILESMAN::__getAppTitles()
         if(wcsicmp(str, L"-\r\n") != 0)//
         {
             wcout<<"["<<i<<"]  "<<str;
-            _str = makeWcharString(str);
+            _str = makeWString(str);
         }
         
         TITLEFILE[i++].Text = _str;
@@ -358,7 +359,7 @@ void CSFILESMAN::__getAppTitles()
     {
         if(wt[i] != L"-")
         {
-            TITLEFILE[i].Text = makeWcharString(wt[i].c_str());
+            TITLEFILE[i].Text = makeWString(wt[i].c_str());
         }
     }
 
@@ -385,7 +386,7 @@ void CSFILESMAN::setSaveAppSizes(bool b)
 bool __translateTitles() 
 {
     // === PARAMÈTRES À MODIFIER ===
-    std::string INPUT_FILE = "lang\\titles\\en.txt";
+    std::string INPUT_FILE = "lang\\titles\\en-us.txt";
     std::string OUTPUT_FILE = wcharPtrToCharPtr(appTitleFilePath); //"D:\\projects\\CSigma\\lang\\titles\\hi.txt";
 
     csLIST<char*> l1;
@@ -405,7 +406,7 @@ bool __translateTitles()
     
     //std::cout<<"\n"<<tar<<"    -----\n";
 
-    std::string SOURCE_LANG = "en";
+    std::string SOURCE_LANG = "en-us";
     std::string TARGET_LANG = tar;
     // =============================
     
@@ -533,7 +534,7 @@ bool CSFILESMAN::__getAppTips(wchar_t* path)
                 int paragNum = wcstol(pstruct[j].c_str(), &t, 10);
                 for(int k=0; k<paragNum; k++)
                 {
-                    pragGroup.push_back(makeWcharString((wchar_t*)vstr[strIter].c_str()));
+                    pragGroup.push_back(makeWString((wchar_t*)vstr[strIter].c_str()));
                     //wcout<<vstr[strIter]<<L"\n";
                     strIter++;
                 }
@@ -585,9 +586,8 @@ bool __translateTips(char* inputLanguage)
         return 0;
     }
     
-    //std::cout<<"\n"<<tar<<"    -----\n";
 
-    std::string SOURCE_LANG = "en";
+    std::string SOURCE_LANG = "en-us";
     std::string TARGET_LANG = tar;
     // =============================
     
@@ -606,6 +606,7 @@ bool __translateTips(char* inputLanguage)
                 ret = translator.translate(TIPSFILE[i][j]);
 
                 int o = ret.size();
+                wcout<<TIPSFILE[i][j].size()<<"  "<<o<<"\n";
                 for(int k=0; k<o; k++)
                 {
                     free(TIPSFILE[i][j][k]);

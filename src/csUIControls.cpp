@@ -190,14 +190,15 @@ CSSYSCOMMAND_SECTION CSUICONTROLS::addSysCommand(int& id, POINT pos)
 
 int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, char*iconPath, int fontSize, wchar_t*fontName)
 {
+
     if(size.cx == 0 || size.cy == 0)
     {
         HFONT hf = CreateFontW(CSUTILS::getAdjustedFontSizeX(fontSize),
                               0,
                               0, 0, 0, 0,0,0,DEFAULT_CHARSET,
                               OUT_DEFAULT_PRECIS,CLIP_STROKE_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH|FF_DONTCARE, fontName);
-        LPSIZE lps = CSUTILS::textExtentW(SECTION[0], hf, title);
-        size = {lps->cx/dimFact, lps->cy/dimFact};
+        LPSIZE lps = CSUTILS::textExtentW(SECTION[id], hf, title);
+        size = {lps->cx, lps->cy};
         free(lps);
         DeleteFont(hf);
 
@@ -206,12 +207,15 @@ int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, char*iconPath, int
     }
 
     int TITLE_SECTION = CSUIMAN::createSection(id, {2,0,size.cx,size.cy},  RGB(5,5,5), {0,0,0,0});
+
     CSUIMAN::setBorderColorAndThick(TITLE_SECTION, RGB(20,20,20), 1);
     if(iconPath)
         CSUIFX::setImageGradient(TITLE_SECTION, iconPath, iconPath, {2,2}, {26,26}, 0.05, 2,1);
     CSUIMAN::setTitle(TITLE_SECTION, CSTEXT{.Text=title, .Font=fontName, .FontSize = fontSize, .Italic=0,
                                    .Bold=0, .Color={150,150,150},
                                    .Marging={35/dimFact,0}, .Align = CS_TA_CENTER_LEFT, .Show=1});
+    
+    
     
     CSUIMAN::inert(TITLE_SECTION,190);
     SetWindowTextW(SECTION[id], title);
@@ -225,6 +229,8 @@ int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, char*iconPath, int
             {
                 InvalidateRect(HWND(Args),0,1);
                 updateTitleSectionBool[id] = 1;
+                RECT r = TITLE[id].TextRect;
+                SetWindowPos(SECTION[id], 0, 0,0,r.right, 20*dimFact, SWP_NOMOVE|SWP_NOZORDER);
             }
         }
     };
