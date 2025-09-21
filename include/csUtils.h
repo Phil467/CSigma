@@ -52,8 +52,8 @@ using namespace  std;
 namespace CSUIMAN
 {
 
-void _CSIGMA_APP_INIT_(HINSTANCE hInstance, void(*forceEventFunc)(CSARGS)=0, CSARGS* forceEventArgs=0);
-int _CSIGMA_APP_CREATE_();
+void _CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* originalLanguage=L"us", const wchar_t* viewLanguage=L"fr", bool saveAppText=0, bool saveAppGeometry=0, void(*forceEventFunc)(CSARGS)=0, CSARGS* forceEventArgs=0);
+int _CSIGMA_APP_RUN_();
 void __setAllRects();
 int createSection(int id, RECT geom,  COLORREF color, BOOL_RECT edgeResize, bool show=1, bool isRoot=0, bool attach=1);
 bool addAction(int id, void(*f)(CSARGS), CSARGS& args);

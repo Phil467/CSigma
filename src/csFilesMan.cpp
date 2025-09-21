@@ -1,6 +1,7 @@
 #include "csFilesMan.h"
 #include "readwfile.h"
 #include "csTranslator.h"
+#include "csUtils.h"
 
 extern vector<HWND> SECTION;
 extern vector<RECT> RECTPARREFSAVED;
@@ -12,14 +13,23 @@ wchar_t* appSizesFilePath = L"appSizes.txt\0";
 extern bool saveAppSizes;
 
 wchar_t* appTitleParamsFilePath = L"lang/titles/prm.txt\0";
-wchar_t* appTitleFilePath = L"lang/titles/he.txt\0";
+wchar_t* appTitleFilePath = L"lang/titles/fr.txt\0";
 vector<CSTEXT> TITLEFILE;
 vector<bool> setTitleInit;
 bool saveAppTitles;
 
-wchar_t* appTipsFilePath = L"lang/tips/he.txt\0";
+wchar_t* appTipsFilePath = L"lang/tips/fr.txt\0";
 vector<vector<vector<wchar_t*>>> TIPSFILE;
 bool saveAppTips;
+
+
+extern const wchar_t* languagesW[];
+extern const wchar_t* langCodesW[];
+extern int LANGUAGES_COUNT;
+
+
+extern wchar_t* originalLanguage;
+extern wchar_t* viewLanguage;
 
 using namespace CSSTRUTILS;
 
@@ -272,6 +282,7 @@ void CSFILESMAN::__getAppTitles()
     {
         w = _splitWords(str);
         CSTEXT t;
+        t.Text = 0;
         
         int i = 0;
         t.TextRect = {tl(w[i++]), tl(w[i++]), tl(w[i++]), tl(w[i++])};
@@ -315,28 +326,13 @@ void CSFILESMAN::__getAppTitles()
         rewind(f); // revenir au début si pas de BOM
     }
 
-    /*while(fgetws(str, 1000, f) != NULL)
-    {
-        if(i >= n)
-            break;
-
-        wchar_t* _str = 0;
-        if(wcsicmp(str, L"-\r\n") != 0)//
-        {
-            wcout<<"["<<i<<"]  "<<str;
-            _str = makeWString(str);
-        }
-        
-        TITLEFILE[i++].Text = _str;
-        
-    }*/
-    fseek(f,0,SEEK_END);
+    /*fseek(f,0,SEEK_END);
     long size = ftell(f);
-    fseek(f,0,SEEK_SET);
+    fseek(f,0,SEEK_SET);*/
 
-    wchar_t* str2 = csAlloc<wchar_t>(MAX_TRANSLATION_TEXT_LENGTH_REQUESTED);
+    wchar_t* str2 = csAlloc<wchar_t>(MAX_TRANSLATION_TEXT_LENGTH_REQUESTED+1);
     vector<wstring> wt;
-    while(fgetws(str2, size, f) != 0)
+    while(fgetws(str2, MAX_TRANSLATION_TEXT_LENGTH_REQUESTED, f) != 0)
     {
         vector<wstring> titles = splitWords(str2, L"|");
         int m = titles.size();
@@ -347,7 +343,6 @@ void CSFILESMAN::__getAppTitles()
         }
         //titles.clear();
     }
-    free(str2);
 
     if(wt.size() != n)
     {
@@ -357,16 +352,34 @@ void CSFILESMAN::__getAppTitles()
 
     for(int i=0; i<n; i++)
     {
-        if(wt[i] != L"-")
+        if(wt[i] != L"-" && wt[i] != L"-\n")
         {
             TITLEFILE[i].Text = makeWString(wt[i].c_str());
         }
     }
 
     wt.clear();
+    free(str2);
 
     fclose(f);
 
+}
+
+void CSFILESMAN::__setAppTitles()
+{
+    int n = TITLEFILE.size();
+    cout<<n<<"  "<<SECTION.size()<<"  ---text\n";
+    for(int i=0; i<n; i++)
+    {
+        if(TITLEFILE[i].Text)
+        {
+            wchar_t* t = TITLE[i].Text;
+            TITLE[i].Text = makeWString(TITLEFILE[i].Text);
+            free(t);
+        }
+        //CSUIMAN::setTitle(i, TITLEFILE[i], 0);
+    }
+    InvalidateRect(SECTION[0],0,1);
 }
 
 void CSFILESMAN::setSaveAppTitles(bool b)
@@ -386,7 +399,7 @@ void CSFILESMAN::setSaveAppSizes(bool b)
 bool __translateTitles() 
 {
     // === PARAMÈTRES À MODIFIER ===
-    std::string INPUT_FILE = "lang\\titles\\en-us.txt";
+    std::string INPUT_FILE = "lang\\titles\\" + utf16_to_utf8(originalLanguage) + ".txt";
     std::string OUTPUT_FILE = wcharPtrToCharPtr(appTitleFilePath); //"D:\\projects\\CSigma\\lang\\titles\\hi.txt";
 
     csLIST<char*> l1;
@@ -406,7 +419,7 @@ bool __translateTitles()
     
     //std::cout<<"\n"<<tar<<"    -----\n";
 
-    std::string SOURCE_LANG = "en-us";
+    std::string SOURCE_LANG = utf16_to_utf8(originalLanguage);
     std::string TARGET_LANG = tar;
     // =============================
     
@@ -490,6 +503,23 @@ bool CSFILESMAN::__getAppTips(wchar_t* path)
     if(!(saveAppTips && fileExists(_path)))
         return 0;
 
+    int m = TIPSFILE.size();
+    for(int i=0; i<m; i++)
+    {
+        int n = TIPSFILE[i].size();
+        for(int j=0; j<n; j++)
+        {
+            int o = TIPSFILE[i][j].size();
+            for(int k=0; k<o; k++)
+            {
+                free(TIPSFILE[i][j][k]);
+            }
+            TIPSFILE[i][j].clear();
+        }
+        TIPSFILE[i].clear();
+    }
+    TIPSFILE.clear();
+
     FILE *f = _wfopen(_path,L"rb+");
     
     // Lire le BOM (Byte Order Mark)
@@ -550,26 +580,46 @@ bool CSFILESMAN::__getAppTips(wchar_t* path)
     return 1;
 }
 
+void CSFILESMAN::__setAppTips()
+{
+    int n = SECTION.size();
+
+    for(int i=0; i<n; i++)
+    {
+        int m = TipsPopupParams[i].message.size();
+        
+        for(int j=0; j<m; j++)
+        {
+            int o = TipsPopupParams[i].message[j].paragraph.size();
+            for(int k=0; k<o; k++)
+            {
+                wchar_t* t = (TipsPopupParams[i].message[j].paragraph[k].Text);
+                TipsPopupParams[i].message[j].paragraph[k].Text = CSSTRUTILS::makeWString(TIPSFILE[i][j][k]);
+                free(t);
+
+            }
+        }
+    }
+}
+
 void CSFILESMAN::setSaveAppTips(bool b)
 {
     saveAppTips = b;
 }
 
 
-bool __translateTips(char* inputLanguage) 
+bool __translateTips() 
 {
     
-    std::string INPUT_FILE = string("lang\\tips\\") + inputLanguage + ".txt";
+    std::string INPUT_FILE = string("lang\\tips\\") + utf16_to_utf8(originalLanguage) + ".txt";
     std::string OUTPUT_FILE = wcharPtrToCharPtr(appTipsFilePath); 
-    
-    if(!TIPSFILE.size())
+
+    if(!CSFILESMAN::__getAppTips((wchar_t*)charPtrtoWcharPtr(INPUT_FILE.c_str()).c_str()))
     {
-        if(!CSFILESMAN::__getAppTips((wchar_t*)charPtrtoWcharPtr(INPUT_FILE.c_str()).c_str()))
-        {
-            wcout<< L"Pas de fichier à traduire. Veuillez créer un fichier de langue initial.\n";
-            return 0;
-        }
+        wcout<< L"Pas de fichier à traduire. Veuillez créer un fichier de langue initial.\n";
+        return 0;
     }
+    
 
     csLIST<char*> l1;
     l1.insertEnd((char*)OUTPUT_FILE.c_str());
@@ -587,13 +637,13 @@ bool __translateTips(char* inputLanguage)
     }
     
 
-    std::string SOURCE_LANG = "en-us";
+    std::string SOURCE_LANG = utf16_to_utf8(originalLanguage);
     std::string TARGET_LANG = tar;
     // =============================
     
     
     CSTRANSLATOR translator(INPUT_FILE, OUTPUT_FILE, SOURCE_LANG, TARGET_LANG);
-
+    
     int m = TIPSFILE.size();
     for(int i=0; i<m; i++)
     {
@@ -606,16 +656,48 @@ bool __translateTips(char* inputLanguage)
                 ret = translator.translate(TIPSFILE[i][j]);
 
                 int o = ret.size();
-                wcout<<TIPSFILE[i][j].size()<<"  "<<o<<"\n";
                 for(int k=0; k<o; k++)
                 {
-                    free(TIPSFILE[i][j][k]);
+                    wchar_t*t=(TIPSFILE[i][j][k]);
                     TIPSFILE[i][j][k] = ret[k];
+                    free(TIPSFILE[i][j][k]);
                 }
             }
         }
     }
-    std::wcout << std::endl << L"Traduction terminee ! " << std::endl;
+    std::cout << std::endl << "Traduction terminee ! " << std::endl;
     
     return 1;
+}
+
+void CSFILESMAN::translateAppStrings()
+{
+    
+    __translateTitles();
+    __getAppTitles();
+
+    __translateTips();
+    
+    __setAppTitles();
+    __setAppTips();
+}
+
+void CSFILESMAN::setViewLanguage(unsigned int idLang)
+{
+    if(idLang < LANGUAGES_COUNT)
+    {
+        viewLanguage = (wchar_t*)langCodesW[idLang];
+
+        wstring s = appTitleFilePath;
+        size_t pos1 = s.find_last_of(L"/");
+        size_t pos2 = s.find_last_of(L".");
+
+        appTitleFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + viewLanguage + s.substr(pos2, s.size()-pos2)).c_str());
+
+        s = appTipsFilePath;
+        pos1 = s.find_last_of(L"/");
+        pos2 = s.find_last_of(L".");
+
+        appTipsFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + viewLanguage + s.substr(pos2, s.size()-pos2)).c_str());
+    }
 }

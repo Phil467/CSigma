@@ -1,5 +1,6 @@
 #include "csUtils.h"
 #include "math.h"
+#include "csFilesMan.h"
 //#include <shellscalingapi.h>
 extern float xdimFact;
 extern float ydimFact;
@@ -74,6 +75,12 @@ HINSTANCE hReditLib;
 extern int CURSOR_NCHITTEST_POS;
 extern float dimFact;
 
+extern wchar_t* originalLanguage;
+extern wchar_t* viewLanguage;
+
+extern wchar_t* appTitleFilePath;
+extern wchar_t* appTipsFilePath;
+
 LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 HHOOK setHook();
 
@@ -94,9 +101,27 @@ typedef enum
 extern vector<CSTEXT> TITLEFILE;
 extern vector<bool> setTitleInit;
 
-void CSUIMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, void(*forceEventFunc)(CSARGS), CSARGS *forceEventArgs)
+void CSUIMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _originalLanguage, const wchar_t* _viewLanguage, bool saveAppText, bool saveAppGeometry, void(*forceEventFunc)(CSARGS), CSARGS *forceEventArgs)
 {
     _hInstance = hInstance;
+    originalLanguage = (wchar_t*)_originalLanguage;
+    viewLanguage = (wchar_t*)_viewLanguage;
+
+    wstring s = appTitleFilePath;
+    size_t pos1 = s.find_last_of(L"/");
+    size_t pos2 = s.find_last_of(L".");
+
+    appTitleFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + viewLanguage + s.substr(pos2, s.size()-pos2)).c_str());
+
+    s = appTipsFilePath;
+    pos1 = s.find_last_of(L"/");
+    pos2 = s.find_last_of(L".");
+
+    appTipsFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + viewLanguage + s.substr(pos2, s.size()-pos2)).c_str());
+
+    CSFILESMAN::setSaveAppTitles(saveAppText);
+    CSFILESMAN::setSaveAppSizes(saveAppGeometry);
+    CSFILESMAN::setSaveAppTips(saveAppText);
 
     xdimFact = 1.0*GetSystemMetrics(SM_CXSCREEN)/(1920);
     ydimFact = 1.0*GetSystemMetrics(SM_CYSCREEN)/(1080);
@@ -129,7 +154,7 @@ void CSUIMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, void(*forceEventFunc)(CSARG
 
 extern bool CLICK_EFFECT_BOOL;
 
-int CSUIMAN::_CSIGMA_APP_CREATE_()
+int CSUIMAN::_CSIGMA_APP_RUN_()
 {
     HHOOK mhook = setHook();
 
@@ -400,28 +425,24 @@ void CSUIMAN::setTitle(int id, CSTEXT title, bool textOnly)
             if(!setTitleInit[id])
             {
                 TITLE[id] = TITLEFILE[id];
+                TITLE[id].Text = CSSTRUTILS::makeWString(TITLEFILE[id].Text);
+                TITLE[id].Font = CSSTRUTILS::makeWString(TITLEFILE[id].Font);
                 setTitleInit[id] = 1;
             }
             else
             {
                 if(!textOnly)
                     TITLE[id] = title;
-                int l;
-                TITLE[id].Text = csAlloc<wchar_t>((l=wcslen(title.Text)+1));
-                wcscpy_s(TITLE[id].Text, l, title.Text);
-                TITLE[id].Font = csAlloc<wchar_t>((l=wcslen(title.Font)+1));
-                wcscpy_s(TITLE[id].Font, l, title.Font);
+                TITLE[id].Text = CSSTRUTILS::makeWString(title.Text);
+                TITLE[id].Font = CSSTRUTILS::makeWString(title.Font);
             }
         }
         else
         {
             if(!textOnly)
                 TITLE[id] = title;
-            int l;
-            TITLE[id].Text = csAlloc<wchar_t>((l=wcslen(title.Text)+1));
-            wcscpy_s(TITLE[id].Text, l, title.Text);
-            TITLE[id].Font = csAlloc<wchar_t>((l=wcslen(title.Font)+1));
-            wcscpy_s(TITLE[id].Font, l, title.Font);
+            TITLE[id].Text = CSSTRUTILS::makeWString(title.Text);
+            TITLE[id].Font = CSSTRUTILS::makeWString(title.Font);
 
         }
         
@@ -431,7 +452,7 @@ void CSUIMAN::setTitle(int id, CSTEXT title, bool textOnly)
             hStackBmp[id] = (CreateCompatibleBitmap(hdcontext[id],hdcSize[id].cx, hdcSize[id].cy));
             SelectBitmap(hdStackContext[id], hStackBmp[id]);
         }
-        SetWindowTextW(SECTION[id], title.Text);
+        SetWindowTextW(SECTION[id], TITLE[id].Text);
     }
 }
 

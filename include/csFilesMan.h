@@ -15,11 +15,16 @@ void setSaveAppSizes(bool b);
 
 void __saveAppTitles();
 void __getAppTitles();
+void __setAppTitles();
 void setSaveAppTitles(bool b);
 
 void __saveAppTips(wchar_t* path=0);
 bool __getAppTips(wchar_t* path=0);
+void __setAppTips();
 void setSaveAppTips(bool b);
+
+void translateAppStrings();
+void setViewLanguage(unsigned int idLang);
 };
 
 #endif // CSFILESMAN_H

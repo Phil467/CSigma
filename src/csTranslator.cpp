@@ -3,6 +3,114 @@
 
 #pragma comment(lib, "wininet.lib")
 
+// Nombre total de langues et codes
+int LANGUAGES_COUNT = 220;
+
+const char* languages[] = {
+    "abkhazian", "acehnese", "acholi", "afar", "afrikaans", "aghem", "akan", "albanian", "alemannic_german", "amharic",
+    "arabic", "aragonese", "armenian", "assamese", "asturian", "avaric", "awadhi", "aymara", "azerbaijani", "balinese",
+    "balti", "bambara", "banjar", "bashkir", "basque", "belarusian", "bemba", "bengali", "bhojpuri", "bislama",
+    "bosnian", "breton", "bulgarian", "burmese", "cantonese", "catalan", "cebuano", "chamorro", "chechen", "chichewa",
+    "chinese_simplified", "chinese_traditional", "choctaw", "chuvash", "corsican", "cree", "crimean_tatar", "croatian", "czech", "danish",
+    "dari", "dhivehi", "dinka", "dogri", "dutch", "dzongkha", "eastern_mari", "english","english_usa","english_uk", "erzya", "esperanto",
+    "estonian", "ewe", "faroese", "fijian", "filipino", "finnish", "french", "frisian", "fula", "ga",
+    "galician", "ganda", "georgian", "german", "gilbertese", "greek", "guarani", "gujarati", "haitian_creole", "hausa",
+    "hawaiian", "hebrew", "hiligaynon", "hindi", "hmong", "hungarian", "icelandic", "igbo", "ilocano", "indonesian",
+    "inuktitut", "irish", "italian", "japanese", "javanese", "jingpho", "kalaallisut", "kannada", "kanuri", "kashmiri",
+    "kazakh", "khmer", "kinyarwanda", "kirghiz", "komi", "konkani", "korean", "krio", "kurdish_kurmanji", "kurdish_sorani",
+    "kyrgyz", "lao", "latin", "latvian", "ligurian", "limburgish", "lingala", "lithuanian", "luganda", "luo",
+    "luxembourgish", "macedonian", "madurese", "magahi", "maithili", "makassar", "malagasy", "malay", "malayalam", "maltese",
+    "manipuri_meitei", "manx", "maori", "marathi", "marshallese", "minangkabau", "mirandese", "mizo", "mongolian", "myanmar",
+    "nahuatl", "ndau", "ndebele", "nepali", "newari", "nko", "northern_sotho", "norwegian_bokmal", "norwegian_nynorsk", "nuer",
+    "occitan", "odia", "oromo", "ossetian", "pangasinan", "papiamento", "pashto", "persian", "polish", "portuguese",
+    "punjabi_gurmukhi", "punjabi_shahmukhi", "quechua", "romani", "romanian", "rundi", "russian", "samoan", "sango", "sanskrit",
+    "sardinian", "scots_gaelic", "serbian", "sesotho", "setswana", "shona", "sindhi", "sinhala", "slovak", "slovenian",
+    "somali", "spanish", "sundanese", "swahili", "swati", "swedish", "tajik", "tamil", "tatar", "telugu",
+    "tetum", "thai", "tibetan", "tigrinya", "tiv", "tok_pisin", "tongan", "tsonga", "tswana", "tulu",
+    "turkish", "turkmen", "twi", "ukrainian", "urdu", "uyghur", "uzbek", "venda", "vietnamese", "waigali",
+    "welsh", "western_frisian", "wolof", "xhosa", "yiddish", "yoruba", "yue_chinese", "zulu"
+};
+
+
+const char* langCodes[] = {
+    "ab", "ace", "ach", "aa", "af", "agq", "ak", "sq", "gsw", "am",
+    "ar", "an", "hy", "as", "ast", "av", "awa", "ay", "az", "ban",
+    "bft", "bm", "bjn", "ba", "eu", "be", "bem", "bn", "bho", "bi",
+    "bs", "br", "bg", "my", "yue", "ca", "ceb", "ch", "ce", "ny",
+    "zh-cn", "zh-tw", "cho", "cv", "co", "cr", "crh", "hr", "cs", "da",
+    "prs", "dv", "din", "doi", "nl", "dz", "mhr", "en","en-us","en-gb", "myv", "eo",
+    "et", "ee", "fo", "fj", "tl", "fi", "fr", "fy", "ff", "gaa",
+    "gl", "lg", "ka", "de", "gil", "el", "gn", "gu", "ht", "ha",
+    "haw", "he", "hil", "hi", "hmn", "hu", "is", "ig", "ilo", "id",
+    "iu", "ga", "it", "ja", "jv", "kac", "kl", "kn", "kr", "ks",
+    "kk", "km", "rw", "ky", "kmi", "kok", "ko", "kri", "ku", "ckb",
+    "ky", "lo", "la", "lv", "lij", "li", "ln", "lt", "lg", "luo",
+    "lb", "mk", "mad", "mai", "mai", "mak", "mg", "ms", "ml", "mt",
+    "mni", "gv", "mi", "mr", "mh", "min", "mwl", "lus", "mn", "my",
+    "nah", "ndc", "nr", "ne", "new", "nqo", "nso", "nb", "nn", "nus",
+    "oc", "or", "om", "os", "pag", "pap", "ps", "fa", "pl", "pt",
+    "pa", "pnb", "qu", "rom", "ro", "rn", "ru", "sm", "sg", "sa",
+    "sc", "gd", "sr", "st", "tn", "sn", "sd", "si", "sk", "sl",
+    "so", "es", "su", "sw", "ss", "sv", "tg", "ta", "tt", "te",
+    "tet", "th", "bo", "ti", "tiv", "tpi", "to", "ts", "tn", "tcy",
+    "tr", "tk", "tw", "uk", "ur", "ug", "uz", "ve", "vi", "wbl",
+    "cy", "fy", "wo", "xh", "yi", "yo", "yue", "zu"
+};
+
+const wchar_t* langCodesW[] = {
+    L"ab", L"ace", L"ach", L"aa", L"af", L"agq", L"ak", L"sq", L"gsw", L"am",
+    L"ar", L"an", L"hy", L"as", L"ast", L"av", L"awa", L"ay", L"az", L"ban",
+    L"bft", L"bm", L"bjn", L"ba", L"eu", L"be", L"bem", L"bn", L"bho", L"bi",
+    L"bs", L"br", L"bg", L"my", L"yue", L"ca", L"ceb", L"ch", L"ce", L"ny",
+    L"zh-cn", L"zh-tw", L"cho", L"cv", L"co", L"cr", L"crh", L"hr", L"cs", L"da",
+    L"prs", L"dv", L"din", L"doi", L"nl", L"dz", L"mhr", L"en", L"en-us", L"en-gb", L"myv", L"eo",
+    L"et", L"ee", L"fo", L"fj", L"tl", L"fi", L"fr", L"fy", L"ff", L"gaa",
+    L"gl", L"lg", L"ka", L"de", L"gil", L"el", L"gn", L"gu", L"ht", L"ha",
+    L"haw", L"he", L"hil", L"hi", L"hmn", L"hu", L"is", L"ig", L"ilo", L"id",
+    L"iu", L"ga", L"it", L"ja", L"jv", L"kac", L"kl", L"kn", L"kr", L"ks",
+    L"kk", L"km", L"rw", L"ky", L"kmi", L"kok", L"ko", L"kri", L"ku", L"ckb",
+    L"ky", L"lo", L"la", L"lv", L"lij", L"li", L"ln", L"lt", L"lg", L"luo",
+    L"lb", L"mk", L"mad", L"mai", L"mai", L"mak", L"mg", L"ms", L"ml", L"mt",
+    L"mni", L"gv", L"mi", L"mr", L"mh", L"min", L"mwl", L"lus", L"mn", L"my",
+    L"nah", L"ndc", L"nr", L"ne", L"new", L"nqo", L"nso", L"nb", L"nn", L"nus",
+    L"oc", L"or", L"om", L"os", L"pag", L"pap", L"ps", L"fa", L"pl", L"pt",
+    L"pa", L"pnb", L"qu", L"rom", L"ro", L"rn", L"ru", L"sm", L"sg", L"sa",
+    L"sc", L"gd", L"sr", L"st", L"tn", L"sn", L"sd", L"si", L"sk", L"sl",
+    L"so", L"es", L"su", L"sw", L"ss", L"sv", L"tg", L"ta", L"tt", L"te",
+    L"tet", L"th", L"bo", L"ti", L"tiv", L"tpi", L"to", L"ts", L"tn", L"tcy",
+    L"tr", L"tk", L"tw", L"uk", L"ur", L"ug", L"uz", L"ve", L"vi", L"wbl",
+    L"cy", L"fy", L"wo", L"xh", L"yi", L"yo", L"yue", L"zu"
+};
+
+// Tableau de langues pour accès individuel
+const wchar_t* languagesW[] = {
+    L"abkhazian", L"acehnese", L"acholi", L"afar", L"afrikaans", L"aghem", L"akan", L"albanian", L"alemannic_german", L"amharic",
+    L"arabic", L"aragonese", L"armenian", L"assamese", L"asturian", L"avaric", L"awadhi", L"aymara", L"azerbaijani", L"balinese",
+    L"balti", L"bambara", L"banjar", L"bashkir", L"basque", L"belarusian", L"bemba", L"bengali", L"bhojpuri", L"bislama",
+    L"bosnian", L"breton", L"bulgarian", L"burmese", L"cantonese", L"catalan", L"cebuano", L"chamorro", L"chechen", L"chichewa",
+    L"chinese_simplified", L"chinese_traditional", L"choctaw", L"chuvash", L"corsican", L"cree", L"crimean_tatar", L"croatian", L"czech", L"danish",
+    L"dari", L"dhivehi", L"dinka", L"dogri", L"dutch", L"dzongkha", L"eastern_mari", L"english", L"english_usa", L"english_uk", L"erzya", L"esperanto",
+    L"estonian", L"ewe", L"faroese", L"fijian", L"filipino", L"finnish", L"french", L"frisian", L"fula", L"ga",
+    L"galician", L"ganda", L"georgian", L"german", L"gilbertese", L"greek", L"guarani", L"gujarati", L"haitian_creole", L"hausa",
+    L"hawaiian", L"hebrew", L"hiligaynon", L"hindi", L"hmong", L"hungarian", L"icelandic", L"igbo", L"ilocano", L"indonesian",
+    L"inuktitut", L"irish", L"italian", L"japanese", L"javanese", L"jingpho", L"kalaallisut", L"kannada", L"kanuri", L"kashmiri",
+    L"kazakh", L"khmer", L"kinyarwanda", L"kirghiz", L"komi", L"konkani", L"korean", L"krio", L"kurdish_kurmanji", L"kurdish_sorani",
+    L"kyrgyz", L"lao", L"latin", L"latvian", L"ligurian", L"limburgish", L"lingala", L"lithuanian", L"luganda", L"luo",
+    L"luxembourgish", L"macedonian", L"madurese", L"magahi", L"maithili", L"makassar", L"malagasy", L"malay", L"malayalam", L"maltese",
+    L"manipuri_meitei", L"manx", L"maori", L"marathi", L"marshallese", L"minangkabau", L"mirandese", L"mizo", L"mongolian", L"myanmar",
+    L"nahuatl", L"ndau", L"ndebele", L"nepali", L"newari", L"nko", L"northern_sotho", L"norwegian_bokmal", L"norwegian_nynorsk", L"nuer",
+    L"occitan", L"odia", L"oromo", L"ossetian", L"pangasinan", L"papiamento", L"pashto", L"persian", L"polish", L"portuguese",
+    L"punjabi_gurmukhi", L"punjabi_shahmukhi", L"quechua", L"romani", L"romanian", L"rundi", L"russian", L"samoan", L"sango", L"sanskrit",
+    L"sardinian", L"scots_gaelic", L"serbian", L"sesotho", L"setswana", L"shona", L"sindhi", L"sinhala", L"slovak", L"slovenian",
+    L"somali", L"spanish", L"sundanese", L"swahili", L"swati", L"swedish", L"tajik", L"tamil", L"tatar", L"telugu",
+    L"tetum", L"thai", L"tibetan", L"tigrinya", L"tiv", L"tok_pisin", L"tongan", L"tsonga", L"tswana", L"tulu",
+    L"turkish", L"turkmen", L"twi", L"ukrainian", L"urdu", L"uyghur", L"uzbek", L"venda", L"vietnamese", L"waigali",
+    L"welsh", L"western_frisian", L"wolof", L"xhosa", L"yiddish", L"yoruba", L"yue_chinese", L"zulu"
+};
+
+wchar_t* originalLanguage = L"en-us";
+wchar_t* viewLanguage = L"fr";
+
 extern int MAX_TRANSLATION_TEXT_LENGTH_REQUESTED;
 
 std::wstring utf8_to_utf16(const std::string& utf8) 
@@ -74,6 +182,87 @@ std::string CSTRANSLATOR::httpRequest(const std::string& url)
     
     InternetCloseHandle(hConnect);
     InternetCloseHandle(hInternet);
+    return result;
+}
+
+std::string translateWithLibreTranslate(const std::string& text, 
+        const std::string& sourceLang, 
+        const std::string& targetLang) 
+{
+    std::string result;
+
+    // 1. Initialiser WinINet
+    HINTERNET hInternet = InternetOpen(L"LibreTranslate Client", 
+    INTERNET_OPEN_TYPE_PRECONFIG, 
+    NULL, NULL, 0);
+    if (!hInternet) {
+    return "Erreur: Impossible d'initialiser WinINet";
+    }
+
+    // 2. Se connecter au serveur
+    HINTERNET hConnect = InternetConnect(hInternet,
+        L"libretranslate.com",
+        INTERNET_DEFAULT_HTTPS_PORT,
+        NULL, NULL,
+        INTERNET_SERVICE_HTTP,
+        0, 0);
+    if (!hConnect) {
+    InternetCloseHandle(hInternet);
+    return "Erreur: Impossible de se connecter au serveur";
+    }
+
+    // 3. Créer la requête HTTP POST
+    HINTERNET hRequest = HttpOpenRequest(hConnect,
+        L"POST",
+        L"/translate",
+        NULL,
+        NULL,
+        NULL,
+        INTERNET_FLAG_SECURE, // HTTPS
+        0);
+    if (!hRequest) {
+    InternetCloseHandle(hConnect);
+    InternetCloseHandle(hInternet);
+    return "Erreur: Impossible de créer la requête";
+    }
+
+    // 4. Construire le JSON avec les paramètres fournis
+    std::string headers = "Content-Type: application/json\r\n";
+    std::string jsonData = "{\"q\":\"" + text + 
+    "\",\"source\":\"" + sourceLang + 
+    "\",\"target\":\"" + targetLang + 
+    "\",\"format\":\"text\"}";
+
+    // 5. Envoyer la requête
+    BOOL requestSent = HttpSendRequestA(hRequest,
+        headers.c_str(),
+        headers.length(),
+        (LPVOID)jsonData.c_str(),
+        jsonData.length());
+
+    if (!requestSent) 
+    {
+    InternetCloseHandle(hRequest);
+    InternetCloseHandle(hConnect);
+    InternetCloseHandle(hInternet);
+    return "Erreur: Impossible d'envoyer la requête";
+    }
+
+    // 6. Lire la réponse
+    char buffer[4096];
+    DWORD bytesRead;
+
+    while (InternetReadFile(hRequest, buffer, sizeof(buffer) - 1, &bytesRead) && bytesRead > 0) 
+    {
+    buffer[bytesRead] = '\0';
+    result += buffer;
+    }
+
+    // 7. Nettoyer les handles
+    InternetCloseHandle(hRequest);
+    InternetCloseHandle(hConnect);
+    InternetCloseHandle(hInternet);
+
     return result;
 }
 
@@ -347,17 +536,21 @@ std::vector<wchar_t*> CSTRANSLATOR::translate(std::vector<wchar_t*> lines)
             std::wcout << L"Ligne " << lineCount << L"/" << totalLines 
                         << L": " << preview << std::endl;
             if(part) free(part);*/
-            wcout<<L"\n"<<line.getTable() << L"    path = ---------------------------------------------" <<L"\n";
+            //wcout<<L"\n"<<line.getTable() << L"    path = ---------------------------------------------" <<L"\n";
             
             // Construire l'URL de l'API
             std::string encodedText = urlEncode(utf16_to_utf8(line.getTable()));
+
             std::string url = "https://api.mymemory.translated.net/get?q=" + 
                             encodedText + "&langpair=" + sourceLang + "|" + targetLang;
             
             // Effectuer la requête
             std::string response = httpRequest(url);
+
+            //std::string response = translateWithLibreTranslate(encodedText, sourceLang, targetLang);
             std::string translation = extractTranslation(response);
-            
+            printf("%s\n",response.c_str());
+
             if (!translation.empty() && translation != "null") 
             {
                 cout<<response<<"\n";
@@ -462,21 +655,33 @@ bool CSTRANSLATOR::translate()
             std::string encodedText = urlEncode(line);
             std::string url = "https://api.mymemory.translated.net/get?q=" + 
                             encodedText + "&langpair=" + sourceLang + "|" + targetLang;
+                            
             
             // Effectuer la requête
             std::string response = httpRequest(url);
             std::string translation = extractTranslation(response);
             
-            if (!translation.empty() && translation != "null") {
+            if (!translation.empty() && translation != "null") 
+            {
                 n = translation.size();
                 for(int i=0; i<n; i++)
                 {
                     if(translation[i] == '\n')
+                    {
                         translation[i] = '|';
+                    }
                 }
+                //cout<<translation<<"\n";
                 writeLineUtf16(outFile, translation);
-            } else {
+            } 
+            else 
+            {
                 std::cout << "Erreur de traduction, conservation du texte original" << std::endl;
+                for(int i=0; i<n; i++)
+                {
+                    if(line[i] == '\n')
+                        line[i] = '|';
+                }
                 writeLineUtf16(outFile, line);
             }
             

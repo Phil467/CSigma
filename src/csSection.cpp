@@ -115,7 +115,7 @@ vector<CSAPP_ICON> appIcon;
 extern vector<bool> updateTitleSectionBool;
 
 extern bool __translateTitles();
-extern bool __translateTips(char* inputLanguage);
+extern bool __translateTips();
 
 
 
@@ -166,7 +166,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
 
         if((saveAppTips && !CSFILESMAN::fileExists(appTipsFilePath)))
         {
-            __translateTips("en-us");
+            __translateTips();
         }
         else if((saveAppTips && CSFILESMAN::fileExists(appTipsFilePath)))
         {
@@ -180,7 +180,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
             MoveWindow(SECTION[0], RF[0].left, RF[0].top, RF[0].right, RF[0].bottom, 1);
         }
     }
-    CSUIMAN::printRect(geom);
+    //CSUIMAN::printRect(geom);
     RESIZE_EDGE.push_back(edgeResize);
     RECTPARREF.push_back({0});
     RECTCL.push_back({0,0,geom.right, geom.bottom});
