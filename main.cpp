@@ -63,16 +63,14 @@ int GA_CLIENT;
 
 int smx = GetSystemMetrics(SM_CXSCREEN);
 int smy = GetSystemMetrics(SM_CYSCREEN);
+
+extern const wchar_t* languagesW[];
+extern const wchar_t* langCodesW[];
+extern int LANGUAGES_COUNT;
 // WinMain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
-    //_setmode(_fileno(stdout), _O_U8TEXT); // utf8 console
-    //_setmode(_fileno(stdout), _O_U16TEXT);
-    //example();
-
-    CSFILESMAN::setSaveAppTitles(1);
-    CSFILESMAN::setSaveAppSizes(1);
-    CSUIMAN::_CSIGMA_APP_INIT_(hInstance, forceEventFunction, &forceEventArgs);
+    CSUIMAN::_CSIGMA_APP_INIT_(hInstance, L"en-us", L"ar", 1, 1, forceEventFunction, &forceEventArgs);
 
     //float dimFact = GetSystemMetrics(SM_CXSCREEN)*GetSystemMetrics(SM_CYSCREEN)/(1366.0*768);
     float dimFact = 1.5;
@@ -83,7 +81,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     int ICON_ROOT  = setIcon(ROOT, L"icon.ico", L"icon.ico");
     CSUIMAN::enableDarkEdge(ROOT);
 
-    CSUICONTROLS::addTitle(ROOT, L"CSIGMA LIB TEST",{150,(CAPTION_AREA_SIZE+10)/dimFact}, "img/icon.bmp\0", 22, L"Arial Black");
+    CSUICONTROLS::addTitle(ROOT, L"CSIGMA LIBRARY TEST",{0}, "img/icon.bmp\0", 22, L"Arial Black");
     CSSYSCOMMAND_SECTION SYS_CMD = CSUICONTROLS::addSysCommand(ROOT, {600});
 
     /******************************** Tips popup **************************************** */
@@ -244,12 +242,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMessage0.marg = {10,10,10,10};
     tipsMessage0.updateGASize = 1;
     tipsMessage0.view = 1;
-    wchar_t* txt = makeWcharString(L"Font Size \0");
-    tipsMessage0.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMessage0.paragraph.push_back(CSTEXT{.Text=L"Font Size \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMessage0.pSpace.push_back(5);
-    txt = makeWcharString(L"Set de font size of text.\0");
-    tipsMessage0.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
+    
+    tipsMessage0.paragraph.push_back(CSTEXT{.Text=L"Set the font size of text.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage0.pSpace.push_back(5);
     CSUIMAN::addTips(fontSizeInc.idSection, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bRBottom=1}, 3, 0, tipsMessage0);
@@ -257,16 +254,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     /********************************************************************************** */
     int cy = CAPTION_AREA_SIZE/dimFact-2;
-    MENU_SECTION = createSection(ROOT, {(sRectClient(ROOT).right/dimFact-300)/2,0,300,cy},  RGB(15,15,15), {0,0,0,0});
+    int cx = 70;
+    MENU_SECTION = createSection(ROOT, {(sRectClient(ROOT).right/dimFact-cx*6)/2,0,cx*6,cy},  RGB(15,15,15), {0,0,0,0});
     bd = {MENU_SECTION, {-0.5,0,0.5,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
     bindGeometry(ROOT, bd);
-    int cx = 70;
 
     MENU_NS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"Preferences\0", "img/Settings01.bmp", "img/Settings01.bmp", {1,0,cx*1.5,cy-1}, 16);
-    MENU_BIS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"Edition\0", "img/Settings01.bmp", "img/Settings01.bmp", {1+cx*1.5,0,cx,cy-1}, 16);
-    MENU_CS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"Models\0", "img/Settings01.bmp", "img/Settings01.bmp", {1+cx*2.5,0,cx,cy-1}, 16);
+    MENU_BIS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"Edition\0", "img/Settings01.bmp", "img/Settings01.bmp", {1+cx*1.5,0,cx*1.5,cy-1}, 16);
+    MENU_CS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"Models\0", "img/Settings01.bmp", "img/Settings01.bmp", {1+cx*3,0,cx*1.5,cy-1}, 16);
     //MENU_PREFERENCES = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"PREFERENCES\0", "img/Settings01.bmp", "img/Settings01.bmp", {1+cx*3,0,cx*1.5,cy-1}, 16);
-    MENU_ABOUT = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"About\0", "img/About01.bmp", "img/About01.bmp", {1+cx*3.5,0,cx,cy-1}, 16);
+    MENU_ABOUT = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"About\0", "img/About01.bmp", "img/About01.bmp", {1+cx*4.5,0,cx*1.5,cy-1}, 16);
 
     //ABOUT_UI = createSection(-1, {100,25,600,500},  RGB(0,0,0), {1,1,1,1,1,1,1,1}, 1, 1);
     ABOUT_UI = createSection(0, {100,25,600,500},  RGB(40,40,40), {1,1,1,1,1,1,1,1}, 0, 1, 0);
@@ -342,11 +339,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMessage.marg = {10,10,10,10};
     tipsMessage.updateGASize = 1;
     tipsMessage.view = 1;
-    txt = makeWcharString(L"Op. Precision \0");
-    tipsMessage.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMessage.paragraph.push_back(CSTEXT{.Text=L"Op. Precision \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMessage.pSpace.push_back(5);
-    txt = makeWcharString(L"Represents the precision of operations. Greater is it, more precise are the results but slower are calculations.\0");
+    wchar_t* txt = L"Represents the precision of operations. Greater is it, more precise are the results but slower are calculations.\0";
     tipsMessage.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage.pSpace.push_back(5);
@@ -358,12 +354,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMessage1.marg = {10,10,10,10};
     tipsMessage1.updateGASize = 1;
     tipsMessage1.view = 1;
-    txt = makeWcharString(L"Nb. Precision \0");
-    tipsMessage1.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMessage1.paragraph.push_back(CSTEXT{.Text=L"Nb. Precision \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMessage1.pSpace.push_back(5);
-    txt = makeWcharString(L"Represents the precision of numbers showed.\0");
-    tipsMessage1.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
+    
+    tipsMessage1.paragraph.push_back(CSTEXT{.Text=L"Represents the precision of numbers showed.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage1.pSpace.push_back(5);
     CSUIMAN::addTips(externPrec.idSection, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMessage1);
@@ -375,11 +370,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMessage2.marg = {10,10,10,10};
     tipsMessage2.updateGASize = 1;
     tipsMessage2.view = 1;
-    txt = makeWcharString(L"Digits Number \0");
-    tipsMessage2.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMessage2.paragraph.push_back(CSTEXT{.Text=L"Digits Number \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMessage2.pSpace.push_back(5);
-    txt = makeWcharString(L"Represents the number of digits of the number to be generated randomly.\0");
+    txt = L"Represents the number of digits of the number to be generated randomly.\0";
     tipsMessage2.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage2.pSpace.push_back(5);
@@ -394,11 +388,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMessage3.marg = {10,10,10,10};
     tipsMessage3.updateGASize = 1;
     tipsMessage3.view = 1;
-    txt = makeWcharString(L"Digit Boundary \0");
-    tipsMessage3.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMessage3.paragraph.push_back(CSTEXT{.Text=L"Digit Boundary \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMessage3.pSpace.push_back(5);
-    txt = makeWcharString(L"Represents the lower or higher boundary of the digit to be generated randomly.\0");
+    txt = L"Represents the lower or higher boundary of the digit to be generated randomly.\0";
     tipsMessage3.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage3.pSpace.push_back(5);
@@ -422,11 +415,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMSG.marg = {10,10,10,10};
     tipsMSG.updateGASize = 1;
     tipsMSG.view = 1;
-    txt = makeWcharString(L"Random \0");
-    tipsMSG.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMSG.paragraph.push_back(CSTEXT{.Text=L"Rand \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMSG.pSpace.push_back(5);
-    txt = makeWcharString(L"Generates a random integer number.\0");
+    txt = L"Generates a random integer number.\0";
     tipsMSG.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMSG.pSpace.push_back(5);
@@ -439,12 +431,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMSG1.marg = {10,10,10,10};
     tipsMSG1.updateGASize = 1;
     tipsMSG1.view = 1;
-    txt = makeWcharString(L"Add   \0");
-    tipsMSG1.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Add   \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMSG1.pSpace.push_back(5);
-    txt = makeWcharString(L"Add a data to list.\0");
-    tipsMSG1.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
+    tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Add a data to list.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMSG1.pSpace.push_back(5);
     CSUIMAN::addTips(BTN_ADD_TO_DATA_LIST, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG1);
@@ -494,8 +484,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     CSDYNAMIC_SIMPLE_TEXT dst;
     dst.marg = {10,10};
     dst.updateGASize = 1;
-    txt = makeWcharString(L"0\0");
-    dst.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri light", .FontSize = 16, .Italic=0,
+    dst.paragraph.push_back(CSTEXT{.Text=L"0\0", .Font=L"calibri light", .FontSize = 16, .Italic=0,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     dst.pSpace.push_back(12);
     dst.view = 0;
@@ -503,21 +492,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     GA_CLIENT = MIDDLE_BOTTOM_SECTION;
     
-    int idImg1 = csGraphics::loadImage(GA_CLIENT, L"img/csigma logo.bmp", {1,1}, {0,0});
+    int idImg1 = csGraphics::loadImage(GA_CLIENT, L"img/CSigma Structure.bmp", {1,1}, {0,0});
     SIZE size1 = csGraphics::getImageSize(GA_CLIENT, idImg1);
     SIZE newSize1 = {size1.cx-200*4, size1.cy-200*4};
-    csGraphics::setImageSize(GA_CLIENT, idImg1, newSize1);
-    csGraphics::setImagePos(GA_CLIENT, idImg1, {200, 200});
-    csGraphics::showImage(GA_CLIENT, idImg1, {0,0}, newSize1);
+    //csGraphics::setImageSize(GA_CLIENT, idImg1, newSize1);
+    csGraphics::setImagePos(GA_CLIENT, idImg1, {100, 100});
+    csGraphics::showImage(GA_CLIENT, idImg1, {0,0}, {0});
 
-    int idImg2 = csGraphics::loadImage(GA_CLIENT, L"img/search02.bmp", {0,0}, {0,0});
+    /*int idImg2 = csGraphics::loadImage(GA_CLIENT, L"img/search02.bmp", {0,0}, {0,0});
     SIZE size2 = csGraphics::getImageSize(GA_CLIENT, idImg2);
     SIZE newSize2 = {size2.cx*10, size2.cy*10};
     csGraphics::setImageSize(GA_CLIENT, idImg2, newSize2);
-    csGraphics::showImage(GA_CLIENT, idImg2);
+    csGraphics::showImage(GA_CLIENT, idImg2);*/
 
     int fact = std::max(ceil(1.0*size1.cx/smx), ceil(1.0*size1.cy/smy));
-    SIZE gaSize = {fact*smx, fact*smy};
+    SIZE gaSize = {size1.cx+200, size1.cy+200};
     csGraphics::setGraphicAreaColor(GA_CLIENT, {10,10,10}, {0});
     csGraphics::setGraphicAreaSize(GA_CLIENT, gaSize);
     csGraphics::updateGraphicArea(GA_CLIENT, 1);
@@ -542,7 +531,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
 
 
-    CSLISTBOXMIN* lbm = csNewMinimalListBoxPtr(&RIGHT_SECTION, 100, 85);
+    /*CSLISTBOXMIN* lbm = csNewMinimalListBoxPtr(&RIGHT_SECTION, 100, 85);
     lbm->setDefaultFont(L"calibri",{12,0});
     lbm->setItemAlign(CS_ALIGN_VERTICAL);
     lbm->setOffset({1,1});
@@ -555,14 +544,37 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     lbm->newIcon(L"img\\Code01.bmp");
     lbm->setDefaultTitle(L"Param");
-    lbm->newItem(0,30,1);
+    lbm->newItem(0,30,1);*/
 
+    CSLISTBOXMIN* lbm = csNewMinimalListBoxPtr(&RIGHT_SECTION, 100, 220);
+    lbm->setDefaultFont(L"calibri",{14,0});
+    lbm->setItemAlign(CS_ALIGN_VERTICAL);
+    lbm->setOffset({1,1});
+    lbm->setDefaultSize({150*dimFact, 15*dimFact});
+    //lbm->setIconSize(0,{26,26});
+
+    lbm->setIcon(0, L"img\\langIcon2.bmp",L"img\\langIcon.bmp", L"img\\langIcon.bmp", L"img\\langIcon.bmp");
+    lbm->setMaxTextWidth(120*dimFact);
+    lbm->setDefaultTitle(L"Index");
+    
+    for(int i=0; i<LANGUAGES_COUNT; i++)
+    {
+        lbm->newItem((wchar_t*)(wstring(languagesW[i])+L" ("+ wstring(langCodesW[i])+L")").c_str(),1,0);
+    }
+    /*for(int i=0; i<218; i++)
+    {
+        lbm->newItem((wchar_t*)langCodesW[i],1,0);
+    }*/
     //lbm->newFilePath(L"Bitmap 24-bits\0*.bmp\0");
 
     lbm->setActiveItem(0);
     lbm->create();
 
-    return CSUIMAN::_CSIGMA_APP_CREATE_();
+    void appTranslateStrings(CSARGS Args);
+    CSUIMAN::addAction(lbm->getId(), appTranslateStrings, 1, lbm);
+    
+
+    return CSUIMAN::_CSIGMA_APP_RUN_();
 }
 
 
@@ -660,3 +672,34 @@ void setFontSize(CSARGS Args)
     }
 }
 
+void appTranslateStrings(CSARGS Args)
+{
+    CSLISTBOXMIN* lbm = (CSLISTBOXMIN*)Args[0];
+    int id = (int)Args;
+    UINT msg = (UINT)Args;
+    static bool isworking = 0;
+
+    if(msg == WM_LBUTTONDBLCLK)
+    {
+        if(!isworking)
+        {
+            int i = *lbm->getActiveItem();
+            isworking = 1;
+
+            thread t(
+                [](int i, bool* isworking)
+                {
+                    CSFILESMAN::setViewLanguage(i);
+                    CSFILESMAN::translateAppStrings();
+                    *isworking = 0;
+
+                }, i, &isworking
+            );
+            t.detach();
+        }
+        else
+        {
+            cout<<"Please wait until active translation ends up !\n";
+        }
+    }
+}
