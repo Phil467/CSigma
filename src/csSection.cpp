@@ -114,6 +114,8 @@ vector<bool> updateAfterResizeMsg;
 vector<CSAPP_ICON> appIcon;
 extern vector<bool> updateTitleSectionBool;
 
+vector<int> autoSizeFromTitle;
+
 extern bool __translateTitles();
 extern bool __translateTips();
 
@@ -267,6 +269,8 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
     halftoneMode.push_back(1);
     TIMER_PARAMS.push_back({0});
     loadedImage.push_back(newVector<CSLOADED_IMAGE>());
+
+    autoSizeFromTitle.push_back(0);
 
     updateAfterResizeMsg.push_back(0);
 
@@ -938,6 +942,18 @@ cout<<"gesture\n";
             /***************************************************************************** */
 
             CSUIMAN::_updateApp(0);
+
+            // autoFitToTitle
+            if(autoSizeFromTitle[id])
+            {
+                int a = TITLE[id].TextRect.right + autoSizeFromTitle[id];
+                if(a != RECTCL[id].right)
+                {
+                    RECT r = RECTCL[id];
+                    SetWindowPos(hwnd,0, 0,0, a, r.bottom, SWP_NOZORDER|SWP_NOMOVE);
+                }
+
+            }
 
         }
 

@@ -45,6 +45,7 @@ int IDCAPTURE;
 extern vector<CSZOOM_PARAMS> zoomParams;
 extern void delay(int del);
 
+
 int SCROLLBAR_AUTO_REPOS_TIMER_ID = 1;
 
 void resize(CSARGS Args);
@@ -151,6 +152,14 @@ void parentResize(CSARGS Args)
 CSSCROLLBAR::CSSCROLLBAR(int idp, RECT geometry, int sctype, bool orientation)
 {
     init(idp, geometry, sctype, orientation);
+}
+
+void CSSCROLLBAR::update()
+{
+    int id = idp;
+    RECT r = RECTCL[id];
+    SetWindowPos(SECTION[id], 0, 0,0,r.right-2,r.bottom-2, SWP_NOMOVE|SWP_NOZORDER);
+    SetWindowPos(SECTION[id], 0, 0,0,r.right,r.bottom, SWP_NOMOVE|SWP_NOZORDER);
 }
 
 void CSSCROLLBAR::setScrollColors(CSRGBA c1, CSRGBA c2)
@@ -424,6 +433,7 @@ void CSSCROLLBAR::setPositionRatio(float posRatio)
     else
     {
         *value0 = *value = posRatio; 
+        //SendMessage(SECTION[idp],WM_SIZE,0,0);
     }
 }
 
@@ -486,6 +496,36 @@ void CSSCROLLBAR::setClient(int _idc, int _idMask)
     }
 }
 
+void CSSCROLLBAR::updateViewArea()
+{
+    if(*orient == CS_SBAR_HORIZONTAL)
+    {
+        POINT p = hdcontextExtOutPos[*idc];
+        int visiblePart = (RECTWND[*idMask].right-viewedAreaRightMarging[*idc])-(RECTWND[*idc].left+p.x);
+        RECT _r = {p.x, p.y, visiblePart+p.x, (RECTWND[*idMask].bottom-viewedAreaBottomMarging[*idc])-RECTWND[*idc].top};
+        if(!withVScroll[idp])
+            bltRect[*idc] = _r; //-----------------------------attention conflit memoire. tester avec withVscroll et ne remplir que cx si nessecaire....
+        else
+        {
+            bltRect[*idc].left = _r.left; 
+            bltRect[*idc].right = _r.right; 
+        }
+    }
+    else
+    {
+        POINT p = hdcontextExtOutPos[*idc];
+        int visiblePart = (RECTWND[*idMask].bottom-viewedAreaBottomMarging[*idc])-(RECTWND[*idc].top+p.y);
+        RECT _r = {p.x, p.y, (RECTWND[*idMask].right-viewedAreaRightMarging[*idc])-RECTWND[*idc].left, visiblePart+p.y};
+        if(!withHScroll[idp])
+            bltRect[*idc] = _r; //-----------------------------attention conflit memoire. tester avec withVscroll et ne remplir que cx si nessecaire....
+        else
+        {
+            bltRect[*idc].top = _r.top; 
+            bltRect[*idc].bottom = _r.bottom; 
+        }
+    }
+}
+
 void resize(CSARGS Args)
 {
     int id = int(Args);
@@ -512,17 +552,23 @@ void resize(CSARGS Args)
     
     if(orientation == CS_SBAR_HORIZONTAL)
     {
-        if(idMask && idc && !*block)
+        if(idMask && idc/* && !*block*/)
         {
             POINT p = hdcontextExtOutPos[idc];
             int visiblePart = (RECTWND[idMask].right-viewedAreaRightMarging[idc])-(RECTWND[idc].left+p.x);
             RECT _r = {p.x, p.y, visiblePart+p.x, (RECTWND[idMask].bottom-viewedAreaBottomMarging[idc])-RECTWND[idc].top};
-            bltRect[idc] = _r; //-----------------------------attention conflit memoire. tester avec withVscroll et ne remplir que cx si nessecaire....
+            if(!withVScroll[id])
+                bltRect[idc] = _r; //-----------------------------attention conflit memoire. tester avec withVscroll et ne remplir que cx si nessecaire....
+            else
+            {
+                bltRect[idc].left = _r.left; 
+                bltRect[idc].right = _r.right; 
+            }
             
             /*zoomParams[idc].hmin = visiblePart/(hdcontextExtSize[idc].cx + zoomParams[idc].marging);
             if(zoomParams[idc].hmin < zoomParams[idc].vmin) zoomParams[idc].hmin = zoomParams[idc].vmin;*/
             
-            if(scType == CS_SBAR_SURFACE)
+            if(scType == CS_SBAR_SURFACE && !*block)
             {
                 int totalLengthScrollable = hdcontextExtSize[idc].cx*hZoom[idc];
                 
@@ -570,17 +616,23 @@ void resize(CSARGS Args)
     }
     else
     {
-        if(idMask && idc && !*block)
+        if(idMask && idc/* && !*block*/)
         {
             POINT p = hdcontextExtOutPos[idc];
             int visiblePart = (RECTWND[idMask].bottom-viewedAreaBottomMarging[idc])-(RECTWND[idc].top+p.y);
             RECT _r = {p.x, p.y, (RECTWND[idMask].right-viewedAreaRightMarging[idc])-RECTWND[idc].left, visiblePart+p.y};
-            bltRect[idc] = _r;
+            if(!withHScroll[id])
+                bltRect[idc] = _r; //-----------------------------attention conflit memoire. tester avec withVscroll et ne remplir que cx si nessecaire....
+            else
+            {
+                bltRect[idc].top = _r.top; 
+                bltRect[idc].bottom = _r.bottom; 
+            }
             
             /*zoomParams[idc].vmin = visiblePart/(hdcontextExtSize[idc].cy + zoomParams[idc].marging);
             if(zoomParams[idc].vmin < zoomParams[idc].hmin) zoomParams[idc].vmin = zoomParams[idc].hmin;*/
 
-            if(scType == CS_SBAR_SURFACE)
+            if(scType == CS_SBAR_SURFACE && !*block)
             {
                 int totalLengthScrollable = hdcontextExtSize[idc].cy*vZoom[idc];
                 *scval = float(visiblePart)/totalLengthScrollable;

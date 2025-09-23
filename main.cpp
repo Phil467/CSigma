@@ -20,6 +20,7 @@
 
 #include "csSection.h"
 #include "csUIControls.h"
+#include "csMenu.h"
 
 #include "csStrUtils.h"
 #include "csSubClasses.h"
@@ -51,26 +52,20 @@ void forceEventFunction(CSARGS Args);
 int ROOT, MENU_SECTION, LEFT_SECTION, MIDDLE_TOP_SECTION, MIDDLE_BOTTOM_SECTION, MIDDLE_SECTION, RIGHT_SECTION, BOTTOM_SECTION;
 int NR_SECTION, CS_SECTION, BIS_SECTION;
 int BTN_NEW_FILE, BTN_NEW_OUTPUT, BTN_REMOVE_FILE, BNT_RANDOM_NUMBER, BTN_ADD_TO_DATA_LIST;
-int BTN_REMOVE_SAVE_1, BTN_REMOVE_UNDO_1, BTN_REMOVE_REDO_1, BTN_REMOVE_SAVE_2, BTN_REMOVE_UNDO_2, BTN_REMOVE_REDO_2;
+int BTN_REMOVE_SAVE_1, BTN_REMOVE_UNDO_1, BTN_1, BTN_2, BTN_3, BTN_4;
 int STATIC_SEARCH, BUTTON_SEARCH;
-
 int MENU_NS, MENU_BIS, MENU_CS, MENU_PREFERENCES, MENU_ABOUT;
 int SYSCOMMAND_SECTION, SYS_CLOSE, SYS_MAX, SYS_MIN, TITLE_SECTION, RIGHT_SECTION_CHILD;
-
 int ABOUT_UI, ABOUT_UI_CLIENT, ABOUT_UI_BOTTOM, ABOUT_SUB_MENU, ABOUT_P1, ABOUT_P2, ABOUT_P3, ABOUT_P4, ABOUT_PTITLE, ABOUT_PINDEX;
-
-int GA_CLIENT;
+int GA_CLIENT, PROGRESS_INFO_SECTION, IMAGE_LIST_SECTION;
 
 int smx = GetSystemMetrics(SM_CXSCREEN);
 int smy = GetSystemMetrics(SM_CYSCREEN);
 
-extern const wchar_t* languagesW[];
-extern const wchar_t* langCodesW[];
-extern int LANGUAGES_COUNT;
 // WinMain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
-    CSUIMAN::_CSIGMA_APP_INIT_(hInstance, L"en-us", L"ar", 1, 1, forceEventFunction, &forceEventArgs);
+    CSUIMAN::_CSIGMA_APP_INIT_(hInstance, L"en-us", L"en-us", 1, 1, forceEventFunction, &forceEventArgs);
 
     //float dimFact = GetSystemMetrics(SM_CXSCREEN)*GetSystemMetrics(SM_CYSCREEN)/(1366.0*768);
     float dimFact = 1.5;
@@ -80,19 +75,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     ROOT = createSection(-1, {100,25,600,500},  RGB(30,30,30), {1,1,1,1,1,1,1,1});
     int ICON_ROOT  = setIcon(ROOT, L"icon.ico", L"icon.ico");
     CSUIMAN::enableDarkEdge(ROOT);
-
+    
     CSUICONTROLS::addTitle(ROOT, L"CSIGMA LIBRARY TEST",{0}, "img/icon.bmp\0", 22, L"Arial Black");
     CSSYSCOMMAND_SECTION SYS_CMD = CSUICONTROLS::addSysCommand(ROOT, {600});
 
-    /******************************** Tips popup **************************************** */
-    CSUICONTROLS::createTipsPupop(RGB(40,40,40));
+    /******************************** ToolTips **************************************** */
+    CSUICONTROLS::createToolTips(RGB(40,40,40));
 
     /*************************************** LEFT_SECTION ************************************ */
 
     CAPTION_AREA_SIZE *= 1.5;
     LEFT_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/dimFact,75,450},  RGB(20,20,20), {0,0,1,0});
 
-    BIND_GEOM_PARAMS bd = {LEFT_SECTION, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE, 0, BIND_DEST_BOTTOM_EDGE}};
+    CSBIND_GEOM_PARAMS bd = {LEFT_SECTION, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE, 0, BIND_DEST_BOTTOM_EDGE}};
     bindGeometry(ROOT, 1, bd); // C version
     
     /*************************************** MIDDLE_SECTION ************************************ */
@@ -229,7 +224,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     /********************************************************************************** */
 
-    CS_NUMERIC_INCREMENTER_PARAMS fontSizeInc = CSUICONTROLS::numericIncrementerExt1(ROOT, {600-120,0,65,16}, L"16", L"1", INPUT_FORMAT_INTERGER,
+    CS_NUMERIC_INCREMENTER_PARAMS fontSizeInc = CSUICONTROLS::numericIncrementerExt1(ROOT, {600-150,0,70,20}, L"16", L"1", INPUT_FORMAT_INTERGER,
                                                             {-1,0,1,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0});
     fontSizeInc.setMinBound("8");
     fontSizeInc.setMaxBound("30");
@@ -255,15 +250,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     /********************************************************************************** */
     int cy = CAPTION_AREA_SIZE/dimFact-2;
     int cx = 70;
-    MENU_SECTION = createSection(ROOT, {(sRectClient(ROOT).right/dimFact-cx*6)/2,0,cx*6,cy},  RGB(15,15,15), {0,0,0,0});
-    bd = {MENU_SECTION, {-0.5,0,0.5,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
-    bindGeometry(ROOT, bd);
 
-    MENU_NS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"Preferences\0", "img/Settings01.bmp", "img/Settings01.bmp", {1,0,cx*1.5,cy-1}, 16);
-    MENU_BIS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"Edition\0", "img/Settings01.bmp", "img/Settings01.bmp", {1+cx*1.5,0,cx*1.5,cy-1}, 16);
-    MENU_CS = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"Models\0", "img/Settings01.bmp", "img/Settings01.bmp", {1+cx*3,0,cx*1.5,cy-1}, 16);
-    //MENU_PREFERENCES = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"PREFERENCES\0", "img/Settings01.bmp", "img/Settings01.bmp", {1+cx*3,0,cx*1.5,cy-1}, 16);
-    MENU_ABOUT = CSUICONTROLS::darkImgTextButton01(MENU_SECTION, L"About\0", "img/About01.bmp", "img/About01.bmp", {1+cx*4.5,0,cx*1.5,cy-1}, 16);
+    CSMENU menu(ROOT, {(sRectClient(ROOT).right/dimFact-cx*6)/2,0,0,cy}, 1);
+
+    menu.newItem( L"File\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
+    menu.newItem( L"Edit\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
+    menu.newItem( L"Data\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
+    menu.newItem( L"Preferences\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
+    int aboutMenuId = menu.newItem( L"About\0", L"img/About01.bmp", L"img/About01.bmp");
+    MENU_ABOUT = menu.getIdButton(aboutMenuId);
+
+
 
     //ABOUT_UI = createSection(-1, {100,25,600,500},  RGB(0,0,0), {1,1,1,1,1,1,1,1}, 1, 1);
     ABOUT_UI = createSection(0, {100,25,600,500},  RGB(40,40,40), {1,1,1,1,1,1,1,1}, 0, 1, 0);
@@ -339,7 +336,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMessage.marg = {10,10,10,10};
     tipsMessage.updateGASize = 1;
     tipsMessage.view = 1;
-    tipsMessage.paragraph.push_back(CSTEXT{.Text=L"Op. Precision \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMessage.paragraph.push_back(CSTEXT{.Text=L"Precision of operations \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMessage.pSpace.push_back(5);
     wchar_t* txt = L"Represents the precision of operations. Greater is it, more precise are the results but slower are calculations.\0";
@@ -354,7 +351,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMessage1.marg = {10,10,10,10};
     tipsMessage1.updateGASize = 1;
     tipsMessage1.view = 1;
-    tipsMessage1.paragraph.push_back(CSTEXT{.Text=L"Nb. Precision \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMessage1.paragraph.push_back(CSTEXT{.Text=L"Precision of numbers\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMessage1.pSpace.push_back(5);
     
@@ -415,7 +412,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMSG.marg = {10,10,10,10};
     tipsMSG.updateGASize = 1;
     tipsMSG.view = 1;
-    tipsMSG.paragraph.push_back(CSTEXT{.Text=L"Rand \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMSG.paragraph.push_back(CSTEXT{.Text=L"Random \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMSG.pSpace.push_back(5);
     txt = L"Generates a random integer number.\0";
@@ -457,10 +454,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     //BTN_REMOVE_UNDO_1 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Undo 1\0", {5,5+total*9,65,h});
 
-    BTN_REMOVE_REDO_1 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Redo 1", {5,5+total*10,65,h});
-    BTN_REMOVE_SAVE_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Save 2", {5,5+total*12,65,h});
-    BTN_REMOVE_UNDO_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Undo 2", {5,5+total*13,65,h});
-    BTN_REMOVE_REDO_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Redo 2", {5,5+total*14,65,h});
+    BTN_1 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Button 1", {5,5+total*10,65,h});
+    BTN_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Button 2", {5,5+total*11,65,h});
+    BTN_3 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Button 3", {5,5+total*12,65,h});
+    BTN_4 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Button 4", {5,5+total*13,65,h});
     // Boucle principale
 
 
@@ -475,11 +472,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     csGraphics::setGraphicAreaPosition(MIDDLE_BOTTOM_SECTION,{0,0});
     csGraphics::setGraphicAreaColor(MIDDLE_BOTTOM_SECTION,{10,10,10},{0});
-    csGraphics::setGraphicAreaSize(MIDDLE_BOTTOM_SECTION,{2500, 3500});
+    //csGraphics::setGraphicAreaSize(MIDDLE_BOTTOM_SECTION,{2500, 3500});
     csGraphics::updateGraphicArea(MIDDLE_BOTTOM_SECTION, 1);
 
-    hscroll1.setPositionRatio(0);
-    vscroll1.setPositionRatio(0);
+    vscroll1.update();
 
     CSDYNAMIC_SIMPLE_TEXT dst;
     dst.marg = {10,10};
@@ -510,6 +506,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     csGraphics::setGraphicAreaColor(GA_CLIENT, {10,10,10}, {0});
     csGraphics::setGraphicAreaSize(GA_CLIENT, gaSize);
     csGraphics::updateGraphicArea(GA_CLIENT, 1);
+    hscroll1.setPositionRatio(0.5);
+    vscroll1.setPositionRatio(0.5);
 
     //csGraphics::showImage(GA_CLIENT, idImg1, {0}, {0}, 0);
     //csGraphics::showImage(GA_CLIENT, idImg2, {0}, {0}, 0);
@@ -526,25 +524,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     csGraphics::setHzoom(RIGHT_SECTION, 1);
     csGraphics::setVzoom(RIGHT_SECTION, 1);
 
-    hscroll2.setPositionRatio(0);
-    vscroll2.setPositionRatio(0.5);
 
-
-
-    /*CSLISTBOXMIN* lbm = csNewMinimalListBoxPtr(&RIGHT_SECTION, 100, 85);
-    lbm->setDefaultFont(L"calibri",{12,0});
-    lbm->setItemAlign(CS_ALIGN_VERTICAL);
-    lbm->setOffset({1,1});
-
-    lbm->setIcon(0, L"img\\search02.bmp",L"img\\search02.bmp", L"img\\search01.bmp", L"img\\search01.bmp");
-    //lbm->newItem(L"Locked",{0},1,L"img\\search02.bmp", L"img\\search02.bmp", L"img\\search01.bmp");
-    lbm->setMaxTextWidth(150);
-    lbm->setDefaultTitle(L"Index");
-    lbm->newItem(0,56,0);
-
-    lbm->newIcon(L"img\\Code01.bmp");
-    lbm->setDefaultTitle(L"Param");
-    lbm->newItem(0,30,1);*/
+    PROGRESS_INFO_SECTION = createSection(BOTTOM_SECTION, {0,0, 300/dimFact, (sRectClient(BOTTOM_SECTION).bottom/dimFact)},  RGB(20,20,20), {0,0,1});
+    CSUIFX::setTitleColorGradient(PROGRESS_INFO_SECTION, {180,180,180},{220,220,200},3,3);
+    CSUIFX::setTitleColorClickEffect(PROGRESS_INFO_SECTION, {220,220,120});
+    CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"No Task", .Font=L"calibri", .FontSize = 16, .Italic=1,
+        .Bold=0, .Color={180,180,180},
+        .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1});
 
     CSLISTBOXMIN* lbm = csNewMinimalListBoxPtr(&RIGHT_SECTION, 100, 220);
     lbm->setDefaultFont(L"calibri",{14,0});
@@ -557,21 +543,64 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     lbm->setMaxTextWidth(120*dimFact);
     lbm->setDefaultTitle(L"Index");
     
-    for(int i=0; i<LANGUAGES_COUNT; i++)
+    int langCount = 0;
+    const wchar_t** languages = CSFILESMAN::getLanguagesW(&langCount);
+    const wchar_t** langCodes = CSFILESMAN::getLanguageCodesW(&langCount);
+    
+    for(int i=0; i<langCount; i++)
     {
-        lbm->newItem((wchar_t*)(wstring(languagesW[i])+L" ("+ wstring(langCodesW[i])+L")").c_str(),1,0);
+        lbm->newItem((wchar_t*)(wstring(languages[i])+L" ("+ wstring(langCodes[i])+L")").c_str(),1,0);
     }
-    /*for(int i=0; i<218; i++)
-    {
-        lbm->newItem((wchar_t*)langCodesW[i],1,0);
-    }*/
+    
     //lbm->newFilePath(L"Bitmap 24-bits\0*.bmp\0");
 
     lbm->setActiveItem(0);
     lbm->create();
 
+    hscroll2.update();
+    hscroll2.setPositionRatio(0);
+    vscroll2.setPositionRatio(0);
+
     void appTranslateStrings(CSARGS Args);
     CSUIMAN::addAction(lbm->getId(), appTranslateStrings, 1, lbm);
+
+    IMAGE_LIST_SECTION = createSection(LEFT_SECTION, {5,300, 65, 130},  RGB(22,22,22), {0});
+    bd = {IMAGE_LIST_SECTION, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE, 0, BIND_DEST_BOTTOM_EDGE}};
+    bindGeometry(ROOT, 1, bd); // C version
+    bd = {IMAGE_LIST_SECTION, {0,0,1,0}, {0,0, BIND_DEST_RIGHT_EDGE,0}};
+    bindGeometry(LEFT_SECTION, 1, bd); 
+
+    CSSCROLLBAR hscroll3 = CSUICONTROLS::addHScrollBar(&IMAGE_LIST_SECTION, &IMAGE_LIST_SECTION, 0, 10);
+    CSSCROLLBAR vscroll3 = CSUICONTROLS::addVScrollBar(&IMAGE_LIST_SECTION, &IMAGE_LIST_SECTION, 0, 10);
+
+    hscroll3.setViewFrameBottomMarging(10);
+    vscroll3.setViewFrameRightMarging(10);
+    csGraphics::setHzoom(IMAGE_LIST_SECTION, 1);
+    csGraphics::setVzoom(IMAGE_LIST_SECTION, 1);
+
+
+    CSLISTBOXMIN* lbm1 = csNewMinimalListBoxPtr(&IMAGE_LIST_SECTION, 100, 50);
+    lbm1->setDefaultFont(L"calibri",{14,0});
+    lbm1->setItemAlign(CS_ALIGN_VERTICAL);
+    lbm1->setOffset({0,0});
+    lbm1->setMarging({2,0});
+    lbm1->setDefaultSize({75*dimFact, 25*dimFact});
+    //lbm1->setAllTitleColors(RGB(200,200,200), RGB(200,200,200), RGB(0,0,0));
+    //lbm1->setDefaultColors(RGB(23,23,23), RGB(40,40,40), RGB(100,100,100));
+    lbm1->setIconSize(0,{20,20});
+
+    lbm1->setIcon(0, L"img\\img.bmp",L"img\\img2.bmp", L"img\\img2.bmp", L"img\\img2.bmp");
+    lbm1->setMaxTextWidth(120*dimFact);
+    lbm1->setDefaultTitle(L"Image");
+    lbm1->newItem(0,100,0);
+    //lbm->newFilePath(L"Bitmap 24-bits\0*.bmp\0");
+
+    lbm1->setActiveItem(0);
+    lbm1->create();
+
+    hscroll3.update();
+    hscroll3.setPositionRatio(0);
+    vscroll3.setPositionRatio(0);
     
 
     return CSUIMAN::_CSIGMA_APP_RUN_();
@@ -639,8 +668,6 @@ void getRandomData(CSARGS Args)
             int idGaphicArea = *(int*)Args[3];
 
 
-
-
             char *str = CSARITHMETIC::getPrintFormat(number);
             wstring w = charPtrtoWcharPtr(str).c_str();
 
@@ -693,13 +720,71 @@ void appTranslateStrings(CSARGS Args)
                     CSFILESMAN::translateAppStrings();
                     *isworking = 0;
 
+                    /*int iter = 0;
+                    while (1)
+                    {
+                        iter++;
+
+                        if(iter >= 10000)
+                        {
+                            *isworking = 0;
+                            cout<<"finish !\n";
+                            break;
+                        }
+                        std::this_thread::sleep_for(std::chrono::microseconds(1000));
+                    }*/
+                    
+
                 }, i, &isworking
             );
             t.detach();
+
+            thread t2(
+                [](bool* isworking)
+                {
+                    const wchar_t* title = CSUIMAN::getTitleText(PROGRESS_INFO_SECTION);
+                    long iter = 0;
+
+                    while (1)
+                    {
+                        if(iter == 50)
+                        {
+                            CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation in progress ."}, 1);
+                            CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                        }
+                        else if(iter == 100)
+                        {
+                            CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation in progress . ."}, 1);
+                            CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                        }
+                        else if(iter == 150)
+                        {
+                            CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation in progress . . ."}, 1);
+                            CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                        }
+                        else if(iter > 150)
+                        {
+                            iter = 0;
+                        }
+                        iter++;
+
+                        if(!*isworking)
+                        {
+                            CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"No task."}, 1);
+                            CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                            break;
+                        }
+                        std::this_thread::sleep_for(std::chrono::microseconds(1000));
+                    }
+                    
+                }, &isworking
+            );
+            t2.detach();
         }
         else
         {
             cout<<"Please wait until active translation ends up !\n";
         }
+
     }
 }

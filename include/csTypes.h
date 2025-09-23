@@ -242,7 +242,7 @@ typedef struct FLAGS4
     int lFlag,tFlag,rFlag,bFlag;
 };
 
-typedef struct BIND_GEOM_PARAMS
+typedef struct CSBIND_GEOM_PARAMS
 {
     int id;
     COEFS4 coef;
@@ -298,6 +298,15 @@ typedef struct
     SIZE targetContextSize;
     POINT focus;
 }CSZOOM_PARAMS;
+
+typedef struct
+{
+    vector<wchar_t*> str;
+    vector<unsigned long> secId;
+    vector<unsigned long> tipId;
+    vector<unsigned long> mlbId;
+
+}REG_STRINGS;
 
 class CSARGS
 {

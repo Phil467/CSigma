@@ -69,6 +69,7 @@ RECT sRectClient(int id);
 POINT sDeltaPos(int id);
 SIZE sDeltaSize(int id);
 void setTitle(int id, CSTEXT title, bool textOnly=0);
+const wchar_t* getTitleText(int id);
 void setBorderThick(int id, int thick);
 void setBorderColorAndThick(int id, COLORREF color, int thick);
 void inert(int id, BYTE alphaLevel=255);
@@ -78,19 +79,19 @@ void printRect(RECT r, char* title="rect");
 void setSizeFactor(float factor);
 
 void bindGeometry(int id, int n, ...);
-void bindGeometry_(int id, BIND_GEOM_PARAMS*& Args, int& n);
-template<typename ..._Args> void bindGeometry_(int id, BIND_GEOM_PARAMS*& Args, int& n, BIND_GEOM_PARAMS arg, _Args... rest)
+void bindGeometry_(int id, CSBIND_GEOM_PARAMS*& Args, int& n);
+template<typename ..._Args> void bindGeometry_(int id, CSBIND_GEOM_PARAMS*& Args, int& n, CSBIND_GEOM_PARAMS arg, _Args... rest)
 {
     n += 1;
-    Args = (BIND_GEOM_PARAMS*)realloc(Args, n*sizeof(BIND_GEOM_PARAMS));
+    Args = (CSBIND_GEOM_PARAMS*)realloc(Args, n*sizeof(CSBIND_GEOM_PARAMS));
     Args[n-1] = arg;
     bindGeometry_(id, Args, n,  rest...);
 };
 
-void bindGeometry(int id, BIND_GEOM_PARAMS* bgps, int n);
-template<typename ..._Args> void bindGeometry(int id, BIND_GEOM_PARAMS bgp, _Args... bgps)
+void bindGeometry(int id, CSBIND_GEOM_PARAMS* bgps, int n);
+template<typename ..._Args> void bindGeometry(int id, CSBIND_GEOM_PARAMS bgp, _Args... bgps)
 {
-    BIND_GEOM_PARAMS* Args = 0;
+    CSBIND_GEOM_PARAMS* Args = 0;
     int n = 0;
     bindGeometry_(id, Args, n, bgp, bgps...);
     bindGeometry(id, Args, n);
@@ -114,7 +115,10 @@ void updateAfterReceivingResizeMessage(int id);
 void addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT message);
 void enableDarkEdge(int id);
 
+void updateSection(int id);
 void _updateApp(int id);
+
+void autoFitToTitle(int id, int marging);
 
 }
 

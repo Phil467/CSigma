@@ -25,7 +25,7 @@ CS_NUMERIC_INCREMENTER_PARAMS numericIncrementerExt2(int idp, RECT r, wchar_t* v
 
 CS_STRING_INCREMENTER_PARAMS stringIncrementer(int idp, RECT r, wchar_t* value, long step, bool loopStyle, COEFS4 bindCoefs, FLAGS4 bindFlags);
 
-void createTipsPupop(COLORREF color);
+void createToolTips(COLORREF color);
 
 }
 

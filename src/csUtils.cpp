@@ -70,6 +70,8 @@ extern vector<SIZE> hdcontextExtSize;
 extern vector<COLORREF> backgroundColor;
 extern vector<COLORREF> borderColor;
 
+extern vector<int> autoSizeFromTitle;
+
 HINSTANCE hReditLib;
 
 extern int CURSOR_NCHITTEST_POS;
@@ -337,16 +339,16 @@ void CSUIMAN::printRect(RECT r, char*title)
 }
 
 
-void CSUIMAN::bindGeometry_(int id, BIND_GEOM_PARAMS*& Args, int& n)
+void CSUIMAN::bindGeometry_(int id, CSBIND_GEOM_PARAMS*& Args, int& n)
 {
 
 }
 
-void CSUIMAN::bindGeometry(int id, BIND_GEOM_PARAMS* bgps, int n)
+void CSUIMAN::bindGeometry(int id, CSBIND_GEOM_PARAMS* bgps, int n)
 {
     for(int i=0; i<n; i++)
     {
-        BIND_GEOM_PARAMS bgp = bgps[i];
+        CSBIND_GEOM_PARAMS bgp = bgps[i];
         if(int(bgp.coef.lcf*10000) != 0)
         {
             lSizeBind[id].push_back({bgp.id, bgp.coef.lcf, bgp.flag.lFlag});
@@ -369,11 +371,11 @@ void CSUIMAN::bindGeometry(int id, BIND_GEOM_PARAMS* bgps, int n)
 void CSUIMAN::bindGeometry(int id, int n, ...)
 {
     va_list adArgs ;
-    BIND_GEOM_PARAMS* tab = csAlloc<BIND_GEOM_PARAMS>(n);
+    CSBIND_GEOM_PARAMS* tab = csAlloc<CSBIND_GEOM_PARAMS>(n);
     va_start (adArgs, n);
     for (int i=0 ; i<n ; i++)
     {
-        tab[i] = va_arg (adArgs, BIND_GEOM_PARAMS) ;
+        tab[i] = va_arg (adArgs, CSBIND_GEOM_PARAMS) ;
 
     }
     va_end(adArgs);
@@ -415,34 +417,46 @@ void CSUIMAN::setTitle(int id, CSTEXT title, bool textOnly)
 {
     if(title.Text)
     {
-        if(TITLE[id].Text);
-        {
-            free(TITLE[id].Text);
-            free(TITLE[id].Font);
-        }
         if(TITLEFILE.size())
         {
             if(!setTitleInit[id])
             {
                 TITLE[id] = TITLEFILE[id];
                 TITLE[id].Text = CSSTRUTILS::makeWString(TITLEFILE[id].Text);
-                TITLE[id].Font = CSSTRUTILS::makeWString(TITLEFILE[id].Font);
+                if(title.Font)
+                    TITLE[id].Font = CSSTRUTILS::makeWString(TITLEFILE[id].Font);
                 setTitleInit[id] = 1;
             }
             else
             {
+                wchar_t* t = TITLE[id].Text;
                 if(!textOnly)
                     TITLE[id] = title;
                 TITLE[id].Text = CSSTRUTILS::makeWString(title.Text);
-                TITLE[id].Font = CSSTRUTILS::makeWString(title.Font);
+                free(t);
+                if(title.Font)
+                {
+                    t = TITLE[id].Font;
+                    TITLE[id].Font = CSSTRUTILS::makeWString(title.Font);
+                    free(t);
+                }
             }
         }
         else
         {
+            wchar_t* t = TITLE[id].Text;
             if(!textOnly)
                 TITLE[id] = title;
             TITLE[id].Text = CSSTRUTILS::makeWString(title.Text);
-            TITLE[id].Font = CSSTRUTILS::makeWString(title.Font);
+            if(setTitleInit[id]) free(t);
+            
+            if(title.Font)
+            {
+                t = TITLE[id].Font;
+                TITLE[id].Font = CSSTRUTILS::makeWString(title.Font);
+                if(setTitleInit[id]) free(t);
+            }
+            setTitleInit[id] = 1;
 
         }
         
@@ -454,6 +468,14 @@ void CSUIMAN::setTitle(int id, CSTEXT title, bool textOnly)
         }
         SetWindowTextW(SECTION[id], TITLE[id].Text);
     }
+}
+
+const wchar_t* CSUIMAN::getTitleText(int id)
+{
+    if(TITLEFILE.size())
+        return (const wchar_t*)TITLEFILE[id].Text;
+    else
+        return (const wchar_t*)TITLE[id].Text;
 }
 
 void CSUIMAN::inert(int id, BYTE alphaLevel)
@@ -636,6 +658,7 @@ void __getHiddenWindowPart(int id, RECT r)
     }
 }
 
+
 void CSUIMAN::setAsMaxButton(int& id, int& id_maximize)
 {
     auto f = [](CSARGS Args)
@@ -685,6 +708,7 @@ void CSUIMAN::setAsMaxButton(int& id, int& id_maximize)
 // redessiner la partie cachee pour eviter le noir
                 __getHiddenWindowPart(id, RECTRESTORE[id]);
             }
+
             __setAllRects();
         }
     };
@@ -810,6 +834,12 @@ void CSUIMAN::enableDarkEdge(int id)
 
 extern int SMX;
 extern int SMY;
+
+void CSUIMAN::updateSection(int id)
+{
+    InvalidateRect(SECTION[id], 0,1);
+}
+
 void CSUIMAN::_updateApp(int id)
 {
     //imageGradients
@@ -898,7 +928,10 @@ void CSUIMAN::_updateApp(int id)
     }
 }
 
-
+void CSUIMAN::autoFitToTitle(int id, int marging)
+{
+    autoSizeFromTitle[id] = marging;
+}
 
 /*********************************************************************************************************** */
 

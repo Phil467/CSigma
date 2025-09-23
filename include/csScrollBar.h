@@ -20,6 +20,7 @@ class CSSCROLLBAR
         CSSCROLLBAR(int idp=0, RECT geometry={0}, int sctype = CS_SBAR_SURFACE, bool orientation=CS_SBAR_HORIZONTAL);
         void init(int idp=0, RECT geometry={0}, int sctype = CS_SBAR_SURFACE, bool orientation=CS_SBAR_HORIZONTAL);
         virtual ~CSSCROLLBAR();
+        void update();
         int getId();
         int* getIdPtr();
         void setClient(int idc, int idMask);
@@ -32,6 +33,8 @@ class CSSCROLLBAR
 
         void setViewFrameRightMarging(int marging);
         void setViewFrameBottomMarging(int marging);
+
+        void updateViewArea();
 
     protected:
 

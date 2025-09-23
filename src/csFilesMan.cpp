@@ -13,12 +13,12 @@ wchar_t* appSizesFilePath = L"appSizes.txt\0";
 extern bool saveAppSizes;
 
 wchar_t* appTitleParamsFilePath = L"lang/titles/prm.txt\0";
-wchar_t* appTitleFilePath = L"lang/titles/fr.txt\0";
+wchar_t* appTitleFilePath = L"lang/titles/ar.txt\0";
 vector<CSTEXT> TITLEFILE;
 vector<bool> setTitleInit;
 bool saveAppTitles;
 
-wchar_t* appTipsFilePath = L"lang/tips/fr.txt\0";
+wchar_t* appTipsFilePath = L"lang/tips/ar.txt\0";
 vector<vector<vector<wchar_t*>>> TIPSFILE;
 bool saveAppTips;
 
@@ -368,7 +368,7 @@ void CSFILESMAN::__getAppTitles()
 void CSFILESMAN::__setAppTitles()
 {
     int n = TITLEFILE.size();
-    cout<<n<<"  "<<SECTION.size()<<"  ---text\n";
+    //cout<<n<<"  "<<SECTION.size()<<"  ---text\n";
     for(int i=0; i<n; i++)
     {
         if(TITLEFILE[i].Text)
@@ -376,10 +376,10 @@ void CSFILESMAN::__setAppTitles()
             wchar_t* t = TITLE[i].Text;
             TITLE[i].Text = makeWString(TITLEFILE[i].Text);
             free(t);
+            InvalidateRect(SECTION[i],0,1);
         }
         //CSUIMAN::setTitle(i, TITLEFILE[i], 0);
     }
-    InvalidateRect(SECTION[0],0,1);
 }
 
 void CSFILESMAN::setSaveAppTitles(bool b)
@@ -401,6 +401,9 @@ bool __translateTitles()
     // === PARAMÈTRES À MODIFIER ===
     std::string INPUT_FILE = "lang\\titles\\" + utf16_to_utf8(originalLanguage) + ".txt";
     std::string OUTPUT_FILE = wcharPtrToCharPtr(appTitleFilePath); //"D:\\projects\\CSigma\\lang\\titles\\hi.txt";
+
+    if(!CSFILESMAN::fileExists(utf8_to_utf16(INPUT_FILE).c_str()))
+        return 0;
 
     csLIST<char*> l1;
     l1.insertEnd((char*)OUTPUT_FILE.c_str());
@@ -523,7 +526,7 @@ bool CSFILESMAN::__getAppTips(wchar_t* path)
     FILE *f = _wfopen(_path,L"rb+");
     
     // Lire le BOM (Byte Order Mark)
-    unsigned char bom[2];
+    unsigned char bom[3];
     fread(bom, 1, 2, f);
 
     if (!(bom[0] == 0xFF && bom[1] == 0xFE)) {
@@ -595,6 +598,7 @@ void CSFILESMAN::__setAppTips()
             {
                 wchar_t* t = (TipsPopupParams[i].message[j].paragraph[k].Text);
                 TipsPopupParams[i].message[j].paragraph[k].Text = CSSTRUTILS::makeWString(TIPSFILE[i][j][k]);
+                wprintf(L"%ls\n",TIPSFILE[i][j][k]);
                 free(t);
 
             }
@@ -660,7 +664,7 @@ bool __translateTips()
                 {
                     wchar_t*t=(TIPSFILE[i][j][k]);
                     TIPSFILE[i][j][k] = ret[k];
-                    free(TIPSFILE[i][j][k]);
+                    free(t);
                 }
             }
         }
@@ -672,12 +676,12 @@ bool __translateTips()
 
 void CSFILESMAN::translateAppStrings()
 {
-    
-    __translateTitles();
+    if(!fileExists(appTitleFilePath))
+        __translateTitles();
     __getAppTitles();
 
     __translateTips();
-    
+
     __setAppTitles();
     __setAppTips();
 }
@@ -700,4 +704,31 @@ void CSFILESMAN::setViewLanguage(unsigned int idLang)
 
         appTipsFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + viewLanguage + s.substr(pos2, s.size()-pos2)).c_str());
     }
+}
+
+const wchar_t** CSFILESMAN::getLanguagesW(int* langCount)
+{
+    if(langCount) *langCount = LANGUAGES_COUNT;
+
+    /*wchar_t* lang[LANGUAGES_COUNT];
+
+    for(int i=0; i<LANGUAGES_COUNT; i++)
+    {
+        lang[i] = (wchar_t*)languagesW[i];
+    }*/
+
+    return (const wchar_t**)languagesW;
+}
+const wchar_t** CSFILESMAN::getLanguageCodesW(int* langCount)
+{
+    if(langCount) *langCount = LANGUAGES_COUNT;
+
+    /*wchar_t* lang[LANGUAGES_COUNT];
+
+    for(int i=0; i<LANGUAGES_COUNT; i++)
+    {
+        lang[i] = (wchar_t*)languagesW[i];
+    }*/
+
+    return (const wchar_t**)langCodesW;
 }

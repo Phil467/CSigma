@@ -92,7 +92,7 @@ int CSUICONTROLS::iconButton01(int idp, char* path1, char* path2, RECT r)
 {
 
     int BUTTON = CSUIMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
-    BIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE,0}};
+    CSBIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE,0}};
     CSUIMAN::bindGeometry(idp, bd);
     CSUIFX::setImageGradient(BUTTON, path1, path2, {0}, {r.bottom*dimFact,r.bottom*dimFact}, 0.1, 4,1);
 
@@ -103,7 +103,7 @@ int CSUICONTROLS::iconButton02(int idp, char* path1, char* path2, RECT r)
 {
 
     int BUTTON = CSUIMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
-    /*BIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE,0}};
+    /*CSBIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE,0}};
     CSUIMAN::bindGeometry(idp, bd);*/
     CSUIFX::setImageGradient(BUTTON, path1, path2, {0}, {r.bottom*dimFact,r.bottom*dimFact}, 0.1, 4,1);
 
@@ -114,7 +114,7 @@ int CSUICONTROLS::darkTextButton01(int idp, wchar_t*title, RECT r, int fontSize)
 {
 
     int BUTTON = CSUIMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
-    BIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
+    CSBIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
     CSUIMAN::bindGeometry(idp, bd);
     CSUIFX::setBackgroundColorGradient(BUTTON, {50,50,50}, {20,20,20}, 2, 2);
     CSUIFX::setBackgroundColorClickEffect(BUTTON, {60,60,60});
@@ -133,7 +133,7 @@ int CSUICONTROLS::darkImgTextButton01(int idp, wchar_t*title, char* path1, char*
 {
 
     int BUTTON = CSUIMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
-    BIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
+    CSBIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
     CSUIMAN::bindGeometry(idp, bd);
     CSUIFX::setImageGradient(BUTTON, path1, path2, {0}, {26,26}, 0.1, 2, 2);
     CSUIFX::setBackgroundColorGradient(BUTTON, {5,5,5}, {20,20,20}, 2, 2);
@@ -153,7 +153,7 @@ int CSUICONTROLS::darkTextButton02(int idp, wchar_t*title, RECT r, int fontSize)
 {
 
     int BUTTON = CSUIMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
-    BIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
+    CSBIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
     CSUIMAN::bindGeometry(idp, bd);
     CSUIFX::setBackgroundColorGradient(BUTTON, {50,50,50}, {20,20,20}, 2, 2);
     CSUIFX::setBackgroundColorClickEffect(BUTTON, {60,60,60});
@@ -171,13 +171,13 @@ int CSUICONTROLS::darkTextButton02(int idp, wchar_t*title, RECT r, int fontSize)
 CSSYSCOMMAND_SECTION CSUICONTROLS::addSysCommand(int& id, POINT pos)
 {
     CSSYSCOMMAND_SECTION sc;
-    int width = (GetSystemMetrics(SM_CYCAPTION))/dimFact;
-    sc.SYSCOMMAND_SECTION = CSUIMAN::createSection(id, {pos.x-3*width-10-2,pos.y/dimFact,3*width,width},  RGB(5,5,5), {0,0,0,0});
-    BIND_GEOM_PARAMS bd = {sc.SYSCOMMAND_SECTION, {-1,0,1,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
+    int width = (GetSystemMetrics(SM_CYCAPTION)-2);
+    sc.SYSCOMMAND_SECTION = CSUIMAN::createSection(id, {RECTCL[id].right/dimFact-3*width-2,pos.y,3*width,width},  RGB(5,5,5), {0,0,0,0});
+    CSBIND_GEOM_PARAMS bd = {sc.SYSCOMMAND_SECTION, {-1,0,1,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
     CSUIMAN::bindGeometry(id, bd);
     CSUIMAN::setBorderColorAndThick(sc.SYSCOMMAND_SECTION, RGB(20,20,20), 1);
 
-    width -= 1;
+    width -= 2;
     sc.SYS_MIN = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_min02.bmp\0", "img/_min01.bmp\0", {1,1,width,width});
     sc.SYS_MAX = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_max02.bmp\0", "img/_max01.bmp\0", {1+width,1,width,width});
     sc.SYS_CLOSE = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_close02.bmp\0", "img/_close01.bmp\0", {1+width*2,1,width,width});
@@ -205,9 +205,9 @@ int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, char*iconPath, int
         if(iconPath)
             size.cx += 26;
     }
-
+    
     int TITLE_SECTION = CSUIMAN::createSection(id, {2,0,size.cx,size.cy},  RGB(5,5,5), {0,0,0,0});
-
+    
     CSUIMAN::setBorderColorAndThick(TITLE_SECTION, RGB(20,20,20), 1);
     if(iconPath)
         CSUIFX::setImageGradient(TITLE_SECTION, iconPath, iconPath, {2,2}, {26,26}, 0.05, 2,1);
@@ -215,10 +215,10 @@ int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, char*iconPath, int
                                    .Bold=0, .Color={150,150,150},
                                    .Marging={35/dimFact,0}, .Align = CS_TA_CENTER_LEFT, .Show=1});
     
-    
-    
     CSUIMAN::inert(TITLE_SECTION,190);
     SetWindowTextW(SECTION[id], title);
+
+    CSUIMAN::autoFitToTitle(TITLE_SECTION, 10);
 
     auto f = [](CSARGS Args)
     {
@@ -492,7 +492,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUICONTROLS::numericIncrementerExt1(int idp, RECT
     CS_NUMERIC_INCREMENTER_PARAMS nip = {0};
     nip.idSection = CSUIMAN::createSection(idp, r,  RGB(25,25,25), {0,0,0,0});
     CSUIMAN::setBorderColorAndThick(nip.idSection, RGB(40,40,40), 1);
-    BIND_GEOM_PARAMS bd;
+    CSBIND_GEOM_PARAMS bd;
     bd = {nip.idSection, bindCoefs, bindFlags};
     CSUIMAN::bindGeometry(idp, bd);
     int l = (r.bottom-4);
@@ -524,7 +524,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUICONTROLS::numericIncrementerExt2(int idp, RECT
 {
     CS_NUMERIC_INCREMENTER_PARAMS nip = {0};
     nip.idSection = CSUIMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
-    BIND_GEOM_PARAMS bd;
+    CSBIND_GEOM_PARAMS bd;
     bd = {nip.idSection, {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
     CSUIMAN::bindGeometry(idp, bd);
     int l = (r.bottom-4);
@@ -563,11 +563,11 @@ void reposIncBtn(CSARGS Args)
     }
 }
 
-void CSUICONTROLS::createTipsPupop(COLORREF color)
+void CSUICONTROLS::createToolTips(COLORREF color)
 {
     if(SECTION.size())
     {
-        TIPS_POPUP = CSUIMAN::createSection(0, {0,0,200/dimFact,200/dimFact}, color, {0}, 0, 1, 0);
+        TIPS_POPUP = CSUIMAN::createSection(0, {0,0,200/dimFact,200/dimFact}, color, {0}, 0, 0, 0);
         CSUIMAN::enableDarkEdge(TIPS_POPUP);
     }
 }
@@ -757,7 +757,7 @@ CS_STRING_INCREMENTER_PARAMS CSUICONTROLS::stringIncrementer(int idp, RECT r, wc
     sip.step = step;
     sip.currentItem = 0;
 
-    BIND_GEOM_PARAMS bd;
+    CSBIND_GEOM_PARAMS bd;
     bd = {sip.idSection, bindCoefs, bindFlags};
     CSUIMAN::bindGeometry(idp, bd);
     int l = (r.bottom-4);

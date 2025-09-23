@@ -108,10 +108,13 @@ const wchar_t* languagesW[] = {
     L"welsh", L"western_frisian", L"wolof", L"xhosa", L"yiddish", L"yoruba", L"yue_chinese", L"zulu"
 };
 
+wchar_t* KEY = L"";
+
 wchar_t* originalLanguage = L"en-us";
 wchar_t* viewLanguage = L"fr";
 
 extern int MAX_TRANSLATION_TEXT_LENGTH_REQUESTED;
+
 
 std::wstring utf8_to_utf16(const std::string& utf8) 
 {
@@ -553,7 +556,6 @@ std::vector<wchar_t*> CSTRANSLATOR::translate(std::vector<wchar_t*> lines)
 
             if (!translation.empty() && translation != "null") 
             {
-                cout<<response<<"\n";
                 vector<wstring> vline = CSSTRUTILS::splitWords(utf8_to_utf16(translation).c_str(), L"\n");
                 int n = vline.size();
                 for(int i=0; i<n; i++)
@@ -569,7 +571,7 @@ std::vector<wchar_t*> CSTRANSLATOR::translate(std::vector<wchar_t*> lines)
                 int n = vline.size();
                 for(int i=0; i<vline.size(); i++)
                 {
-                    ret.push_back(CSSTRUTILS::makeWString(vline[i].c_str()));
+                    ret.push_back((wchar_t*)CSSTRUTILS::makeWString(vline[i].c_str()));
                 }
                 vline.clear();
             }

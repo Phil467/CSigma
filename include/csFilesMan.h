@@ -25,6 +25,9 @@ void setSaveAppTips(bool b);
 
 void translateAppStrings();
 void setViewLanguage(unsigned int idLang);
+
+const wchar_t** getLanguagesW(int* langCount);
+const wchar_t** getLanguageCodesW(int* langCount);
 };
 
 #endif // CSFILESMAN_H

@@ -42,6 +42,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -50,21 +51,25 @@
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
+			<Add option="-D_UNICODE -DUNICODE" />
 		</Compiler>
 		<Linker>
 			<Add library="gdi32" />
 			<Add library="user32" />
 			<Add library="kernel32" />
 			<Add library="comctl32" />
+			<Add library="C:/msys64/mingw64/lib/libwininet.a" />
 		</Linker>
 		<Unit filename="include/csArgs.h" />
 		<Unit filename="include/csArithmetic/csARITHMETIC.h" />
 		<Unit filename="include/csArithmetic/csArithUtils.h" />
 		<Unit filename="include/csArithmetic/csSQRT.h" />
+		<Unit filename="include/csFilesMan.h" />
 		<Unit filename="include/csGraphics.h" />
 		<Unit filename="include/csLIST.h" />
 		<Unit filename="include/csLISTBOX.h" />
 		<Unit filename="include/csListBoxMin.h" />
+		<Unit filename="include/csMenu.h" />
 		<Unit filename="include/csParallelTask/csPARALLEL.h" />
 		<Unit filename="include/csParallelTask/csPARGS.h" />
 		<Unit filename="include/csParallelTask/csPERF_MEASUREMENT.h" />
@@ -72,6 +77,7 @@
 		<Unit filename="include/csSection.h" />
 		<Unit filename="include/csStrUtils.h" />
 		<Unit filename="include/csSubClasses.h" />
+		<Unit filename="include/csTranslator.h" />
 		<Unit filename="include/csTypes.h" />
 		<Unit filename="include/csUIControls.h" />
 		<Unit filename="include/csUIFx.h" />
@@ -79,14 +85,17 @@
 		<Unit filename="include/readwfile.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/csArgs.cpp" />
+		<Unit filename="src/csFilesMan.cpp" />
 		<Unit filename="src/csGraphics.cpp" />
 		<Unit filename="src/csLIST.cpp" />
 		<Unit filename="src/csLISTBOX.cpp" />
 		<Unit filename="src/csListBoxMin.cpp" />
+		<Unit filename="src/csMenu.cpp" />
 		<Unit filename="src/csScrollBar.cpp" />
 		<Unit filename="src/csSection.cpp" />
 		<Unit filename="src/csStrUtils.cpp" />
 		<Unit filename="src/csSubClasses.cpp" />
+		<Unit filename="src/csTranslator.cpp" />
 		<Unit filename="src/csUIControls.cpp" />
 		<Unit filename="src/csUIFx.cpp" />
 		<Unit filename="src/csUtils.cpp" />
