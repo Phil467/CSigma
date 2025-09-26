@@ -7,6 +7,11 @@ using namespace std;
 #include "csTypes.h"
 #include "csUtils.h"
 
+#define CS_MOUSEWHEEL_NONE 0
+#define CS_MOUSEWHEEL_HSCROLL 1
+#define CS_MOUSEWHEEL_VSCROLL 2
+#define CS_MOUSEWHEEL_ZOOM 3
+
 namespace csGraphics
 {
 vector<CSGRAPHIC_CONTEXT> getImageGradient(CSIMAGE_GRADIENT mhg, CSRGBA bkgColor);
@@ -27,6 +32,7 @@ BITMAPINFO setBMI(SIZE sz);
 
 void setHzoom(int id, float zoom);
 void setVzoom(int id, float zoom);
+void setMouseWheelPreference(int id, BYTE pref);
 void setGraphicAreaPosition(int id, POINT position);
 void setGraphicAreaSize(int id, SIZE size);
 void setGraphicAreaXSize(int id, long cx);

@@ -33,6 +33,7 @@ extern vector<int> viewedAreaBottomMarging;
 extern vector<RECT> bltRect;
 extern vector<float> hZoom;
 extern vector<float> vZoom;
+extern vector<BYTE> mouseWheelPreference;
 
 extern vector<bool> halftoneMode;
 
@@ -1312,7 +1313,7 @@ void mouseWheel(CSARGS Args)
         if(GET_WHEEL_DELTA_WPARAM(WPARAM(Args))<0)
         {
             bool a = 0, b = 0;
-            if(withHScroll[idc] && GetAsyncKeyState(VK_CONTROL))
+            if(withHScroll[idc] && (GetAsyncKeyState(VK_CONTROL) || mouseWheelPreference[idc] == CS_MOUSEWHEEL_HSCROLL))
             {
                 long px = p.x/hZoom[idc];
                 long cx = (bltRect[idc].right/hZoom[idc]);
@@ -1327,7 +1328,7 @@ void mouseWheel(CSARGS Args)
                 
                 a = 1;
             }
-            if(withVScroll[idc] && GetAsyncKeyState(VK_SHIFT))
+            if(withVScroll[idc] && (GetAsyncKeyState(VK_SHIFT) || mouseWheelPreference[idc] == CS_MOUSEWHEEL_VSCROLL))
             {
                 long py = p.y/vZoom[idc];
                 long cy = (bltRect[idc].bottom/vZoom[idc]);
@@ -1343,7 +1344,7 @@ void mouseWheel(CSARGS Args)
                 b = 1;
             }
             
-            if(!a && !b)
+            if((!a && !b) && mouseWheelPreference[idc] == CS_MOUSEWHEEL_ZOOM)
             {//halftoneMode[idc] = 0;
                 POINT pt = TIMER_POINT;
                 ScreenToClient(SECTION[idc], &pt);
@@ -1376,7 +1377,7 @@ void mouseWheel(CSARGS Args)
         else
         {
             bool a = 0 , b = 0;
-            if(withHScroll[idc] && GetAsyncKeyState(VK_CONTROL))
+            if(withHScroll[idc] && (GetAsyncKeyState(VK_CONTROL) || mouseWheelPreference[idc] == CS_MOUSEWHEEL_HSCROLL))
             {
                 long px = p.x/hZoom[idc];
                 long cx = (bltRect[idc].right/hZoom[idc]);
@@ -1391,7 +1392,7 @@ void mouseWheel(CSARGS Args)
                 a = 1;
             }
 
-            if(withVScroll[idc] && GetAsyncKeyState(VK_SHIFT))
+            if(withVScroll[idc] && (GetAsyncKeyState(VK_SHIFT) || mouseWheelPreference[idc] == CS_MOUSEWHEEL_VSCROLL))
             {
                 long py = p.y/vZoom[idc];
                 long cy = (bltRect[idc].bottom/vZoom[idc]);
@@ -1406,7 +1407,7 @@ void mouseWheel(CSARGS Args)
                 b = 1;
             }
 
-            if(!a && !b)
+            if((!a && !b) && mouseWheelPreference[idc] == CS_MOUSEWHEEL_ZOOM)
             {//halftoneMode[idc] = 0;
                 POINT pt = TIMER_POINT;
                 ScreenToClient(SECTION[idc], &pt);

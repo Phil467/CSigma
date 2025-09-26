@@ -1,5 +1,6 @@
 #include "csSection.h"
 #include "csUIFx.h"
+#include "csList.h"
 
 #include<mutex>
 
@@ -18,6 +19,9 @@ extern bool saveAppTitles;
 
 extern wchar_t* appTipsFilePath;
 extern bool saveAppTips;
+
+vector<csLIST<wchar_t**>> registeredStrings;
+vector<bool> allowTranslation;
 
 vector<HWND> SECTION;
 vector<HWND> PAR;
@@ -73,6 +77,7 @@ vector<vector<CSGRAPHIC_ENTITY>> entity;
 vector<CSENTITY_ID_MAP> entityMap;
 vector<bool> bltUpdate;
 vector<bool> attached;
+vector<MINMAXINFO> minMaxInfo;
 
 vector<bool> WAITANIMEENDSIN;
 vector<bool> WAITANIMEENDSOUT;
@@ -99,6 +104,7 @@ vector<int> viewedAreaBottomMarging;
 vector<RECT> bltRect;
 vector<float> hZoom;
 vector<float> vZoom;
+vector<BYTE> mouseWheelPreference;
 
 vector<bool> halftoneMode;
 vector<CSTIMER_PARAMS> TIMER_PARAMS;
@@ -181,7 +187,12 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
         {
             MoveWindow(SECTION[0], RF[0].left, RF[0].top, RF[0].right, RF[0].bottom, 1);
         }
+
+        CSLANGMAN::openUnsupportedLanguages();
     }
+    allowTranslation.push_back(1);
+    csLIST<wchar_t**> regStr;
+    registeredStrings.push_back(regStr);
     //CSUIMAN::printRect(geom);
     RESIZE_EDGE.push_back(edgeResize);
     RECTPARREF.push_back({0});
@@ -239,6 +250,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
     entity.push_back(newVector<CSGRAPHIC_ENTITY>());
     entityMap.push_back({newVector<long>(),0,0});
     bltUpdate.push_back(0);
+    minMaxInfo.push_back({{0,0},{0,0},{0,0}});
 
 
     vector<void(*)(CSARGS)> funcList;
@@ -262,6 +274,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
     bltRect.push_back(geom);
     hZoom.push_back({1});
     vZoom.push_back({1});
+    mouseWheelPreference.push_back(3);
     
     hdcontextExtBkgColor.push_back({0});
     hdcontextExtBrdColor.push_back({0});
@@ -962,6 +975,38 @@ cout<<"gesture\n";
         CSUIFX::_autoTransformation(hwnd, msg, wParam, lParam, id);
         CSUIFX::_mouseHover_movePopup(hwnd, msg, wParam, lParam, id);
 
+        if(msg == WM_GETMINMAXINFO)
+        {
+            MINMAXINFO *mmi=(MINMAXINFO*)lParam;
+            MINMAXINFO MMI = minMaxInfo[id];
+            //std::cout<<HWND(lp);
+            if(MMI.ptMaxTrackSize.x > 0)
+                mmi->ptMaxTrackSize.x = MMI.ptMaxTrackSize.x*dimFact;
+            else if(MMI.ptMaxTrackSize.x < 0 )
+            {
+                mmi->ptMaxTrackSize.x = RECTCL[PARID[id]].right
+                                    -(RECTWND[PARID[id]].right - RECTWND[id].right)
+                                    + MMI.ptMaxTrackSize.x*dimFact;
+            }
+            if(MMI.ptMaxTrackSize.y > 0)
+                mmi->ptMaxTrackSize.y = MMI.ptMaxTrackSize.y*dimFact;
+            else if(MMI.ptMaxTrackSize.y < 0 )
+            {
+                mmi->ptMaxTrackSize.y = RECTCL[PARID[id]].bottom
+                                    -(RECTWND[PARID[id]].bottom - RECTWND[id].bottom)
+                                    + MMI.ptMaxTrackSize.y*dimFact;
+            }
+
+            mmi->ptMinTrackSize.x = MMI.ptMinTrackSize.x*dimFact;
+            mmi->ptMinTrackSize.y = MMI.ptMinTrackSize.y*dimFact;
+
+            if(MMI.ptMaxSize.x > 0)
+                mmi->ptMaxSize.x = MMI.ptMaxSize.x*dimFact;
+            if(MMI.ptMaxSize.y > 0)
+                mmi->ptMaxSize.y = MMI.ptMaxSize.y*dimFact;
+
+        }
+
 
         if(msg == WM_PAINT && !moving)
         {
@@ -1505,7 +1550,7 @@ void endSizeMove(int id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n)
     unSetSizeMoveWaitList(sizeBind);
 }
 
-int delayVal = 750;
+int delayVal = 500;
 
 void geometryBinding(int& _id)
 {

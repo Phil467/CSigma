@@ -16,7 +16,18 @@
 #include "csLIST.h"
 #include "csStrUtils.h"
 
+#define CSTRANSLATOR_ERR_INVALID_LANGUAGE 0
+
 using namespace std;
+
+struct CSTRANSLATIONRESULT 
+{
+    std::string translatedText;
+    std::string originalText;
+    double confidence;
+    std::string status;
+    bool success;
+};
 
 class CSTRANSLATOR
 {
@@ -28,6 +39,9 @@ class CSTRANSLATOR
     bool translate() ;
     std::vector<wchar_t*> translate(std::vector<wchar_t*> v);
     bool translateFileAsSingleString(wchar_t* linesDelims);
+
+    bool success = 1;
+    int errType = 0;
 
     private:
     

@@ -477,6 +477,11 @@ void CSUIFX::setImageGradient(int id, char*path1, char*path2, POINT position, SI
 
 }
 
+CSMOUSE_HOVER_EFFECT* CSUIFX::getMouseHoverEffectPtr(int id)
+{
+    return &mhgradient[id];
+}
+
 void CSUIFX::setBackgroundColorClickEffect(int id, CSRGBA color)
 {
     clkGradient[id].Color = color;

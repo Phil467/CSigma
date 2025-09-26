@@ -71,14 +71,17 @@ extern vector<COLORREF> backgroundColor;
 extern vector<COLORREF> borderColor;
 
 extern vector<int> autoSizeFromTitle;
+extern vector<MINMAXINFO> minMaxInfo;
+
+extern vector<vector<bool>> HIDEGROUPMSG;
 
 HINSTANCE hReditLib;
 
 extern int CURSOR_NCHITTEST_POS;
 extern float dimFact;
 
-extern wchar_t* originalLanguage;
-extern wchar_t* viewLanguage;
+extern wchar_t* originalLanguageCode;
+extern wchar_t* viewLanguageCode;
 
 extern wchar_t* appTitleFilePath;
 extern wchar_t* appTipsFilePath;
@@ -106,20 +109,20 @@ extern vector<bool> setTitleInit;
 void CSUIMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _originalLanguage, const wchar_t* _viewLanguage, bool saveAppText, bool saveAppGeometry, void(*forceEventFunc)(CSARGS), CSARGS *forceEventArgs)
 {
     _hInstance = hInstance;
-    originalLanguage = (wchar_t*)_originalLanguage;
-    viewLanguage = (wchar_t*)_viewLanguage;
+    originalLanguageCode = (wchar_t*)_originalLanguage;
+    viewLanguageCode = (wchar_t*)_viewLanguage;
 
     wstring s = appTitleFilePath;
     size_t pos1 = s.find_last_of(L"/");
     size_t pos2 = s.find_last_of(L".");
 
-    appTitleFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + viewLanguage + s.substr(pos2, s.size()-pos2)).c_str());
+    appTitleFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + viewLanguageCode + s.substr(pos2, s.size()-pos2)).c_str());
 
     s = appTipsFilePath;
     pos1 = s.find_last_of(L"/");
     pos2 = s.find_last_of(L".");
 
-    appTipsFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + viewLanguage + s.substr(pos2, s.size()-pos2)).c_str());
+    appTipsFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + viewLanguageCode + s.substr(pos2, s.size()-pos2)).c_str());
 
     CSFILESMAN::setSaveAppTitles(saveAppText);
     CSFILESMAN::setSaveAppSizes(saveAppGeometry);
@@ -202,6 +205,11 @@ void CSUIMAN::__setAllRects()
     }
 }
 
+void CSUIMAN::catchEventsGroup(int id, int idEvents, bool b)
+{
+    HIDEGROUPMSG[id][idEvents] = b;
+}
+
 HWND HOOK_HWND_1;
 extern vector<HWND> richEdits;
 extern vector<bool> hookRichEditSignal;
@@ -253,6 +261,29 @@ bool CSUIMAN::addAction(int id, void(*f)(CSARGS), int nbArgs, ...)
     GROUPED_EVENTS_FUNC[id].push_back(f);
     GROUPED_EVENTS_ARGS[id].push_back(args);
     HIDEGROUPMSG[id].push_back(0);
+    return 1;
+}
+
+
+bool CSUIMAN::removeAction(int id, int idAction)
+{
+    if(idAction < GROUPED_EVENTS_ARGS[id].size())
+    {
+        GROUPED_EVENTS_ARGS[id][idAction].clear();
+        GROUPED_EVENTS_ARGS[id].erase(GROUPED_EVENTS_ARGS[id].begin()+idAction);
+        GROUPED_EVENTS_FUNC[id].erase(GROUPED_EVENTS_FUNC[id].begin()+idAction);
+        return 1;
+    }
+    return 0;
+}
+
+bool CSUIMAN::removeLastAction(int id)
+{
+    int idAction = GROUPED_EVENTS_ARGS[id].size()-1;
+    GROUPED_EVENTS_ARGS[id][idAction].clear();
+    GROUPED_EVENTS_ARGS[id].erase(GROUPED_EVENTS_ARGS[id].begin()+idAction);
+    GROUPED_EVENTS_FUNC[id].erase(GROUPED_EVENTS_FUNC[id].begin()+idAction);
+
     return 1;
 }
 
@@ -472,10 +503,25 @@ void CSUIMAN::setTitle(int id, CSTEXT title, bool textOnly)
 
 const wchar_t* CSUIMAN::getTitleText(int id)
 {
-    if(TITLEFILE.size())
+    /*if(TITLEFILE.size())
         return (const wchar_t*)TITLEFILE[id].Text;
     else
-        return (const wchar_t*)TITLE[id].Text;
+        */return (const wchar_t*)TITLE[id].Text;
+}
+
+CSRGBA CSUIMAN::getTitleColor(int id)
+{
+    return TITLE[id].Color;
+}
+
+void CSUIMAN::setTitleColor(int id, CSRGBA color)
+{
+    TITLE[id].Color = color;
+    if(mhgradient[id].TitleGradient)
+    {
+        mhgradient[id].ActiveTitleColor = color;
+        mhgradient[id].TitleColor1 = color;
+    }
 }
 
 void CSUIMAN::inert(int id, BYTE alphaLevel)
@@ -760,11 +806,10 @@ extern int TIPS_POPUP;
 extern bool saveAppTips;
 extern vector<vector<vector<wchar_t*>>> TIPSFILE;
 
-
-void CSUIMAN::addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT message)
+void CSUIMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT message)
 {
     TIPS_POPUP_PARAMS tpp;
-    tpp.Ids.push_back(TIPS_POPUP);
+    tpp.Ids.push_back(idPopup);
     tpp.Geometry.push_back({0,0,rTips.right*dimFact, rTips.bottom*dimFact});
     tpp.Bpos.push_back(pb);
     if(TIPSFILE.size() && saveAppTips)
@@ -813,6 +858,12 @@ void CSUIMAN::addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, C
         vscroll1.setViewFrameRightMarging(20);*/
     }
 }
+
+void CSUIMAN::addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT message)
+{
+    CSUIMAN::joinPopup(id, TIPS_POPUP, rTips, pb, delay, locked, message);
+}
+
 
 #include <dwmapi.h>
 #pragma comment(lib, "dwmapi.lib")
@@ -931,6 +982,11 @@ void CSUIMAN::_updateApp(int id)
 void CSUIMAN::autoFitToTitle(int id, int marging)
 {
     autoSizeFromTitle[id] = marging;
+}
+
+void CSUIMAN::setMinMaxInfo(int id, MINMAXINFO mmi)
+{
+    minMaxInfo[id] = mmi;
 }
 
 /*********************************************************************************************************** */

@@ -62,7 +62,13 @@ class CSLISTBOXMIN
         void setFont(int id, wchar_t* fnt, SIZE size);
         void setTitleColors(int id,COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
         void setAllTitleColors(COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
+        void getItemBackground(int id, COLORREF* color, COLORREF* highlightColor, COLORREF* selectionColor);
         void setItemBackground(int id, COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
+        void setMultipleItemsBackground(int*ids, int idsSize, COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
+        void setMultipleItemsBackground(std::vector<int> ids, COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
+        void setItemBackground(wchar_t*_title, COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
+        void setMultipleItemsBackground(wchar_t**_titles, int _titlesSize, COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
+        void setMultipleItemsBackground(std::vector<std::wstring> titles, COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
         void setAllBackgrounds(COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
         void setDefaultColors(COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
         void setDefaultSize(SIZE size);
@@ -84,9 +90,9 @@ class CSLISTBOXMIN
         bool* getCntState();
         void setCntState(bool activate);
         void autoRepos();
+        int getEventsGroupId();
         
         void removeItem(int id);
-        void getUsefulEventsNumber();
         void copyItem(int id);
         void cutItem(int id);
         void pasteItem(int id);
@@ -95,6 +101,7 @@ class CSLISTBOXMIN
         int* getCopyPasteKeyDownState();
         void duplicate(int src, int pos);
         int getId();
+        void updateItem(int id);
         
         int getSize();
         bool *click_message = 0;

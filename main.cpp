@@ -65,7 +65,7 @@ int smy = GetSystemMetrics(SM_CYSCREEN);
 // WinMain
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 {
-    CSUIMAN::_CSIGMA_APP_INIT_(hInstance, L"en-us", L"en-us", 1, 1, forceEventFunction, &forceEventArgs);
+    CSUIMAN::_CSIGMA_APP_INIT_(hInstance, L"fr-fr", L"fr-fr", 1, 1, forceEventFunction, &forceEventArgs);
 
     //float dimFact = GetSystemMetrics(SM_CXSCREEN)*GetSystemMetrics(SM_CYSCREEN)/(1366.0*768);
     float dimFact = 1.5;
@@ -75,8 +75,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     ROOT = createSection(-1, {100,25,600,500},  RGB(30,30,30), {1,1,1,1,1,1,1,1});
     int ICON_ROOT  = setIcon(ROOT, L"icon.ico", L"icon.ico");
     CSUIMAN::enableDarkEdge(ROOT);
+    CSUIMAN::setMinMaxInfo(ROOT, MINMAXINFO{.ptMinTrackSize={400,250}});
     
-    CSUICONTROLS::addTitle(ROOT, L"CSIGMA LIBRARY TEST",{0}, "img/icon.bmp\0", 22, L"Arial Black");
+    CSUICONTROLS::addTitle(ROOT, L"TEST BIBLIOTHEQUE CSIGMA",{0}, "img/icon.bmp\0", 22, L"Arial Black");
     CSSYSCOMMAND_SECTION SYS_CMD = CSUICONTROLS::addSysCommand(ROOT, {600});
 
     /******************************** ToolTips **************************************** */
@@ -89,6 +90,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     CSBIND_GEOM_PARAMS bd = {LEFT_SECTION, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE, 0, BIND_DEST_BOTTOM_EDGE}};
     bindGeometry(ROOT, 1, bd); // C version
+    
+    CSUIMAN::setMinMaxInfo(LEFT_SECTION, MINMAXINFO{.ptMinTrackSize={50}, .ptMaxTrackSize={172}});
     
     /*************************************** MIDDLE_SECTION ************************************ */
 
@@ -108,6 +111,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     bindGeometry(LEFT_SECTION, bd);
     bd = {MIDDLE_TOP_SECTION, {-1,0,1,0}, {BIND_DEST_RIGHT_EDGE,0,BIND_DEST_RIGHT_EDGE,0}};
     bindGeometry(ROOT, bd); // cpp version
+    CSUIMAN::setMinMaxInfo(MIDDLE_TOP_SECTION, MINMAXINFO{.ptMinTrackSize={0,17}, .ptMaxTrackSize={0,100}});
 
     /***********************************MIDDLE_BOTTOM_SECTION *************************************** */
 
@@ -144,6 +148,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     bd = {RIGHT_SECTION, {0,0,-1,0}, {0,0,BIND_DEST_LEFT_EDGE,0}};
     bindGeometry(LEFT_SECTION, bd);
 
+    CSUIMAN::setMinMaxInfo(RIGHT_SECTION, MINMAXINFO{.ptMinTrackSize={50}, .ptMaxTrackSize={162}});
     CSUIMAN::updateAfterReceivingResizeMessage(RIGHT_SECTION);
 
     /**************************************************************************************************** */
@@ -215,7 +220,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     bindGeometry(ROOT, bd);
     CSUIFX::setBorderColorGradient(STATIC_SEARCH, {100,100,100}, {40,40,40}, 2, 2);
     setBorderThick(STATIC_SEARCH, 2);
-    setTitle(STATIC_SEARCH, CSTEXT{.Text=L"Search...\0", .Font=L"Arial", .FontSize=16, .Italic=1, .Color={100,100,100},
+    setTitle(STATIC_SEARCH, CSTEXT{.Text=L"Rechercher...\0", .Font=L"Arial", .FontSize=16, .Italic=1, .Color={100,100,100},
                                    .Marging={-15,0}, .Align = CS_TA_CENTER, .Show=1});
 
     BUTTON_SEARCH = CSUICONTROLS::iconButton01(STATIC_SEARCH, "img/search02.bmp\0", "img/search01.bmp\0", {200-14-1,1,14,14});
@@ -237,11 +242,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMessage0.marg = {10,10,10,10};
     tipsMessage0.updateGASize = 1;
     tipsMessage0.view = 1;
-    tipsMessage0.paragraph.push_back(CSTEXT{.Text=L"Font Size \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMessage0.paragraph.push_back(CSTEXT{.Text=L"Taille de la police\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMessage0.pSpace.push_back(5);
     
-    tipsMessage0.paragraph.push_back(CSTEXT{.Text=L"Set the font size of text.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
+    tipsMessage0.paragraph.push_back(CSTEXT{.Text=L"Modifie la taille de la police.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage0.pSpace.push_back(5);
     CSUIMAN::addTips(fontSizeInc.idSection, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bRBottom=1}, 3, 0, tipsMessage0);
@@ -253,16 +258,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     CSMENU menu(ROOT, {(sRectClient(ROOT).right/dimFact-cx*6)/2,0,0,cy}, 1);
 
-    menu.newItem( L"File\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
-    menu.newItem( L"Edit\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
-    menu.newItem( L"Data\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
-    menu.newItem( L"Preferences\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
-    int aboutMenuId = menu.newItem( L"About\0", L"img/About01.bmp", L"img/About01.bmp");
+    menu.newGroup( L"Fichier\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
+    menu.newGroup( L"Edition\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
+    menu.newGroup( L"Données\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
+    menu.newGroup( L"Paramètres\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
+    int aboutMenuId = menu.newGroup( L"A propos\0", L"img/About01.bmp", L"img/About01.bmp");
     MENU_ABOUT = menu.getIdButton(aboutMenuId);
 
 
-
-    //ABOUT_UI = createSection(-1, {100,25,600,500},  RGB(0,0,0), {1,1,1,1,1,1,1,1}, 1, 1);
     ABOUT_UI = createSection(0, {100,25,600,500},  RGB(40,40,40), {1,1,1,1,1,1,1,1}, 0, 1, 0);
     CSUIMAN::enableDarkEdge(ABOUT_UI);
     CSUIMAN::setIcon(ABOUT_UI, ICON_ROOT);
@@ -278,7 +281,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
                                         BIND_DEST_RIGHT_EDGE, BIND_DEST_TOP_EDGE}};
     bindGeometry(ABOUT_UI, bd);
 
-    CSUIMAN::setTitle(ABOUT_UI_BOTTOM, CSTEXT{.Text=L"CSigma logo", .Font=L"calibri", .FontSize = 16, .Italic=0,
+    CSUIMAN::setTitle(ABOUT_UI_BOTTOM, CSTEXT{.Text=L"Logo CSigma", .Font=L"calibri", .FontSize = 16, .Italic=0,
                                    .Bold=0, .Color={180,180,180},
                                    .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1});
 
@@ -336,10 +339,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMessage.marg = {10,10,10,10};
     tipsMessage.updateGASize = 1;
     tipsMessage.view = 1;
-    tipsMessage.paragraph.push_back(CSTEXT{.Text=L"Precision of operations \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMessage.paragraph.push_back(CSTEXT{.Text=L"Précision des opérations\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMessage.pSpace.push_back(5);
-    wchar_t* txt = L"Represents the precision of operations. Greater is it, more precise are the results but slower are calculations.\0";
+    wchar_t* txt = L"Représente la précision des opérations. Plus elle est grande, plus les calculs sont précis, et par conséquent lents.\0";
     tipsMessage.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage.pSpace.push_back(5);
@@ -351,11 +354,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMessage1.marg = {10,10,10,10};
     tipsMessage1.updateGASize = 1;
     tipsMessage1.view = 1;
-    tipsMessage1.paragraph.push_back(CSTEXT{.Text=L"Precision of numbers\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMessage1.paragraph.push_back(CSTEXT{.Text=L"Précision des nombres\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMessage1.pSpace.push_back(5);
     
-    tipsMessage1.paragraph.push_back(CSTEXT{.Text=L"Represents the precision of numbers showed.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
+    tipsMessage1.paragraph.push_back(CSTEXT{.Text=L"Représente la précision d'affichqge des numbres.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage1.pSpace.push_back(5);
     CSUIMAN::addTips(externPrec.idSection, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMessage1);
@@ -367,10 +370,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMessage2.marg = {10,10,10,10};
     tipsMessage2.updateGASize = 1;
     tipsMessage2.view = 1;
-    tipsMessage2.paragraph.push_back(CSTEXT{.Text=L"Digits Number \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMessage2.paragraph.push_back(CSTEXT{.Text=L"Nombre de chiffres\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMessage2.pSpace.push_back(5);
-    txt = L"Represents the number of digits of the number to be generated randomly.\0";
+    txt = L"Représente le numbre de chiffres du nombre aléatoire à générer.\0";
     tipsMessage2.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage2.pSpace.push_back(5);
@@ -385,10 +388,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMessage3.marg = {10,10,10,10};
     tipsMessage3.updateGASize = 1;
     tipsMessage3.view = 1;
-    tipsMessage3.paragraph.push_back(CSTEXT{.Text=L"Digit Boundary \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMessage3.paragraph.push_back(CSTEXT{.Text=L"Borne du chiffre\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMessage3.pSpace.push_back(5);
-    txt = L"Represents the lower or higher boundary of the digit to be generated randomly.\0";
+    txt = L"Represent l'une ou l'autre des deux bornes des chiffres constituant le nombre aléatoire généré.\0";
     tipsMessage3.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMessage3.pSpace.push_back(5);
@@ -405,17 +408,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     /********************************************************************************** */
 
     void getRandomData(CSARGS Args);
-    BNT_RANDOM_NUMBER = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Random\0", {5,5+total*5,65,h});
+    BNT_RANDOM_NUMBER = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Nombre aléatoire\0", {5,5+total*5,65,h});
     CSUIMAN::addAction(BNT_RANDOM_NUMBER, getRandomData, 4, &Nnb.idSection, &minDigit.idSection, &maxDigit.idSection, &MIDDLE_BOTTOM_SECTION);
 
     CSDYNAMIC_SIMPLE_TEXT tipsMSG;
     tipsMSG.marg = {10,10,10,10};
     tipsMSG.updateGASize = 1;
     tipsMSG.view = 1;
-    tipsMSG.paragraph.push_back(CSTEXT{.Text=L"Random \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMSG.paragraph.push_back(CSTEXT{.Text=L"Nombre aléatoire\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMSG.pSpace.push_back(5);
-    txt = L"Generates a random integer number.\0";
+    txt = L"Génère un entier aléatoire.\0";
     tipsMSG.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMSG.pSpace.push_back(5);
@@ -423,15 +426,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     /********************************************************************************** */
 
-    BTN_ADD_TO_DATA_LIST = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Add\0", {5,5+total*6,65,h});
+    BTN_ADD_TO_DATA_LIST = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Ajouter\0", {5,5+total*6,65,h});
     CSDYNAMIC_SIMPLE_TEXT tipsMSG1;
     tipsMSG1.marg = {10,10,10,10};
     tipsMSG1.updateGASize = 1;
     tipsMSG1.view = 1;
-    tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Add   \0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Ajouter\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMSG1.pSpace.push_back(5);
-    tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Add a data to list.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
+    tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Ajouter une donnée à la liste.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMSG1.pSpace.push_back(5);
     CSUIMAN::addTips(BTN_ADD_TO_DATA_LIST, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG1);
@@ -454,10 +457,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     //BTN_REMOVE_UNDO_1 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Undo 1\0", {5,5+total*9,65,h});
 
-    BTN_1 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Button 1", {5,5+total*10,65,h});
-    BTN_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Button 2", {5,5+total*11,65,h});
-    BTN_3 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Button 3", {5,5+total*12,65,h});
-    BTN_4 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Button 4", {5,5+total*13,65,h});
+    BTN_1 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Bouton 1", {5,5+total*10,65,h});
+    BTN_2 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Bouton 2", {5,5+total*11,65,h});
+    BTN_3 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Bouton 3", {5,5+total*12,65,h});
+    BTN_4 = CSUICONTROLS::darkTextButton01(LEFT_SECTION, L"Bouton 4", {5,5+total*13,65,h});
     // Boucle principale
 
 
@@ -521,8 +524,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     hscroll2.setViewFrameBottomMarging(10);
     vscroll2.setViewFrameRightMarging(10);
-    csGraphics::setHzoom(RIGHT_SECTION, 1);
-    csGraphics::setVzoom(RIGHT_SECTION, 1);
+    csGraphics::setGraphicAreaColor(RIGHT_SECTION, {30,30,30}, {0});
+    csGraphics::setMouseWheelPreference(RIGHT_SECTION, CS_MOUSEWHEEL_VSCROLL);
 
 
     PROGRESS_INFO_SECTION = createSection(BOTTOM_SECTION, {0,0, 300/dimFact, (sRectClient(BOTTOM_SECTION).bottom/dimFact)},  RGB(20,20,20), {0,0,1});
@@ -531,11 +534,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"No Task", .Font=L"calibri", .FontSize = 16, .Italic=1,
         .Bold=0, .Color={180,180,180},
         .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1});
+    CSUIMAN::autoFitToTitle(PROGRESS_INFO_SECTION, 10);
+    CSLANGMAN::translateTitle(PROGRESS_INFO_SECTION, 0);
 
     CSLISTBOXMIN* lbm = csNewMinimalListBoxPtr(&RIGHT_SECTION, 100, 220);
     lbm->setDefaultFont(L"calibri",{14,0});
     lbm->setItemAlign(CS_ALIGN_VERTICAL);
-    lbm->setOffset({1,1});
+    lbm->setOffset({0,0});
     lbm->setDefaultSize({150*dimFact, 15*dimFact});
     //lbm->setIconSize(0,{26,26});
 
@@ -544,8 +549,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     lbm->setDefaultTitle(L"Index");
     
     int langCount = 0;
-    const wchar_t** languages = CSFILESMAN::getLanguagesW(&langCount);
-    const wchar_t** langCodes = CSFILESMAN::getLanguageCodesW(&langCount);
+    const wchar_t** languages = CSLANGMAN::getLanguagesW(&langCount);
+    const wchar_t** langCodes = CSLANGMAN::getLanguageCodesW(&langCount);
     
     for(int i=0; i<langCount; i++)
     {
@@ -556,6 +561,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     lbm->setActiveItem(0);
     lbm->create();
+
+    void checkInstalledLanguages(CSLISTBOXMIN*& lbm);
+    checkInstalledLanguages(lbm);
 
     hscroll2.update();
     hscroll2.setPositionRatio(0);
@@ -575,8 +583,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     hscroll3.setViewFrameBottomMarging(10);
     vscroll3.setViewFrameRightMarging(10);
-    csGraphics::setHzoom(IMAGE_LIST_SECTION, 1);
-    csGraphics::setVzoom(IMAGE_LIST_SECTION, 1);
+    csGraphics::setMouseWheelPreference(IMAGE_LIST_SECTION, CS_MOUSEWHEEL_VSCROLL);
 
 
     CSLISTBOXMIN* lbm1 = csNewMinimalListBoxPtr(&IMAGE_LIST_SECTION, 100, 50);
@@ -699,48 +706,58 @@ void setFontSize(CSARGS Args)
     }
 }
 
+COLORREF sectionColor1 = RGB(160,160,220), sectionColor2 = RGB(160,160,230), sectionColor3 = RGB(160,160,220);
+COLORREF dColor1 = RGB(30,40,30), dColor2 = RGB(30,50,30), dColor3 = RGB(160,220,160);
+
 void appTranslateStrings(CSARGS Args)
 {
     CSLISTBOXMIN* lbm = (CSLISTBOXMIN*)Args[0];
     int id = (int)Args;
     UINT msg = (UINT)Args;
-    static bool isworking = 0;
+    static bool isworking = 0, showStatus = 0;
+    static int lastViewLanguageId = -1, statusIter = 0;
 
     if(msg == WM_LBUTTONDBLCLK)
     {
+        if(statusIter > 0)
+            statusIter = 900; //terminer le processus precedent
+
         if(!isworking)
         {
-            int i = *lbm->getActiveItem();
             isworking = 1;
 
             thread t(
-                [](int i, bool* isworking)
+                [](CSLISTBOXMIN* lbm)
                 {
-                    CSFILESMAN::setViewLanguage(i);
-                    CSFILESMAN::translateAppStrings();
-                    *isworking = 0;
+                    int i = *lbm->getActiveItem();
+                    CSLANGMAN::setViewLanguage(i);
+                    CSLANGMAN::translateAppStrings();
+                    isworking = 0;
 
-                    /*int iter = 0;
-                    while (1)
+                    if(CSLANGMAN::getTranslationProcessStatus())
                     {
-                        iter++;
+                        int viewLanguageId = CSLANGMAN::getLanguageCodeId(CSLANGMAN::getViewLanguageCode());
+                        COLORREF color , highlightColor, selectionColor;
 
-                        if(iter >= 10000)
+                        if(viewLanguageId != lastViewLanguageId)
                         {
-                            *isworking = 0;
-                            cout<<"finish !\n";
-                            break;
+                            if(lastViewLanguageId > -1)
+                            {
+                                lbm->setItemBackground(lastViewLanguageId, dColor1, dColor2, dColor3);
+                            }
+                            lbm->setItemBackground(viewLanguageId, sectionColor1, sectionColor2, sectionColor3);
+                            lastViewLanguageId = viewLanguageId;
+                            InvalidateRect(sHandle(lbm->getId()), 0,1);
                         }
-                        std::this_thread::sleep_for(std::chrono::microseconds(1000));
-                    }*/
+                    }
                     
 
-                }, i, &isworking
+                }, lbm
             );
             t.detach();
 
             thread t2(
-                [](bool* isworking)
+                []()
                 {
                     const wchar_t* title = CSUIMAN::getTitleText(PROGRESS_INFO_SECTION);
                     long iter = 0;
@@ -768,18 +785,61 @@ void appTranslateStrings(CSARGS Args)
                         }
                         iter++;
 
-                        if(!*isworking)
+                        if(!isworking)
                         {
-                            CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"No task."}, 1);
-                            CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                            showStatus = 1;
                             break;
                         }
                         std::this_thread::sleep_for(std::chrono::microseconds(1000));
                     }
                     
-                }, &isworking
+                }
             );
             t2.detach();
+
+            thread t3(
+                []()
+                {
+                    //const wchar_t* title = CSUIMAN::getTitleText(PROGRESS_INFO_SECTION);
+                    //CSRGBA titleColor = CSUIMAN::getTitleColor(PROGRESS_INFO_SECTION);
+                    CSRGBA titleColor = {220,220,220};
+
+                    while (1)
+                    {
+
+                        if(showStatus)
+                        {
+                            statusIter++;
+                            if(CSLANGMAN::getTranslationProcessStatus())
+                            {
+                                CSUIMAN::setTitleColor(PROGRESS_INFO_SECTION, {70,200,70});
+                                CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation succeeded !"}, 1);
+                                CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                            }
+                            else
+                            {
+                                CSUIMAN::setTitleColor(PROGRESS_INFO_SECTION, {200,70,70});
+                                CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation failed !"}, 1);
+                                CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                            }
+                        
+
+                            if(statusIter > 900)
+                            {
+                                CSUIMAN::setTitleColor(PROGRESS_INFO_SECTION, titleColor);
+                                CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"No task."}, 1);
+                                CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                                statusIter = 0;
+                                showStatus = 0;
+                                break;
+                            }
+                        }
+                        std::this_thread::sleep_for(std::chrono::microseconds(1000));
+                    }
+                    
+                }
+            );
+            t3.detach();
         }
         else
         {
@@ -787,4 +847,77 @@ void appTranslateStrings(CSARGS Args)
         }
 
     }
+}
+
+void checkInstalledLanguages(CSLISTBOXMIN*& lbm)
+{
+    thread t(
+    
+        [](CSLISTBOXMIN* lbm)
+        {
+            int n = 0;
+            COLORREF color , highlightColor, selectionColor;
+            lbm->getItemBackground(0, &color, &highlightColor, &selectionColor);
+            vector<int> idsSave;
+
+            wstring unsupportedLangCodes2 = L"";
+            
+            while (1)
+            {
+                
+                std::vector<std::wstring> installedLanguages = CSLANGMAN::getInstalledLanguages();
+                std::vector<int> langIds = CSLANGMAN::getLanguagesCodesIds(installedLanguages);
+
+                if(n < langIds.size())
+                {
+                    lbm->setMultipleItemsBackground(langIds, dColor1, dColor2, dColor3);
+                    
+                }
+                else if(n > langIds.size())
+                {
+                    int m = langIds.size(), idRemoved;
+                    for(int i=0; i<idsSave.size(); i++)
+                    {
+                        int j;
+                        for(j=0; j<m; j++)
+                        {
+                            if(langIds[j] == idsSave[i]) break;
+                        }
+                        if(j == m)
+                        {
+                            idRemoved = i;
+                            break;
+                        }
+                    }
+
+                    lbm->setItemBackground(idsSave[idRemoved], color, highlightColor, selectionColor);
+                }
+
+                
+                n = langIds.size();
+
+                idsSave.clear();
+                idsSave = langIds;
+                langIds.clear();
+                installedLanguages.clear();
+
+                wstring unsupportedLangCodes = CSLANGMAN::getUnsupportedLanguages();
+                if(unsupportedLangCodes2 != unsupportedLangCodes)
+                {
+                    vector<wstring> v = splitWords(unsupportedLangCodes.c_str(), L" ");
+                    std::vector<int> uids = CSLANGMAN::getLanguagesCodesIds(v);
+                    lbm->setMultipleItemsBackground(uids, RGB(50,30,30), RGB(55,30,30), RGB(220,170,170));
+                    v.clear();
+                    uids.clear();
+
+
+                    unsupportedLangCodes2 = unsupportedLangCodes;
+                }
+
+                std::this_thread::sleep_for(std::chrono::seconds(1));
+            }
+        }, lbm
+
+    );
+    t.detach();
 }

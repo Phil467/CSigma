@@ -52,12 +52,15 @@ using namespace  std;
 namespace CSUIMAN
 {
 
-void _CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* originalLanguage=L"us", const wchar_t* viewLanguage=L"fr", bool saveAppText=0, bool saveAppGeometry=0, void(*forceEventFunc)(CSARGS)=0, CSARGS* forceEventArgs=0);
+void _CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* originalLanguageCode=L"us", const wchar_t* viewLanguageCode=L"fr", bool saveAppText=0, bool saveAppGeometry=0, void(*forceEventFunc)(CSARGS)=0, CSARGS* forceEventArgs=0);
 int _CSIGMA_APP_RUN_();
 void __setAllRects();
+void catchEventsGroup(int id, int idEvents, bool b);
 int createSection(int id, RECT geom,  COLORREF color, BOOL_RECT edgeResize, bool show=1, bool isRoot=0, bool attach=1);
 bool addAction(int id, void(*f)(CSARGS), CSARGS& args);
 bool addAction(int id, void(*f)(CSARGS), int nbArgs, ...);
+bool removeAction(int id, int idAction);
+bool removeLastAction(int id);
 int setIcon(int id, wchar_t*pathSmallIcon, wchar_t*pathBigIcon);
 void setIcon(int id, int idIcon);
 HWND sHandle(int id);
@@ -70,6 +73,8 @@ POINT sDeltaPos(int id);
 SIZE sDeltaSize(int id);
 void setTitle(int id, CSTEXT title, bool textOnly=0);
 const wchar_t* getTitleText(int id);
+CSRGBA getTitleColor(int id);
+void setTitleColor(int id, CSRGBA color);
 void setBorderThick(int id, int thick);
 void setBorderColorAndThick(int id, COLORREF color, int thick);
 void inert(int id, BYTE alphaLevel=255);
@@ -112,6 +117,7 @@ TASKBAR_INFO getTaskbarInfo();
 
 void setLockable(int id, CSLOCKED_MODE lm);
 void updateAfterReceivingResizeMessage(int id);
+void joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT message);
 void addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT message);
 void enableDarkEdge(int id);
 
@@ -119,6 +125,7 @@ void updateSection(int id);
 void _updateApp(int id);
 
 void autoFitToTitle(int id, int marging);
+void setMinMaxInfo(int id, MINMAXINFO mmi);
 
 }
 

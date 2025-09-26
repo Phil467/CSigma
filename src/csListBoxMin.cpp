@@ -348,7 +348,16 @@ void CSLISTBOXMIN::setAllTitleColors(COLORREF color, COLORREF highlightColor, CO
         color1[i] = color;
         color2[i] = highlightColor;
         color3[i] = selectionColor;
+        updateItem(i);
     }
+}
+
+
+void CSLISTBOXMIN::getItemBackground(int id, COLORREF* color, COLORREF* highlightColor, COLORREF* selectionColor)
+{
+    *color = bkgcol1[id];
+    *highlightColor = bkgcol2[id];
+    *selectionColor = bkgcol3[id];
 }
 
 void CSLISTBOXMIN::setItemBackground(int id, COLORREF color, COLORREF highlightColor, COLORREF selectionColor)
@@ -357,7 +366,56 @@ void CSLISTBOXMIN::setItemBackground(int id, COLORREF color, COLORREF highlightC
     bkgcol1[id] = color;
     bkgcol2[id] = highlightColor;
     bkgcol3[id] = selectionColor;
+    updateItem(id);
 }
+
+void CSLISTBOXMIN::setMultipleItemsBackground(int*ids, int idsSize, COLORREF color, COLORREF highlightColor, COLORREF selectionColor)
+{
+    for(int i=0; i<idsSize; i++)
+    {
+        setItemBackground(ids[i], color, highlightColor, selectionColor);
+    }
+}
+
+void CSLISTBOXMIN::setMultipleItemsBackground(std::vector<int> ids, COLORREF color, COLORREF highlightColor, COLORREF selectionColor)
+{
+    int n = ids.size();
+    for(int i=0; i<n; i++)
+    {
+        setItemBackground(ids[i], color, highlightColor, selectionColor);
+    }
+}
+
+void CSLISTBOXMIN::setItemBackground(wchar_t*_title, COLORREF color, COLORREF highlightColor, COLORREF selectionColor)
+{
+    int n = title.size();
+    for(int i=0; i<n; i++)
+    {
+        if(wcscmp(titleReal[i],_title) == 0)
+        {
+            setItemBackground(i, color, highlightColor, selectionColor);
+            break;
+        }
+    }
+}
+
+void CSLISTBOXMIN::setMultipleItemsBackground(wchar_t**_titles, int _titlesSize, COLORREF color, COLORREF highlightColor, COLORREF selectionColor)
+{
+    for(int i=0; i<_titlesSize; i++)
+    {
+        setItemBackground(_titles[i], color, highlightColor, selectionColor);
+    }
+}
+
+void CSLISTBOXMIN::setMultipleItemsBackground(std::vector<std::wstring> titles, COLORREF color, COLORREF highlightColor, COLORREF selectionColor)
+{
+    int n = titles.size();
+    for(int i=0; i<n; i++)
+    {
+        setItemBackground((wchar_t*)titles[i].c_str(), color, highlightColor, selectionColor);
+    }
+}
+
 
 void CSLISTBOXMIN::setAllBackgrounds(COLORREF color, COLORREF highlightColor, COLORREF selectionColor)
 {
@@ -465,6 +523,30 @@ void CSLISTBOXMIN::updateActiveItem(int id)
         args.setId(parent);
         args.setHwnd(&SECTION[*parent]);
         mouseClick(args);
+    }
+}
+
+void CSLISTBOXMIN::updateItem(int id)
+{
+    if(id>=0 && id<pos.size())
+    {
+        HDC gdc = hdcontextExt[*parent];
+        int i=id;
+        SIZE sz;
+        CSGRAPHIC_CONTEXT idc;
+
+        sz = {pos[i].right-pos[i].left,pos[i].bottom-pos[i].top};
+        idc = createCompatibleGraphicContext(hdc,sz, bkgcol0[i], bkgcol0[i]);
+        SetBkMode(idc.dc, TRANSPARENT);
+        SelectFont(idc.dc, font[i]);
+        SetTextColor(idc.dc, color0[i]);
+        TextOutW(idc.dc,posTitle[i].x-pos[i].left,posTitle[i].y-pos[i].top,(LPCWSTR)title[i],wcslen(title[i]));
+        BitBlt(idc.dc,posImg[i].x-pos[i].left,posImg[i].y-pos[i].top,imgSize.cx,imgSize.cy, dcs0[i],0,0,SRCCOPY);
+        BitBlt(gdc,pos[i].left,pos[i].top,sz.cx,sz.cy, idc.dc,0,0,SRCCOPY);
+        releaseGraphicContext(idc);
+
+        RECT r = {pos[i].left*hZoom[*parent], pos[i].top*vZoom[*parent], sz.cx*hZoom[*parent],sz.cy*vZoom[*parent]};
+        InvalidateRect(SECTION[*parent],&r,1);
     }
 }
 
@@ -1123,7 +1205,7 @@ void CSLISTBOXMIN::animate()
         cutPasteViewer, cutPasteStart, cutPasteDone, cutPasteDone0,copyPasteKeyDownState,click_message, &cxmax, &cymax,
         &itemAlign);
         animated = 1;
-        getUsefulEventsNumber();
+        groupMsgPos = GROUPED_EVENTS_ARGS[*parent].size()-1;
     }
     else
     {
@@ -1132,9 +1214,9 @@ void CSLISTBOXMIN::animate()
 
 }
 
-void CSLISTBOXMIN::getUsefulEventsNumber()
+int CSLISTBOXMIN::getEventsGroupId()
 {
-    groupMsgPos = GROUPED_EVENTS_ARGS[*parent].size()-1;
+    return groupMsgPos;
 
 }
 

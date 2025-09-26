@@ -27,6 +27,8 @@ extern vector<vector<CSGRAPHIC_ENTITY>> entity;
 
 extern vector<float> hZoom;
 extern vector<float> vZoom;
+extern vector<BYTE> mouseWheelPreference;
+
 extern vector<bool> bltUpdate;
 
 extern vector<CSDYNAMIC_SIMPLE_TEXT> dynSimpleText;
@@ -381,6 +383,11 @@ void csGraphics::setHzoom(int id, float zoom)
 void csGraphics::setVzoom(int id, float zoom)
 {
     vZoom[id] = zoom;
+}
+
+void csGraphics::setMouseWheelPreference(int id, BYTE pref)
+{
+    mouseWheelPreference[id] = pref;
 }
 
 void csGraphics::setGraphicAreaPosition(int id, POINT pos)

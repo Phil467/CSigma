@@ -524,4 +524,5 @@ typedef struct
 }CSTEXT_PARAGRAPH;
 
 
+typedef CSIMAGE_GRADIENT CSMOUSE_HOVER_EFFECT;
 #endif // CSTYPES_H

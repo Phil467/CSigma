@@ -1,5 +1,8 @@
 #include "csTranslator.h"
 #include <iomanip>
+#include <nlohmann/json.hpp>
+#include <regex>
+#include <unordered_map>
 
 #pragma comment(lib, "wininet.lib")
 
@@ -110,8 +113,8 @@ const wchar_t* languagesW[] = {
 
 wchar_t* KEY = L"";
 
-wchar_t* originalLanguage = L"en-us";
-wchar_t* viewLanguage = L"fr";
+wchar_t* originalLanguageCode = L"en-us";
+wchar_t* viewLanguageCode = L"fr";
 
 extern int MAX_TRANSLATION_TEXT_LENGTH_REQUESTED;
 
@@ -405,6 +408,208 @@ std::string CSTRANSLATOR::extractTranslation(const std::string& jsonResponse)
     return decoded;
 }
 
+
+
+
+
+
+
+/*********************************  json parsing ******************************************************* */
+
+using json = nlohmann::json;
+
+// Table de correspondance des entités HTML courantes
+std::unordered_map<std::string, std::string> htmlEntities = {
+    {"&#10;", "\n"},     // Line Feed
+    {"&#13;", "\r"},     // Carriage Return
+    {"&#9;", "\t"},      // Tab
+    {"&#32;", " "},      // Space
+    {"&#34;", "\""},     // Quote
+    {"&#38;", "&"},      // Ampersand
+    {"&#39;", "'"},      // Apostrophe
+    {"&#60;", "<"},      // Less than
+    {"&#62;", ">"},      // Greater than
+    {"&lt;", "<"},       // Less than (named)
+    {"&gt;", ">"},       // Greater than (named)
+    {"&amp;", "&"},      // Ampersand (named)
+    {"&quot;", "\""},    // Quote (named)
+    {"&apos;", "'"},     // Apostrophe (named)
+    {"&nbsp;", " "},     // Non-breaking space
+};
+std::unordered_map<std::string, std::string> htmlEntities2 = {
+    {"&#10; ", "\n"},     // Line Feed
+    {"&#13; ", "\r"},     // Carriage Return
+    {"&#9; ", "\t"},      // Tab
+    {"&#32; ", " "},      // Space
+    {"&#34; ", "\""},     // Quote
+    {"&#38; ", "&"},      // Ampersand
+    {"&#39; ", "'"},      // Apostrophe
+    {"&#60; ", "<"},      // Less than
+    {"&#62; ", ">"},      // Greater than
+    {"&lt; ", "<"},       // Less than (named)
+    {"&gt; ", ">"},       // Greater than (named)
+    {"&amp; ", "&"},      // Ampersand (named)
+    {"&quot; ", "\""},    // Quote (named)
+    {"&apos; ", "'"},     // Apostrophe (named)
+    {"&nbsp; ", " "},     // Non-breaking space
+};
+
+// Fonction pour décoder les entités HTML numériques (&#xxx;)
+std::string decodeNumericEntities(const std::string& text, const std::regex& numericPattern) 
+{
+    //std::regex numericPattern(R"(&#(\d+);)");
+    //std::regex numericPattern(R"(&#(\d+); )"); // espace a la fin
+    std::string result = text;
+    
+    std::sregex_iterator iter(text.begin(), text.end(), numericPattern);
+    std::sregex_iterator end;
+    
+    // Traiter les correspondances en ordre inverse pour éviter les problèmes d'index
+    std::vector<std::pair<size_t, size_t>> matches;
+    std::vector<int> codes;
+    
+    for (auto it = iter; it != end; ++it) {
+        matches.push_back({it->position(), it->length()});
+        codes.push_back(std::stoi((*it)[1].str()));
+    }
+    
+    // Traiter de la fin vers le début
+    for (int i = matches.size() - 1; i >= 0; i--) {
+        size_t pos = matches[i].first;
+        size_t len = matches[i].second;
+        int code = codes[i];
+        
+        // Convertir le code ASCII en caractère
+        if (code >= 0 && code <= 127) {
+            char character = static_cast<char>(code);
+            result.replace(pos, len, 1, character);
+        }
+    }
+    
+    return result;
+}
+
+// Fonction pour décoder les entités HTML nommées et numériques
+std::string decodeHtmlEntities(const std::string& text) 
+{
+    std::string result = text;
+    
+    // D'abord, décoder les entités numériques
+    std::regex numericPattern(R"(&#(\d+); )");
+    result = decodeNumericEntities(result, numericPattern);
+
+    std::regex numericPattern2(R"(&#(\d+);)");
+    result = decodeNumericEntities(result, numericPattern2);
+    
+    // Ensuite, décoder les entités nommées courantes
+    for (const auto& entity : htmlEntities) {
+        size_t pos = 0;
+        while ((pos = result.find(entity.first, pos)) != std::string::npos) {
+            result.replace(pos, entity.first.length(), entity.second);
+            pos += entity.second.length();
+        }
+    }
+    for (const auto& entity : htmlEntities2) {
+        size_t pos = 0;
+        while ((pos = result.find(entity.first, pos)) != std::string::npos) {
+            result.replace(pos, entity.first.length(), entity.second);
+            pos += entity.second.length();
+        }
+    }
+    
+    return result;
+}
+
+// Version améliorée de la fonction d'extraction avec décodage HTML
+std::string extractTranslationWithDecoding(const std::string& jsonResponse) 
+{
+    try {
+        json parsed = json::parse(jsonResponse);
+        
+        if (parsed.contains("responseData") && 
+            parsed["responseData"].contains("translatedText")) {
+            
+            std::string translatedText = parsed["responseData"]["translatedText"];
+            
+            // Décoder les entités HTML
+            translatedText = decodeHtmlEntities(translatedText);
+            
+            return translatedText;
+        } else {
+            std::cerr << "Erreur: Structure JSON inattendue" << std::endl;
+            return "";
+        }
+        
+    } catch (const json::parse_error& e) {
+        std::cerr << "Erreur de parsing JSON: " << e.what() << std::endl;
+        return "";
+    }
+}
+
+
+CSTRANSLATIONRESULT extractDetailedTranslationWithDecoding(const std::string& jsonResponse) 
+{
+    CSTRANSLATIONRESULT result = {"", "", 0.0, "", false};
+    
+    try {
+        json parsed = json::parse(jsonResponse);
+        
+        // Vérifier le statut
+        if (parsed.contains("responseStatus")) {
+            int responseStatus = parsed["responseStatus"];
+            if (responseStatus == 200) {
+                result.success = true;
+                result.status = "OK";
+            } else {
+                result.success = false;
+                result.status = "Error: " + std::to_string(responseStatus);
+                return result;
+            }
+        }
+        
+        // Extraire et décoder la traduction
+        if (parsed.contains("responseData")) {
+            auto responseData = parsed["responseData"];
+            
+            if (responseData.contains("translatedText")) {
+                result.translatedText = responseData["translatedText"];
+                // Décoder les entités HTML
+                result.translatedText = decodeHtmlEntities(result.translatedText);
+            }
+        }
+        
+        // Traiter les matches
+        if (parsed.contains("matches") && parsed["matches"].is_array() && 
+            !parsed["matches"].empty()) {
+            auto firstMatch = parsed["matches"][0];
+            if (firstMatch.contains("segment")) {
+                result.originalText = firstMatch["segment"];
+                // Décoder aussi le texte original si nécessaire
+                result.originalText = decodeHtmlEntities(result.originalText);
+            }
+            if (firstMatch.contains("quality")) {
+                if (firstMatch["quality"].is_string()) {
+                    std::string qualityStr = firstMatch["quality"];
+                    result.confidence = std::stod(qualityStr) / 100.0;
+                } else if (firstMatch["quality"].is_number()) {
+                    result.confidence = firstMatch["quality"];
+                }
+            }
+        }
+        
+    } catch (const std::exception& e) {
+        std::cerr << "Erreur: " << e.what() << std::endl;
+        result.success = false;
+        result.status = "Error";
+    }
+    
+    return result;
+}
+
+
+
+/************************************************************************************************************************************************ */
+
 // Lire fichier avec détection d'encodage
 std::vector<std::string> CSTRANSLATOR::readInputFile() 
 {
@@ -545,18 +750,21 @@ std::vector<wchar_t*> CSTRANSLATOR::translate(std::vector<wchar_t*> lines)
             std::string encodedText = urlEncode(utf16_to_utf8(line.getTable()));
 
             std::string url = "https://api.mymemory.translated.net/get?q=" + 
-                            encodedText + "&langpair=" + sourceLang + "|" + targetLang;
+                            encodedText + "&langpair=" + sourceLang + "|" + targetLang + "&de=azphil@outlook.fr";
             
             // Effectuer la requête
             std::string response = httpRequest(url);
 
             //std::string response = translateWithLibreTranslate(encodedText, sourceLang, targetLang);
-            std::string translation = extractTranslation(response);
+            //std::string translation = extractTranslation(response);
+            CSTRANSLATIONRESULT translation = extractDetailedTranslationWithDecoding(response);
+
             printf("%s\n",response.c_str());
 
-            if (!translation.empty() && translation != "null") 
+            //if (!translation.empty() && translation != "null") 
+            if(translation.success)
             {
-                vector<wstring> vline = CSSTRUTILS::splitWords(utf8_to_utf16(translation).c_str(), L"\n");
+                vector<wstring> vline = CSSTRUTILS::splitWords(utf8_to_utf16(translation.translatedText).c_str(), L"\n");
                 int n = vline.size();
                 for(int i=0; i<n; i++)
                 {
@@ -574,6 +782,15 @@ std::vector<wchar_t*> CSTRANSLATOR::translate(std::vector<wchar_t*> lines)
                     ret.push_back((wchar_t*)CSSTRUTILS::makeWString(vline[i].c_str()));
                 }
                 vline.clear();
+                success = 0;
+
+                if(strstr("IS AN INVALID TARGET LANGUAGE", translation.translatedText.c_str()) != 0)
+                {
+                    errType = CSTRANSLATOR_ERR_INVALID_LANGUAGE;
+                    wcout<<L"invalid language! ------------------------------------\n";
+                }
+                else 
+                    errType = 1;
             }
             
             // Pause d'1 seconde
@@ -626,6 +843,7 @@ bool CSTRANSLATOR::translate()
     int lineCount = 0;
     
     std::string line;
+    bool b = 1;
     for (int i=0; i<totalLines; i++) 
     {
         line = lines[i];
@@ -656,25 +874,27 @@ bool CSTRANSLATOR::translate()
             // Construire l'URL de l'API
             std::string encodedText = urlEncode(line);
             std::string url = "https://api.mymemory.translated.net/get?q=" + 
-                            encodedText + "&langpair=" + sourceLang + "|" + targetLang;
+                            encodedText + "&langpair=" + sourceLang + "|" + targetLang + "&de=azphil@outlook.fr";
                             
             
             // Effectuer la requête
             std::string response = httpRequest(url);
-            std::string translation = extractTranslation(response);
+            //std::string translation = extractTranslation(response);
+            CSTRANSLATIONRESULT translation = extractDetailedTranslationWithDecoding(response);
             
-            if (!translation.empty() && translation != "null") 
+            //if (!translation.empty() && translation != "null") 
+            if(translation.success)
             {
-                n = translation.size();
+                n = translation.translatedText.size();
                 for(int i=0; i<n; i++)
                 {
-                    if(translation[i] == '\n')
+                    if(translation.translatedText[i] == '\n')
                     {
-                        translation[i] = '|';
+                        translation.translatedText[i] = '|';
                     }
                 }
-                //cout<<translation<<"\n";
-                writeLineUtf16(outFile, translation);
+                cout<<translation.translatedText<<"\n";
+                writeLineUtf16(outFile, translation.translatedText);
             } 
             else 
             {
@@ -685,6 +905,7 @@ bool CSTRANSLATOR::translate()
                         line[i] = '|';
                 }
                 writeLineUtf16(outFile, line);
+                b = 0;
             }
             
             // Pause d'1 seconde
@@ -697,7 +918,7 @@ bool CSTRANSLATOR::translate()
     std::cout << std::endl << "Traduction terminee: " << outputFile << std::endl;
     std::cout << "Fichier encode en UTF-16 LE avec BOM" << std::endl;
     
-    return true;
+    return b;
 };
 
 bool CSTRANSLATOR::translateFileAsSingleString(wchar_t* linesDelims)
@@ -736,7 +957,7 @@ bool CSTRANSLATOR::translateFileAsSingleString(wchar_t* linesDelims)
     
     std::string encodedText = urlEncode(line);
     std::string url = "https://api.mymemory.translated.net/get?q=" + 
-                    encodedText + "&langpair=" + sourceLang + "|" + targetLang;
+                    encodedText + "&langpair=" + sourceLang + "|" + targetLang + "&de=azphil237@outlook.com";
     
     // Effectuer la requête
     std::string response = httpRequest(url);

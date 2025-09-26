@@ -22,6 +22,8 @@ void setBackgroundColorClickEffect(int id, CSRGBA color);
 void setBorderColorClickEffect(int id, CSRGBA color);
 void setTitleColorClickEffect(int id, CSRGBA color);
 
+CSMOUSE_HOVER_EFFECT* getMouseHoverEffectPtr(int id);
+
 
 void _mouseHover_colorGradient(HWND hwnd, int id);
 void _mouseHoverLeave(HWND hwnd, UINT msg, int id);
