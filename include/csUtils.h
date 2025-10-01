@@ -57,8 +57,8 @@ int _CSIGMA_APP_RUN_();
 void __setAllRects();
 void catchEventsGroup(int id, int idEvents, bool b);
 int createSection(int id, RECT geom,  COLORREF color, BOOL_RECT edgeResize, bool show=1, bool isRoot=0, bool attach=1);
-bool addAction(int id, void(*f)(CSARGS), CSARGS& args);
-bool addAction(int id, void(*f)(CSARGS), int nbArgs, ...);
+int addAction(int id, void(*f)(CSARGS), CSARGS& args);
+int addAction(int id, void(*f)(CSARGS), int nbArgs, ...);
 bool removeAction(int id, int idAction);
 bool removeLastAction(int id);
 int setIcon(int id, wchar_t*pathSmallIcon, wchar_t*pathBigIcon);
@@ -109,7 +109,8 @@ void setAsCloseButton(int id, int& id_close);
 void setAsMinButton(int id, int& id_minimize);
 void setAsMaxButton(int& id, int& id_maximize);
 
-void manageTimers(int id);
+void sleepWhenMinimizeExcept(int id, vector<int>* idExcept);
+void sleepWhenMinimize(int id, vector<int>* idSleep);
 void killAllTimers();
 void setAllTimers();
 RECT getTaskbarRect();
@@ -117,8 +118,9 @@ TASKBAR_INFO getTaskbarInfo();
 
 void setLockable(int id, CSLOCKED_MODE lm);
 void updateAfterReceivingResizeMessage(int id);
-void joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT message);
-void addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT message);
+void joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips, bool withTips, vector<int>*idsSrc=0);
+void joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT* tips, vector<int>*idsSrc=0);
+void addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips);
 void enableDarkEdge(int id);
 
 void updateSection(int id);
@@ -126,6 +128,12 @@ void _updateApp(int id);
 
 void autoFitToTitle(int id, int marging);
 void setMinMaxInfo(int id, MINMAXINFO mmi);
+
+int newMouseHook(int id);
+int getMouseHook(int id, int idHook);
+void resetMouseHook(int id, int idHook);
+int attach(int id, int idp);
+int detach(int id);
 
 }
 

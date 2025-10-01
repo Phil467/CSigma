@@ -395,7 +395,7 @@ void CSUIFX::_mouseHoverLeave(HWND hwnd, UINT msg, int id)
                 TipsPopupParams[id].Geometry[i].top = RECTWND[i].top;
             }
             TipsPopupParams[id].MouseHoverCount = 0;
-            TipsPopupParams[id].MouseLeaveCount = TipsPopupParams[id].Delay*2;
+            TipsPopupParams[id].MouseLeaveCount = TipsPopupParams[id].Delay + 3;
         }
 
         /*if(HWNDCAPTURE == CNTLIST[0])
@@ -515,6 +515,21 @@ void CSUIFX::setTitleColorClickEffect(int id, CSRGBA color)
 
 }
 
+RECT lastRect;
+
+bool ptInSecRect(vector<int> v)
+{
+    int n=v.size();
+    POINT p;
+    GetCursorPos(&p);
+    for(int i=0; i<n; i++)
+    {
+        if(PtInRect(&RECTWND[v[i]], p))
+            return 1;
+    }
+    return 0;
+}
+
 void CSUIFX::_mouseHover_movePopup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, int id)
 {
     if(msg == WM_TIMER)
@@ -528,12 +543,15 @@ void CSUIFX::_mouseHover_movePopup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                 {
                     //RECT r = RECTPARREF[id]; //in desktop coords
                     RECT r = RECTWND[id]; //in desktop coords
+                    GetWindowRect(hwnd, &r);
                     RECT rc = RECTCL[id]; //in desktop coords
+                    GetClientRect(hwnd, &rc);
                     wchar_t*t = TITLE[id].Text;
                     for(int i = 0; i<m.Ids.size(); i++)
                     {
                         HWND w=SECTION[m.Ids[i]];
                         RECT r1=m.Geometry[i]; //sizes
+                        
                         POS_BOOL b=m.Bpos[i];
 
                         int L = (b.bTLeft|b.bBLeft|b.bMLeft)*(r.left-r1.right)
@@ -548,9 +566,8 @@ void CSUIFX::_mouseHover_movePopup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                         int j = m.Ids[i];
                         TITLE[j].Text = t;
                         if(IsWindowVisible(w))
-                        //if(cv.cp[m.Ids[i]]->Show)
                         {
-                            RECT rp = RECTWND[j];
+                            //RECT rp = RECTWND[j];
 
                             /*SetWindowPos(w,0,rp.left,rp.top,r1.right, r1.bottom,SWP_SHOWWINDOW);
                             InvalidateRect(w,0,1);
@@ -574,17 +591,21 @@ void CSUIFX::_mouseHover_movePopup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                             cv.cp[j]->AutoAlphaFade.ShowHide = 1;
                             cv.cp[j]->AutoAlphaFade.State = CS_AAF_SHOW_CNTR;
                             cv.cp[j]->AutoAlphaFade.Activate = 1;*/
-                            SetWindowPos(w,0,L,T,r1.right,r1.bottom,SWP_SHOWWINDOW);
+                            //SetWindowPos(w,0,L,T,r1.right,r1.bottom,SWP_SHOWWINDOW);
                         }
-
+                        
+                        GetWindowRect(w, &lastRect);
                         SetWindowPos(w,0,L,T,r1.right,r1.bottom,SWP_SHOWWINDOW);
-                        bltRect[j].right = r1.right-m.message[i].marg.right-m.message[i].marg.left;
+                        bltRect[j].right = r1.right-m.text[i].marg.right-m.text[i].marg.left;
                         bltRect[j].left = 0;
-                        bltRect[j].bottom = r1.bottom-m.message[i].marg.bottom;
+                        bltRect[j].bottom = r1.bottom-m.text[i].marg.bottom;
                         bltRect[j].top = 0;
-                        dynSimpleText[j] = m.message[i];
-                        hdcontextExtSize[j].cx = r1.right;
-                        csGraphics::updateGraphicArea(j, 1);
+                        if(m.text.size())
+                        {
+                            dynSimpleText[j] = m.text[i];
+                            hdcontextExtSize[j].cx = r1.right;
+                            csGraphics::updateGraphicArea(j, 1);
+                        }
                     }
                     //cv.BHOOK_LBUTNDOWN_POPUP = 1;
                 }
@@ -593,7 +614,7 @@ void CSUIFX::_mouseHover_movePopup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
             if(TipsPopupParams[id].MouseLeaveCount>0)
             {
                 RECT r, r1;
-                if(TipsPopupParams[id].MouseLeaveCount==TipsPopupParams[id].Delay*2-2)
+                if(TipsPopupParams[id].MouseLeaveCount==TipsPopupParams[id].Delay+3)
                 {
                     //entre cette condition et la suivante, il y'a un espce de temps pendant lequel
                     //la fenetre peut se deplacer. Dans cas il ne faut pa la masquer.
@@ -614,7 +635,19 @@ void CSUIFX::_mouseHover_movePopup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
 
                         if((r1.left==r.left && r1.top==r.top) &&
                             !(PtInRect(&r1,p)&& TipsPopupParams[id].Lock))
-                            ShowWindow(SECTION[m.Ids[i]],SW_HIDE);
+                        {
+                            if(lastRect.left == r1.left && lastRect.top == r1.top)                           
+                            {
+                                ShowWindow(SECTION[m.Ids[i]],SW_HIDE);
+
+                            }
+                            else
+                            {
+                                if(m.Ids_src && !ptInSecRect(*m.Ids_src))
+                                    ShowWindow(SECTION[m.Ids[i]],SW_HIDE);
+                                lastRect = r1;
+                            }
+                        }
                             //cv.cp[m.Ids[i]]->Show = 0;
                     }
                 }

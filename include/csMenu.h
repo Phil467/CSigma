@@ -12,11 +12,12 @@ class CSMENU
         int getIdParent();
         int getIdButton(int idMenuItem);
         int newGroup(const wchar_t* title, const wchar_t* iconPath1, const wchar_t* iconPath2);
-        bool newItem(vector<BYTE> _hierarchy, wchar_t* title, wchar_t*iconPath1, wchar_t*iconPath2);
+        bool newItem(vector<int> _hierarchy, wchar_t* title, wchar_t*iconPath1, wchar_t*iconPath2);
         void setTextParams(CSTEXT textPar);
         //virtual ~CSMENU();
 
     protected:
+        int newlbm(int* idp, int nbItem, wchar_t*defltTitle=L"Item");
 
     private:
         int id;
@@ -29,6 +30,7 @@ class CSMENU
         vector<CSLISTBOXMIN*> lbm;
         vector<CSLISTBOXMIN**> lbmOfHierarchy;
         vector<vector<int>> hierarchy;
+        vector<vector<RECT*>> lbmItemRectLock;
         int selectedItem;
         
 };

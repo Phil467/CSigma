@@ -280,9 +280,10 @@ typedef struct
 typedef struct
 {
     vector<int> Ids;
+    vector<int>* Ids_src;
     vector<RECT> Geometry;
     vector<POS_BOOL> Bpos;
-    vector<CSDYNAMIC_SIMPLE_TEXT> message;
+    vector<CSDYNAMIC_SIMPLE_TEXT> text;
     unsigned int Delay;
     unsigned MouseHoverCount;
     unsigned MouseLeaveCount;

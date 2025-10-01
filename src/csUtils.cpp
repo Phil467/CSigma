@@ -207,12 +207,15 @@ void CSUIMAN::__setAllRects()
 
 void CSUIMAN::catchEventsGroup(int id, int idEvents, bool b)
 {
-    HIDEGROUPMSG[id][idEvents] = b;
+    HIDEGROUPMSG[id][idEvents] = !b;
 }
 
 HWND HOOK_HWND_1;
 extern vector<HWND> richEdits;
 extern vector<bool> hookRichEditSignal;
+extern vector<vector<int>> sectionMouseHook;
+extern vector<bool> attached;
+
 
 LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam)
 {
@@ -225,6 +228,14 @@ LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam)
             for(int i=0; i<n; i++)
             {
                 hookRichEditSignal[i] = 1;
+            }
+
+            n = sectionMouseHook.size();
+            for(int i=0; i<n; i++)
+            {
+                int m = sectionMouseHook[i].size();
+                for(int j=0; j<m; j++)
+                    sectionMouseHook[i][j] = (int)wParam;
             }
         }
 
@@ -239,15 +250,45 @@ HHOOK setHook()
     return mhook;
 }
 
-bool CSUIMAN::addAction(int id, void(*f)(CSARGS), CSARGS& args)
+int CSUIMAN::attach(int id, int idp)
+{
+    attached[id] = 1;
+    PARID[id] = idp;
+    SetParent(SECTION[id], SECTION[idp]);
+}
+int CSUIMAN::detach(int id)
+{
+    attached[id] = 0;
+    PARID[id] = 0;
+    SetParent(SECTION[id], 0);
+}
+
+
+int CSUIMAN::newMouseHook(int id)
+{
+    sectionMouseHook[id].push_back(0);
+    //cout<<sectionMouseHook.size()<<"   mouseHook\n";
+}
+
+int CSUIMAN::getMouseHook(int id, int idHook)
+{
+    return sectionMouseHook[id][idHook];
+}
+
+void CSUIMAN::resetMouseHook(int id, int idHook)
+{
+    sectionMouseHook[id][idHook] = 0;
+}
+
+int CSUIMAN::addAction(int id, void(*f)(CSARGS), CSARGS& args)
 {
     GROUPED_EVENTS_FUNC[id].push_back(f);
     GROUPED_EVENTS_ARGS[id].push_back(args);
     HIDEGROUPMSG[id].push_back(0);
-    return 1;
+    return GROUPED_EVENTS_FUNC[id].size()-1;
 }
 
-bool CSUIMAN::addAction(int id, void(*f)(CSARGS), int nbArgs, ...)
+int CSUIMAN::addAction(int id, void(*f)(CSARGS), int nbArgs, ...)
 {
     CSARGS args(nbArgs);
     va_list adArgs;
@@ -261,7 +302,7 @@ bool CSUIMAN::addAction(int id, void(*f)(CSARGS), int nbArgs, ...)
     GROUPED_EVENTS_FUNC[id].push_back(f);
     GROUPED_EVENTS_ARGS[id].push_back(args);
     HIDEGROUPMSG[id].push_back(0);
-    return 1;
+    return GROUPED_EVENTS_FUNC[id].size()-1;
 }
 
 
@@ -805,31 +846,37 @@ TASKBAR_INFO CSUIMAN::getTaskbarInfo()
 extern int TIPS_POPUP;
 extern bool saveAppTips;
 extern vector<vector<vector<wchar_t*>>> TIPSFILE;
+vector<int> tips_src_ids;
 
-void CSUIMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT message)
+void CSUIMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips, bool withTips, vector<int>*idsSrc)
 {
     TIPS_POPUP_PARAMS tpp;
     tpp.Ids.push_back(idPopup);
+    tpp.Ids_src = idsSrc;
     tpp.Geometry.push_back({0,0,rTips.right*dimFact, rTips.bottom*dimFact});
     tpp.Bpos.push_back(pb);
-    if(TIPSFILE.size() && saveAppTips)
+    if(withTips)
     {
-        int n = message.paragraph.size();
-        for(int i=0; i<n; i++)
+        if(TIPSFILE.size() && saveAppTips)
         {
-            //wcout<<TIPSFILE[id][TipsPopupParams[id].message.size()][i]<<L"\n";
-            message.paragraph[i].Text = CSSTRUTILS::makeWString(TIPSFILE[id][TipsPopupParams[id].message.size()][i]);
+            int n = tips.paragraph.size();
+            for(int i=0; i<n; i++)
+            {
+                //wcout<<TIPSFILE[id][TipsPopupParams[id].tips.size()][i]<<L"\n";
+                tips.paragraph[i].Text = CSSTRUTILS::makeWString(TIPSFILE[id][TipsPopupParams[id].text.size()][i]);
+            }
         }
-    }
-    else
-    {
-        int n = message.paragraph.size();
-        for(int i=0; i<n; i++)
+        else
         {
-            message.paragraph[i].Text = CSSTRUTILS::makeWString(message.paragraph[i].Text);
+            int n = tips.paragraph.size();
+            for(int i=0; i<n; i++)
+            {
+                tips.paragraph[i].Text = CSSTRUTILS::makeWString(tips.paragraph[i].Text);
+            }
         }
+    
     }
-    tpp.message.push_back(message);
+    tpp.text.push_back(tips);
     tpp.Lock = locked;
     tpp.Delay = delay;
     tpp.MouseHoverCount = 0;
@@ -859,9 +906,20 @@ void CSUIMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay,
     }
 }
 
-void CSUIMAN::addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT message)
+void CSUIMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT* tips, vector<int>*idsSrc)
 {
-    CSUIMAN::joinPopup(id, TIPS_POPUP, rTips, pb, delay, locked, message);
+    if(tips) joinPopup(id, idPopup, rTips, pb, delay, locked, *tips, 1, idsSrc);
+    else 
+    {
+        CSDYNAMIC_SIMPLE_TEXT _tips;
+        joinPopup(id, idPopup, rTips, pb, delay, locked, _tips, 0, idsSrc);
+    }
+}
+
+void CSUIMAN::addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips)
+{
+    tips_src_ids.push_back(id);
+    CSUIMAN::joinPopup(id, TIPS_POPUP, rTips, pb, delay, locked, tips, 1, &tips_src_ids);
 }
 
 
@@ -1008,8 +1066,35 @@ void _manageTimers(CSARGS Args)
     }
 }
 
-void CSUIMAN::manageTimers(int id)
+void CSUIMAN::sleepWhenMinimizeExcept(int id, vector<int>* idExcept)
 {
+    int n = idExcept->size();
+    int m = SECTION.size();
+    for(int j=0; j<m; j++)
+    {
+        bool b = 0;
+        for(int i=0; i<n; i++)
+        {
+            if(idExcept[0][i] == j)
+            {
+                TIMER_PARAMS[j].closeWhenMinimize = 0;
+                b = 1;
+                break;
+            }
+            
+        }
+        if(!b) TIMER_PARAMS[j].closeWhenMinimize = 1;
+    }
+    addAction(id, _manageTimers,0);
+}
+
+void CSUIMAN::sleepWhenMinimize(int id, vector<int>* idSleep)
+{
+    int n = idSleep->size();
+    for(int i=0; i<n; i++)
+    {
+        TIMER_PARAMS[idSleep[0][i]].closeWhenMinimize = 1;
+    }
     addAction(id, _manageTimers,0);
 }
 

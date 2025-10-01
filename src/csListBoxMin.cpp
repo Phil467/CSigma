@@ -94,6 +94,8 @@ void CSLISTBOXMIN::init(int* idp, int _gridStyle, int _gridWidth)
     cutPasteDone0 = 0;
     copyPasteKeyDownState = 0;
     click_message = 0;
+    extFunc = 0;
+    extFuncArgs = 0;
 
     maxTextWidth = 40;
 
@@ -569,7 +571,7 @@ void CSLISTBOXMIN::create()
         setActiveItem(0);
     }
     organize();
-    refresh();
+    update();
     animate();
 }
 
@@ -1172,15 +1174,15 @@ extern vector<vector<CSARGS>> GROUPED_EVENTS_ARGS;
 
 void CSLISTBOXMIN::animate()
 {
-    *n = pos.size();
-    *pimgSize = imgSize;
-    *pmarging = marging;
-    *pdfltSz = dfltSz;
-    *poffset = offset;
-    *pgridWidth = gridWidth;
+    n = pos.sizePtr();
+    pimgSize = &imgSize;
+    pmarging = &marging;
+    pdfltSz = &dfltSz;
+    poffset = &offset;
+    pgridWidth = &gridWidth;
 
     args.clear();
-    args.setArgNumber(43);
+    args.setArgNumber(45);
     args.regArg(dcs0.getTable(), dcs1.getTable(),dcs2.getTable(),dcs3.getTable(),
                  color0.getTable(), color1.getTable(),color2.getTable(),color3.getTable(),
                  bkgcol0.getTable(), bkgcol1.getTable(),bkgcol2.getTable(),bkgcol3.getTable(),
@@ -1190,11 +1192,11 @@ void CSLISTBOXMIN::animate()
         vkCtrlCount, vkCtrlCountControl, vkCtrlPoint, vkCtrlGdcPos, pmarging, pdfltSz,
         poffset, pgridWidth, smoothRepos, smoothReposCount,
         cutPasteViewer, cutPasteStart, cutPasteDone, cutPasteDone0,copyPasteKeyDownState,click_message, &cxmax, &cymax,
-        &itemAlign);
+        &itemAlign, extFunc, extFuncArgs);
 
     if(!animated)
     {
-        CSUIMAN::addAction(*parent, catchEvents, 43, dcs0.getTable(), dcs1.getTable(),dcs2.getTable(),dcs3.getTable(),
+        groupMsgPos = CSUIMAN::addAction(*parent, catchEvents, 45, dcs0.getTable(), dcs1.getTable(),dcs2.getTable(),dcs3.getTable(),
                  color0.getTable(), color1.getTable(),color2.getTable(),color3.getTable(),
                  bkgcol0.getTable(), bkgcol1.getTable(),bkgcol2.getTable(),bkgcol3.getTable(),
                  pos.getTable(), posImg.getTable(), posTitle.getTable(),
@@ -1203,9 +1205,9 @@ void CSLISTBOXMIN::animate()
         vkCtrlCount, vkCtrlCountControl, vkCtrlPoint, vkCtrlGdcPos, pmarging, pdfltSz,
         poffset, pgridWidth, smoothRepos, smoothReposCount,
         cutPasteViewer, cutPasteStart, cutPasteDone, cutPasteDone0,copyPasteKeyDownState,click_message, &cxmax, &cymax,
-        &itemAlign);
+        &itemAlign, extFunc, extFuncArgs);
+        
         animated = 1;
-        groupMsgPos = GROUPED_EVENTS_ARGS[*parent].size()-1;
     }
     else
     {
@@ -1217,10 +1219,34 @@ void CSLISTBOXMIN::animate()
 int CSLISTBOXMIN::getEventsGroupId()
 {
     return groupMsgPos;
-
 }
 
-void CSLISTBOXMIN::refresh()
+void CSLISTBOXMIN::hide()
+{
+    CSUIMAN::catchEventsGroup(*parent, groupMsgPos, 0);
+    CSUIMAN::updateSection(*parent);
+}
+void CSLISTBOXMIN::show()
+{
+    CSUIMAN::catchEventsGroup(*parent, groupMsgPos, 1);
+    CSUIMAN::updateSection(*parent);
+}
+
+RECT CSLISTBOXMIN::getItemRect(int id)
+{
+    return pos[id];
+}
+RECT* CSLISTBOXMIN::getItemRectPtr(int id)
+{
+    return &pos[id];
+}
+void CSLISTBOXMIN::addExternalFunction(void(*_extFunc)(CSARGS), CSARGS* _extFuncArgs)
+{
+    extFunc = _extFunc;
+    extFuncArgs = _extFuncArgs;
+}
+
+void CSLISTBOXMIN::update()
 {
 
     if(*cntActivate)
@@ -1262,6 +1288,13 @@ void catchEvents(CSARGS Args)
     else if(msg == WM_MOUSELEAVE) mouseLeave(Args);
     else if(msg == WM_KEYDOWN) vkeydownSelect(Args);
     //else if(msg == WM_TIMER) autoReposition(Args);
+
+    void(*extFunc)(CSARGS) = (void(*)(CSARGS))Args[43];
+    CSARGS*extFuncArgs = (CSARGS*)Args[43];
+    if(extFunc && extFuncArgs)
+    {  
+        extFunc(*extFuncArgs);
+    }
 }
 
 extern POINT TIMER_POINT;
@@ -1279,6 +1312,7 @@ void _mouseMove(CSARGS Args)
     RECT rr = {dcpos.x, dcpos.y, 
                 cxmax*hZoom[id], cymax*vZoom[id]};
     //if(cntState && (!g || (g && PtInRect(&rr,ptm)))) 
+    
     if(cntState && PtInRect(&rr,ptm)) 
     //if(cntState && (!g || (g && PtInRect(&RECTWND[id],TIMER_POINT))))
     {

@@ -540,19 +540,19 @@ void CSFILESMAN::__saveAppTips(wchar_t* path)
     csLIST<wchar_t> strStruct;
     for(int i=0; i<n; i++)
     {
-        int m = TipsPopupParams[i].message.size();
+        int m = TipsPopupParams[i].text.size();
         
         wstring tmp= (to_wstring(m)+L" ");
         strStruct.insertTableAt((wchar_t*)tmp.c_str(), strStruct.size(), tmp.size());
         for(int j=0; j<m; j++)
         {
-            int o = TipsPopupParams[i].message[j].paragraph.size();
+            int o = TipsPopupParams[i].text[j].paragraph.size();
             wstring tmp= (to_wstring(o)+L" ");
             strStruct.insertTableAt((wchar_t*)tmp.c_str(), strStruct.size(), tmp.size());
             int pos = 0;
             for(int k=0; k<o; k++)
             {
-                wchar_t* t = TipsPopupParams[i].message[j].paragraph[k].Text;
+                wchar_t* t = TipsPopupParams[i].text[j].paragraph[k].Text;
                 str.insertTableAt(t, str.size(), wcslen(t));
                 str.insertEnd('|');
 
@@ -671,16 +671,16 @@ void CSFILESMAN::__setAppTips()
 
     for(int i=0; i<n; i++)
     {
-        int m = TipsPopupParams[i].message.size();
+        int m = TipsPopupParams[i].text.size();
         
         for(int j=0; j<m; j++)
         {
-            int o = TipsPopupParams[i].message[j].paragraph.size();
+            int o = TipsPopupParams[i].text[j].paragraph.size();
             for(int k=0; k<o; k++)
             {
-                wchar_t* t = (TipsPopupParams[i].message[j].paragraph[k].Text);
-                TipsPopupParams[i].message[j].paragraph[k].Text = CSSTRUTILS::makeWString(TIPSFILE[i][j][k]);
-                wprintf(L"%ls\n",TIPSFILE[i][j][k]);
+                wchar_t* t = (TipsPopupParams[i].text[j].paragraph[k].Text);
+                TipsPopupParams[i].text[j].paragraph[k].Text = CSSTRUTILS::makeWString(TIPSFILE[i][j][k]);
+                //wprintf(L"%ls\n",TIPSFILE[i][j][k]);
                 free(t);
 
             }
@@ -852,6 +852,8 @@ std::vector<std::wstring> CSLANGMAN::getInstalledLanguages()
     int lastDot = path.find_last_of(L"/");
     path = path.substr(0, lastDot);
     std::vector<std::wstring> lan1 = CSFILESMAN::getTxtFiles(path);
+
+    if(!lan1.size()) return {};
 
     path = appTitleFilePath;
     lastDot = path.find_last_of(L"/");

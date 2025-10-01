@@ -84,7 +84,7 @@ class CSLISTBOXMIN
         void setMouseOverItem(int id);
         void updateActiveItem(int id);
         void unActivateItem(int id);
-        void refresh();
+        void update();
         void organize();
         void create();
         bool* getCntState();
@@ -101,11 +101,16 @@ class CSLISTBOXMIN
         int* getCopyPasteKeyDownState();
         void duplicate(int src, int pos);
         int getId();
+        RECT getItemRect(int id);
+        RECT* getItemRectPtr(int id);
         void updateItem(int id);
         
         int getSize();
         bool *click_message = 0;
         void* (*pf)();
+        void addExternalFunction(void(*extFunc)(CSARGS), CSARGS* extFuncArgs);
+        void hide();
+        void show();
         virtual ~CSLISTBOXMIN();
 
     protected:
@@ -176,6 +181,8 @@ class CSLISTBOXMIN
     int *copyPasteKeyDownState;
 
     int groupMsgPos;
+    void(*extFunc)(CSARGS);
+    CSARGS*extFuncArgs;
 };
 
 CSLISTBOXMIN* csNewMinimalListBoxPtr(int* idp=0, int gridStyle=CS_RDBTN_GRID_HV, int gridWidth=1);

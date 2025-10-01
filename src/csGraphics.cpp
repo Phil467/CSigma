@@ -8,6 +8,8 @@ extern vector<RECT> bltRect;
 extern vector<bool> SECTIONSTYLE;
 extern vector<HWND> SECTION;
 
+extern vector<HDC> hdStackContext;
+extern vector<HBITMAP> hStackBmp;
 extern vector<HDC> hdcontext;
 extern vector<HDC> hdcontextExt;
 extern vector<HDC> hdBkgContext;
@@ -434,6 +436,13 @@ void csGraphics::updateGraphicArea(int id, bool reCreate)
         Rectangle(hdcontextExt[id],0,0,size.cx, size.cy);
         DeletePen(hp);
         DeleteBrush(hb);
+
+        if(!hdStackContext[id])
+        {
+            hdStackContext[id] = CreateCompatibleDC(dc);
+            hStackBmp[id] = CreateCompatibleBitmap(dc, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+            SelectBitmap(hdStackContext[id], hStackBmp[id]);
+        }
         ReleaseDC(0,dc);
     }
     bltUpdate[id] = 1;
@@ -630,6 +639,8 @@ extern float dimFact;
 void viewDynamicSimpleText(int id, vector<CSTEXT> paragraph, vector<int> pSpace, RECT marg, bool updateGASize)
 {
     int n = paragraph.size();
+    if(!n) return;
+
     HFONT hf[n];
 
     int len = (bltRect[id].right-bltRect[id].left)/hZoom[id];

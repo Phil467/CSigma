@@ -105,6 +105,7 @@ vector<RECT> bltRect;
 vector<float> hZoom;
 vector<float> vZoom;
 vector<BYTE> mouseWheelPreference;
+vector<vector<int>> sectionMouseHook;
 
 vector<bool> halftoneMode;
 vector<CSTIMER_PARAMS> TIMER_PARAMS;
@@ -251,6 +252,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
     entityMap.push_back({newVector<long>(),0,0});
     bltUpdate.push_back(0);
     minMaxInfo.push_back({{0,0},{0,0},{0,0}});
+    sectionMouseHook.push_back(vector<int>());
 
 
     vector<void(*)(CSARGS)> funcList;
@@ -263,7 +265,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
     tSizeBind.push_back(newVector<BIND_DIM_GEOM_PARAMS>());
     bSizeBind.push_back(newVector<BIND_DIM_GEOM_PARAMS>());
 
-    TipsPopupParams.push_back({newVector<int>(), newVector<RECT>(), newVector<POS_BOOL>(), newVector<CSDYNAMIC_SIMPLE_TEXT>(),0,0,0,0});
+    TipsPopupParams.push_back({newVector<int>(),0, newVector<RECT>(), newVector<POS_BOOL>(), newVector<CSDYNAMIC_SIMPLE_TEXT>(),0,0,0,0});
     AutoTransform.push_back({0});
     AUTOTRANSCOUNT.push_back(INT_MAX);
 
@@ -328,11 +330,11 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
 
         SECTIONSTYLE.push_back(1);
         hPopup = CreateWindowExW(
-                     0,               // fenêtre sans bouton barre des tâches
-                     wndClass[0]->lpszClassName,              // nom de la classe
-                     NULL,                           // titre (aucun)
-                     WS_CHILD|WS_POPUP,      // style popup + redimensionnable
-                     geom.left, geom.top, geom.right, geom.bottom,             // position et taille initiale
+                     0,               
+                     wndClass[0]->lpszClassName,              
+                     NULL,                          
+                     WS_POPUP|WS_CHILD,      
+                     geom.left, geom.top, geom.right, geom.bottom,            
                      par, 0, _hInstance, NULL
                  );
 
@@ -1117,6 +1119,7 @@ cout<<"gesture\n";
             }
             else if(hdcontextExt[id])
             {
+                //cout<<id << "jkhjhdfkjshdfhsjfkjskdkjlksjdlfjlsjdlfksd\n";
                 BitBlt(hdStackContext[id],0,0,RECTCL[id].right, RECTCL[id].bottom, hdBkgContext[id], 0,0, SRCCOPY);
                 _blitExtDc(id);
                 BitBlt(hdc,0,0,RECTCL[id].right, RECTCL[id].bottom, hdStackContext[id], 0,0, SRCCOPY);
@@ -1242,7 +1245,7 @@ void _blitExtDc(int id)
     {
         POINT pin = hdcontextExtInPos[id];
         POINT pout = hdcontextExtOutPos[id];
-        //cout<<id<<"  "<<RECTCL[id].right<<"  "<<RECTCL[id].bottom<<"\n";
+
         if(!withHScroll[id] && !withVScroll[id])
         {
             _blitEntities(id);

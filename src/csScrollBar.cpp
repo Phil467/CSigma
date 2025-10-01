@@ -319,7 +319,7 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
         *id = CSUIMAN::createSection(_idp, {edge/dimFact, (cy - edge - thick)/dimFact, (cx - 2*edge - thick)/dimFact, thick/dimFact},  RGB(200,200,200), {0,0,0,0});
             
         cursor[*id] = LoadCursor(0,IDC_SIZEWE);
-
+        
         hdStackContext[*id] = CreateCompatibleDC(hdcontext[_idp]);
         hStackBmp[*id] = CreateCompatibleBitmap(hdcontext[_idp],GetSystemMetrics(SM_CXSCREEN), thick);
         SelectBitmap(hdStackContext[*id], hStackBmp[*id]);
