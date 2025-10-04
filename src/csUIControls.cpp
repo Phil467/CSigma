@@ -569,6 +569,7 @@ void CSUICONTROLS::createToolTips(COLORREF color)
     {
         TIPS_POPUP = CSUIMAN::createSection(0, {0,0,200/dimFact,200/dimFact}, color, {0}, 0, 0, 0);
         CSUIMAN::enableDarkEdge(TIPS_POPUP);
+        SetTimer(SECTION[TIPS_POPUP], 0, 20, 0);
     }
 }
 

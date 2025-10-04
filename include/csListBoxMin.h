@@ -70,7 +70,8 @@ class CSLISTBOXMIN
         void setMultipleItemsBackground(wchar_t**_titles, int _titlesSize, COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
         void setMultipleItemsBackground(std::vector<std::wstring> titles, COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
         void setAllBackgrounds(COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
-        void setDefaultColors(COLORREF color, COLORREF highlightColor, COLORREF selectionColor);
+        void setDefaultTitleColors(COLORREF color, COLORREF highlightColor, COLORREF selectionColor, COLORREF disableColor);
+        void setDefaultBackgroundColors(COLORREF color, COLORREF highlightColor, COLORREF selectionColor, COLORREF disableColor);
         void setDefaultSize(SIZE size);
         void setMaxTextWidth(int _maxTextWidth);
         void setItemAlign(bool align);
@@ -108,7 +109,7 @@ class CSLISTBOXMIN
         int getSize();
         bool *click_message = 0;
         void* (*pf)();
-        void addExternalFunction(void(*extFunc)(CSARGS), CSARGS* extFuncArgs);
+        void addExternalFunction(void(*extFunc)(CSPARAARGS), CSPARAARGS* extFuncArgs);
         void hide();
         void show();
         virtual ~CSLISTBOXMIN();
@@ -181,8 +182,8 @@ class CSLISTBOXMIN
     int *copyPasteKeyDownState;
 
     int groupMsgPos;
-    void(*extFunc)(CSARGS);
-    CSARGS*extFuncArgs;
+    void(*extFunc)(CSPARAARGS);
+    CSPARAARGS* extFuncArgs;
 };
 
 CSLISTBOXMIN* csNewMinimalListBoxPtr(int* idp=0, int gridStyle=CS_RDBTN_GRID_HV, int gridWidth=1);

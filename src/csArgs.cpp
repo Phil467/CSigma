@@ -35,7 +35,7 @@ void* CSARGS::getLParam()
 {
     return Args[3];
 }
-void* CSARGS::getLID()
+void* CSARGS::getId()
 {
     return Args[4];
 }
@@ -52,6 +52,15 @@ void CSARGS::setProcParams(HWND* hwnd, UINT* msg, WPARAM* wp, LPARAM* lp, int*id
     Args[4]=(void*)id;
     //Args[5]=(void*)&lr;
 }
+void CSARGS::setProcParams(void* hwnd, void* msg, void* wp, void* lp, void*id)
+{
+    Args[0]=hwnd;
+    Args[1]=msg;
+    Args[2]=wp;
+    Args[3]=lp;
+    Args[4]=id;
+    //Args[5]=(void*)&lr;
+}
 
 int CSARGS::getArgNumber()
 {
@@ -63,6 +72,7 @@ void CSARGS::setArg(unsigned int i, void*arg)
     //free(Args[i+4]);
     Args[i+6]=arg;
 }
+
 void CSARGS::setId(void*id)
 {
     //free(Args[i+4]);

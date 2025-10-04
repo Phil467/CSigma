@@ -252,7 +252,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
     entityMap.push_back({newVector<long>(),0,0});
     bltUpdate.push_back(0);
     minMaxInfo.push_back({{0,0},{0,0},{0,0}});
-    sectionMouseHook.push_back(vector<int>());
+    sectionMouseHook.push_back(newVector<int>());
 
 
     vector<void(*)(CSARGS)> funcList;
@@ -1290,11 +1290,15 @@ void _blitImage(int id, int i)
     if(li.show)
     {
         if(li.eraseBkg)
-        TransparentBlt(hdcontextExt[id], li.outPos.x, li.outPos.y, li.outSize.cx, li.outSize.cy, 
-        li.outDc, li.inPos.x, li.inPos.y, li.inSize.cx, li.inSize.cy, li.bkgColor);
+        {
+            TransparentBlt(hdcontextExt[id], li.outPos.x, li.outPos.y, li.outSize.cx, li.outSize.cy, 
+            li.outDc, li.inPos.x, li.inPos.y, li.inSize.cx, li.inSize.cy, li.bkgColor);
+        }
         else
-        StretchBlt(hdcontextExt[id], li.outPos.x, li.outPos.y, li.outSize.cx, li.outSize.cy, 
-        li.outDc, li.inPos.x, li.inPos.y, li.inSize.cx, li.inSize.cy, SRCCOPY);
+        {
+            StretchBlt(hdcontextExt[id], li.outPos.x, li.outPos.y, li.outSize.cx, li.outSize.cy, 
+            li.outDc, li.inPos.x, li.inPos.y, li.inSize.cx, li.inSize.cy, SRCCOPY);
+        }
     }
 }
 

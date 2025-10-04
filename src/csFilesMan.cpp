@@ -445,7 +445,7 @@ void CSFILESMAN::__getAppTitles()
     {
         for(int i=0; i<n; i++)
         {
-            if(wt[i] != L"-" && wt[i] != L"-\n")
+            if(wt[i] != L"-" && wt[i] != L"-\n" && wt[i] != L"- ."&& wt[i] != L"- .\n")
             {
                 TITLEFILE[i].Text = makeWString(wt[i].c_str());
             }

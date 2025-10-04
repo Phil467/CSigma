@@ -17,7 +17,7 @@ class CSMENU
         //virtual ~CSMENU();
 
     protected:
-        int newlbm(int* idp, int nbItem, wchar_t*defltTitle=L"Item");
+        int newlbm(int* idp, int* idSec, int nbItem, wchar_t*defltTitle=L"Item");
 
     private:
         int id;
@@ -30,7 +30,8 @@ class CSMENU
         vector<CSLISTBOXMIN*> lbm;
         vector<CSLISTBOXMIN**> lbmOfHierarchy;
         vector<vector<int>> hierarchy;
-        vector<vector<RECT*>> lbmItemRectLock;
+        vector<csLIST<RECT>> lbmItemRectLock;
+        vector<CSPARAARGS*> lpargs;
         int selectedItem;
         
 };

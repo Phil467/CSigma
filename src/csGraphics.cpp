@@ -508,7 +508,7 @@ int csGraphics::loadImage(int id, wchar_t*path, POINT position, SIZE size)
     return entity[id].size()-1;
 }
 
-void csGraphics::showImage(int id, int idEnt, POINT posCrop, SIZE sizeCrop, bool show)
+void csGraphics::showImage(int id, int idEnt, bool show, POINT posCrop, SIZE sizeCrop)
 {
     int idImg = entity[id][idEnt].tid;
     CSLOADED_IMAGE& li = loadedImage[id][idImg];
@@ -519,6 +519,12 @@ void csGraphics::showImage(int id, int idEnt, POINT posCrop, SIZE sizeCrop, bool
     li.show = show;
     bltUpdate[id] = 1;
     InvalidateRect(SECTION[id], &bltRect[id],1);
+}
+
+bool csGraphics::isImageVisible(int id, int idEnt)
+{
+    int idImg = entity[id][idEnt].tid;
+    return loadedImage[id][idImg].show;
 }
 
 POINT csGraphics::getImagePos(int id, int idEnt)

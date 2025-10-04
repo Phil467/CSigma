@@ -17,7 +17,7 @@ void showHideLbm(CSARGS Args);
 extern float dimFact;
 
 void initLbm(CSLISTBOXMIN*& lbm, int nbItem, wchar_t*defltTitle);
-void hideMenuContainer(CSARGS Args);
+void hideMenuContainer(CSPARAARGS pArgs);
 
 CSLISTBOXMIN* lastlbm;
 
@@ -38,12 +38,13 @@ CSMENU::CSMENU(int _idp, RECT r, bool _autoResize)
     
     int i;
     idPopup.push_back(i=CSUIMAN::createSection(0, {0,0,200,300},  RGB(100,100,100), {0}, 0, 0, 0));
+    SetTimer(SECTION[i], 0, 20, 0);
 
     //CSUIMAN::newMouseHook(i);
     csGraphics::setGraphicAreaColor(i, {30,30,30}, {0});
     csGraphics::setGraphicAreaSize(i, {200*dimFact,300*dimFact});
     csGraphics::updateGraphicArea(i, 1);
-    sectionMouseHook[id].push_back(0);
+    sectionMouseHook[i].push_back(0);
     
         
 
@@ -97,8 +98,11 @@ int CSMENU::newGroup(const wchar_t* title, const wchar_t* iconPath1, const wchar
         CSUIMAN::removeAction(idSection[idSection.size()-1], ID_ACTION);
     }
 
-    CSUIMAN::joinPopup(BUTTON, idPopup[0], {0,0,200,300}, (POS_BOOL){.bLBottom=1}, 1, 1,0, &idSection);
-    int lbmId = newlbm(&idPopup[0], 1, (wchar_t*)(wstring(L"item-")+to_wstring(lbm.size())+L"-").c_str());
+    CSUIMAN::joinPopup(BUTTON, idPopup[0], {0,0,160,255}, (POS_BOOL){.bLBottom=1}, 1, 1,0, &idSection);
+    idSection.push_back(BUTTON);
+    int id = idSection.size()-1;
+
+    int lbmId = newlbm(&idPopup[0], &idSection[id], 8, (wchar_t*)(wstring(L"Menu-")+to_wstring(lbm.size())+L"-").c_str());
     if(lastlbm) lastlbm->hide();
     lbm[lbmId]->show();
     lastlbm = lbm[lbmId];
@@ -106,35 +110,49 @@ int CSMENU::newGroup(const wchar_t* title, const wchar_t* iconPath1, const wchar
     ID_ACTION = CSUIMAN::addAction(BUTTON, lastMenuItemRepos, 1, bLastMenuItemRepos);
     CSUIMAN::addAction(BUTTON, showHideLbm, 1, lbm[lbmId]);
 
-    idSection.push_back(BUTTON);
-
-    int id = idSection.size()-1;
     
     
 
     return id;
 }
 
-int CSMENU::newlbm(int* idp, int nbItem, wchar_t*defltTitle)
+extern vector<vector<void(*)(CSARGS)>> GROUPED_EVENTS_FUNC;
+extern vector<vector<CSARGS>> GROUPED_EVENTS_ARGS;
+
+int CSMENU::newlbm(int* idp, int* idSec, int nbItem, wchar_t*defltTitle)
 {
     lbm.push_back(csNewMinimalListBoxPtr(idp, 100, 1000));
-    lbmItemRectLock.push_back(vector<RECT*>());
+    csLIST<RECT> lr;
+    lbmItemRectLock.push_back(lr);
     int l = lbm.size()-1;
+    
+    lbmItemRectLock[l].insertEnd(RECT{0,10,100,100});
+    CSPARAARGS* pargs = csAlloc<CSPARAARGS>(1);
+    lpargs.push_back(pargs);
+    pargs->init();
+    pargs->regArg(3,lbmItemRectLock[l].getTable(), csAlloc(1,lbmItemRectLock[l].size()), csAlloc(1,*idSec));
+    lbm[l]->addExternalFunction(hideMenuContainer, pargs);
+
     initLbm(lbm[l], nbItem, defltTitle);
-    CSARGS args(1);
-    args.regArg(&lbmItemRectLock[l]);
-    lbm[l]->addExternalFunction(hideMenuContainer, csAlloc<CSARGS>(1,args));
+
+    //lbmItemRectLock[l].push_back(lbm[l]->getItemRectPtr(0));
+
+    
+    /*CSARGS& args2 = GROUPED_EVENTS_ARGS[*idp][0];
+    pargs->setProcParams(args2.getHwnd(), args2.getMessage(), args2.getWParam(), args2.getLParam(), args2.getId());*/
 
     return l;
 }
 
 void initLbm(CSLISTBOXMIN*& lbm, int nbItem, wchar_t*defltTitle)
 {
-    lbm->setDefaultFont(L"calibri",{14,0});
+    lbm->setDefaultFont(L"calibri",{16,0});
     lbm->setItemAlign(CS_ALIGN_VERTICAL);
-    lbm->setMarging({0,0});
+    lbm->setMarging({8,8});
     lbm->setOffset({0,1});
     lbm->setDefaultSize({150*dimFact, 30*dimFact});
+    lbm->setDefaultTitleColors(RGB(0,0,0), RGB(0,0,0), RGB(0,0,0), RGB(100,100,100));
+    lbm->setDefaultBackgroundColors(RGB(120,120,120), RGB(140,140,140), RGB(120,120,120), RGB(100,100,100));
     lbm->setIconSize(0,{30,30});
 
     lbm->setIcon(0, L"img\\menulogo.bmp",L"img\\menulogo2.bmp", L"img\\menulogo2.bmp", L"img\\menulogo2.bmp");
@@ -199,7 +217,7 @@ bool CSMENU::newItem(vector<int> _hierarchy, wchar_t* title, wchar_t*iconPath1, 
         idLast = lbm.size()-1;
         initLbm(lbm[idLast], _hierarchy[k]+1);*/
         
-        idLast = newlbm(&idPopup[k], _hierarchy[k]+1);
+        idLast = newlbm(&idPopup[k], &idSection[_hierarchy[0]], _hierarchy[k]+1);
         hierarchy.push_back(vh);
         lbmOfHierarchy.push_back(&lbm[idLast]);
         vh.push_back(_hierarchy[k]);
@@ -207,8 +225,9 @@ bool CSMENU::newItem(vector<int> _hierarchy, wchar_t* title, wchar_t*iconPath1, 
 
     for(int k=vlast.size(); k<n; k++)
     {
-        int j = idPopup.size()-1;
+        int j = idPopup.size();
         idPopup.push_back(CSUIMAN::createSection(0, {0,0,200,300},  RGB(15,15,15), {0,0,0,0}, 0, 0, 0));
+        SetTimer(SECTION[j], 0, 20, 0);
         /*lbm.push_back(csNewMinimalListBoxPtr(&idPopup[j], 100, 1000));
         lbmItemRectLock.push_back(vector<RECT*>());
         hierarchy.push_back({k,_hierarchy[k]});
@@ -216,7 +235,7 @@ bool CSMENU::newItem(vector<int> _hierarchy, wchar_t* title, wchar_t*iconPath1, 
         lbmOfHierarchy.push_back(&lbm[idLast]);
         initLbm(lbm[idLast], _hierarchy[k]+1);*/
         
-        idLast = newlbm(&idPopup[k], _hierarchy[k]+1);
+        idLast = newlbm(&idPopup[k], &idSection[_hierarchy[0]], _hierarchy[k]+1);
         hierarchy.push_back(vh);
         lbmOfHierarchy.push_back(&lbm[idLast]);
         vh.push_back(_hierarchy[k]);
@@ -253,8 +272,8 @@ void showHideLbm(CSARGS Args)
     if((UINT)Args == WM_MOUSEHOVER)
     {
         CSLISTBOXMIN* lbm = (CSLISTBOXMIN*)Args[0];
-        //lbm->show();
-        //lbm->update();
+        lbm->show();
+        lbm->update();
         if(lastlbm && lbm != lastlbm) lastlbm->hide();
         lastlbm = lbm;
 
@@ -268,7 +287,7 @@ void showHideLbm(CSARGS Args)
             count++;
             if(count == delay)
             {
-                //lastlbm->update();
+                lastlbm->update();
                 //InvalidateRect(HWND(Args), 0, 1);
                 count = 0;
                 b = 0;
@@ -335,35 +354,36 @@ void resizeMenu(CSARGS Args)
 
 }
 
-void hideMenuContainer(CSARGS Args)
+void hideMenuContainer(CSPARAARGS pArgs)
 {
-    int id = (int)Args;
-
-    if(CSUIMAN::getMouseHook(id,0)  &&UINT(Args) == WM_TIMER)
+    int id = (int)pArgs;
+    HWND hwnd = (HWND)pArgs;
+    if((UINT)pArgs == WM_TIMER && CSUIMAN::getMouseHook(id,0) && IsWindowVisible(hwnd))
     {
-        /*vector<RECT*> rlock = *(vector<RECT*>*)Args[0];
-        POINT p;
+        RECT* rlock = (RECT*)pArgs[0];
+        int n = *(int*)pArgs[1];
+        int ids = *(int*)pArgs[2];
+        POINT p, p0;
         GetCursorPos(&p);
-        ScreenToClient(HWND(Args), &p);
+        p0 = p;
+        ScreenToClient(hwnd, &p);
 
-        int n = rlock.size();
         bool b = 0;
         for(int i=0; i<n; i++)
         {
-            if(PtInRect(rlock[i], p))
+            if(PtInRect(&rlock[i], p))
             {
+                CSUIMAN::printRect(rlock[i], "r = ");
                 b = 1;
                 break;
             }
         }
 
-        if(!b) ShowWindow(HWND(Args),0);*/
-cout<<"ioueiorwufij;lksjsfklj;lajks;dfs\n";
-        RECT r=RECTWND[id];
-        POINT p;
-        GetCursorPos(&p);
-        if(!PtInRect(&r, p))
-            ShowWindow(HWND(Args),0);
+        if(!b && !PtInRect(&RECTWND[ids], p0)) 
+        {
+            ShowWindow(hwnd,0);
+        }
+        
         CSUIMAN::resetMouseHook(id,0);
     }
 }

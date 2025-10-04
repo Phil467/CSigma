@@ -84,11 +84,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     CSUICONTROLS::createToolTips(RGB(40,40,40));
 
     /*************************************** MIDDLE_SECTION ************************************ */
+    CSBIND_GEOM_PARAMS bd;
+    MIDDLE_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/dimFact+6,smx/dimFact,smy/dimFact},  RGB(40,40,40), {0,0,0,0});
+    /*MIDDLE_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/dimFact+6,515+77,450+10},  RGB(40,5,5), {0,0,0,0});
 
-    MIDDLE_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/dimFact+6,515+77,450+10},  RGB(40,5,5), {0,0,0,0});
-
-    CSBIND_GEOM_PARAMS bd = {MIDDLE_SECTION, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE,BIND_DEST_BOTTOM_EDGE,BIND_DEST_RIGHT_EDGE,BIND_DEST_BOTTOM_EDGE}};
-    bindGeometry(ROOT, bd); // cpp version
+    bd = {MIDDLE_SECTION, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE,BIND_DEST_BOTTOM_EDGE,BIND_DEST_RIGHT_EDGE,BIND_DEST_BOTTOM_EDGE}};
+    bindGeometry(ROOT, bd); // cpp version*/
 
     /*************************************** MIDDLE_LEFT_SECTION ************************************ */
 
@@ -295,7 +296,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     int idcv = csGraphics::loadImage(ABOUT_UI_CLIENT, L"img/csigma logo.bmp", {1,1}, {0,0});
     SIZE sizecv = csGraphics::getImageSize(ABOUT_UI_CLIENT, idcv);
-    csGraphics::showImage(ABOUT_UI_CLIENT, idcv, {0}, sizecv);
+    csGraphics::showImage(ABOUT_UI_CLIENT, idcv, 1, {0}, sizecv);
 
     csGraphics::setGraphicAreaPosition(ABOUT_UI_CLIENT,{0,0});
     csGraphics::setGraphicAreaColor(ABOUT_UI_CLIENT,{50,50,50},{0});
@@ -449,8 +450,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     //BTN_REMOVE_UNDO_1 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Undo 1\0", {5,5+total*9,65,h});
 
-    BTN_1 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Bouton 1", {5,5+total*10,65,h});
-    BTN_2 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Bouton 2", {5,5+total*11,65,h});
+    BTN_1 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Show/Hide logo", {5,5+total*10,65,h});
+    BTN_2 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Play/Stop animation", {5,5+total*11,65,h});
     BTN_3 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Bouton 3", {5,5+total*12,65,h});
     BTN_4 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Bouton 4", {5,5+total*13,65,h});
     // Boucle principale
@@ -488,17 +489,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     SIZE newSize1 = {size1.cx-200*4, size1.cy-200*4};
     //csGraphics::setImageSize(GA_CLIENT, idImg1, newSize1);
     csGraphics::setImagePos(GA_CLIENT, idImg1, {100, 100});
-    csGraphics::showImage(GA_CLIENT, idImg1, {0,0}, {0});
+    csGraphics::showImage(GA_CLIENT, idImg1, 1, {0}, {0});
 
-    int idcv1 = csGraphics::loadImage(GA_CLIENT, L"img/csigma logo3.bmp", {100,100}, {350,300});
-    SIZE sizecv1 = csGraphics::getImageSize(GA_CLIENT, idcv);
-    csGraphics::showImage(GA_CLIENT, idcv1, {0}, {0});
-
-    /*int idImg2 = csGraphics::loadImage(GA_CLIENT, L"img/search02.bmp", {0,0}, {0,0});
-    SIZE size2 = csGraphics::getImageSize(GA_CLIENT, idImg2);
-    SIZE newSize2 = {size2.cx*10, size2.cy*10};
-    csGraphics::setImageSize(GA_CLIENT, idImg2, newSize2);
-    csGraphics::showImage(GA_CLIENT, idImg2);*/
+    POINT logoPos = {100,100};
+    SIZE logoSize = {350,300};
+    int idlogo1 = csGraphics::loadImage(GA_CLIENT, L"img/csigma logo3.bmp", logoPos, logoSize);
+    csGraphics::showImage(GA_CLIENT, idlogo1, 1, {0}, {0});
 
     int fact = std::max(ceil(1.0*size1.cx/smx), ceil(1.0*size1.cy/smy));
     SIZE gaSize = {size1.cx+200, size1.cy+200};
@@ -508,8 +504,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     hscroll1.setPositionRatio(0.5);
     vscroll1.setPositionRatio(0.5);
 
-    //csGraphics::showImage(GA_CLIENT, idImg1, {0}, {0}, 0);
-    //csGraphics::showImage(GA_CLIENT, idImg2, {0}, {0}, 0);
+    void showHideLogo(CSARGS Args);
+    CSUIMAN::addAction(BTN_1, showHideLogo, 2, &GA_CLIENT, &idlogo1);
+
+    void stretchLogo(CSARGS Args);
+    CSUIMAN::addAction(BTN_2, stretchLogo, 4, &GA_CLIENT, &idlogo1, &logoPos, &logoSize);
+
 
     // /*********************************************************** */
 
@@ -530,7 +530,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"No Task", .Font=L"calibri", .FontSize = 16, .Italic=1,
         .Bold=0, .Color={180,180,180},
         .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1});
-    CSUIMAN::autoFitToTitle(PROGRESS_INFO_SECTION, 10);
+    //CSUIMAN::autoFitToTitle(PROGRESS_INFO_SECTION, 10);
     CSLANGMAN::translateTitle(PROGRESS_INFO_SECTION, 0);
 
     CSLISTBOXMIN* lbm = csNewMinimalListBoxPtr(&RIGHT_SECTION, 100, 220);
@@ -591,7 +591,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     lbm1->setMarging({2,0});
     lbm1->setDefaultSize({75*dimFact, 25*dimFact});
     //lbm1->setAllTitleColors(RGB(200,200,200), RGB(200,200,200), RGB(0,0,0));
-    //lbm1->setDefaultColors(RGB(23,23,23), RGB(40,40,40), RGB(100,100,100));
+    //lbm1->setDefaultTitleColors(RGB(23,23,23), RGB(40,40,40), RGB(100,100,100));
     lbm1->setIconSize(0,{20,20});
 
     lbm1->setIcon(0, L"img\\img.bmp",L"img\\img2.bmp", L"img\\img2.bmp", L"img\\img2.bmp");
@@ -921,4 +921,102 @@ void checkInstalledLanguages(CSLISTBOXMIN*& lbm)
 
     );
     t.detach();
+}
+
+void showHideLogo(CSARGS Args)
+{
+    int id = (int)Args;
+    UINT msg = UINT(Args);
+
+    if(msg == WM_LBUTTONDOWN || msg == WM_LBUTTONDBLCLK)
+    {
+        int idImg = *(int*)Args[1];
+        int idga = *(int*)Args[0];
+        if(csGraphics::isImageVisible(idga, idImg))
+        {
+            csGraphics::showImage(idga, idImg, 0);
+        }
+        else
+        {
+            csGraphics::showImage(idga, idImg, 1);
+        }
+        //CSUIMAN::updateSection(idga);
+        csGraphics::updateGraphicArea(idga,1);
+        
+    }
+}
+
+void stretchLogo(CSARGS Args)
+{
+    int id = (int)Args;
+    UINT msg = UINT(Args);
+    static bool start = 0, b=0;
+    static int maxCount = 60, count = 0;
+
+
+    if(msg == WM_LBUTTONUP)
+    {
+        int idImg = *(int*)Args[1];
+        int idga = *(int*)Args[0];
+        if(csGraphics::isImageVisible(idga, idImg))
+        {
+            if(!start) start = 1;
+            else start = 0;
+        }
+        
+        thread t(
+            [](CSARGS Args)
+            {
+                int idImg = *(int*)Args[1];
+                int idga = *(int*)Args[0];
+                while(start)
+                {
+                    if(csGraphics::isImageVisible(idga, idImg))
+                    {
+                        if(count < maxCount && !b) count++;
+                        else b = 1;
+
+                        if(count > 1 && b) count--;
+                        else b = 0;
+
+                        POINT imgPos = *(POINT*)Args[2];
+                        SIZE imgSz = *(SIZE*)Args[3];
+                        
+                        int tlen = 2*count;
+                        csGraphics::setImageSize(idga, idImg, {imgSz.cx+tlen, imgSz.cy+tlen});
+                        csGraphics::setImagePos(idga, idImg, {imgPos.x-tlen/2, imgPos.y-tlen/2});
+                        csGraphics::updateGraphicArea(idga,1);
+                    }
+
+                    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+                }
+            }, Args
+        );
+        t.detach();
+    }
+    /*else if(msg == WM_TIMER && start)
+    {
+        int idga = *(int*)Args[0];
+        int idImg = *(int*)Args[1];
+        if(csGraphics::isImageVisible(idga, idImg))
+        {
+            if(count < maxCount && !b) count++;
+            else b = 1;
+
+            if(count > 1 && b) count--;
+            else b = 0;
+
+            POINT imgPos = *(POINT*)Args[2];
+            SIZE imgSz = *(SIZE*)Args[3];
+            
+            //if(count%2 == 0)
+            {
+                int tlen = 2*count;
+                csGraphics::setImageSize(idga, idImg, {imgSz.cx+tlen, imgSz.cy+tlen});
+                csGraphics::setImagePos(idga, idImg, {imgPos.x-tlen/2, imgPos.y-tlen/2});
+                //CSUIMAN::updateSection(idga);
+                csGraphics::updateGraphicArea(idga,1);
+            }
+        }
+    }*/
 }

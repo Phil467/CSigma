@@ -309,23 +309,101 @@ typedef struct
 
 }REG_STRINGS;
 
+class CSPARAARGS
+{
+    private:
+    HWND hwnd;
+    UINT message;
+    WPARAM wParam;
+    LPARAM lParam;
+    int id;
+    void**paraArgs;
+    int nbArgs;
+
+    public:
+    CSPARAARGS()
+    {
+        init();
+    };
+    void init()
+    {
+        paraArgs = 0;
+        nbArgs = 0;
+        //paraArgs = csAlloc<void**>(1);
+    }
+    void regArg(int _nbArgs, ...)
+    {
+        int a = nbArgs;
+        nbArgs += _nbArgs;
+        
+        paraArgs = (void**)realloc(paraArgs, nbArgs*sizeof(void*));
+
+        va_list adArgs ;
+        va_start (adArgs, _nbArgs);
+        for (int i=a ; i<nbArgs ; i++)
+        {
+            paraArgs[i] = va_arg (adArgs, void*) ;
+        }
+        va_end(adArgs);
+    };
+    void setProcParams(HWND _hwnd, UINT _msg, WPARAM _wp, LPARAM _lp, int _id)
+    {
+        hwnd = _hwnd; message = _msg; wParam = _wp; lParam = _lp; id = _id;
+    }
+    void**& getArgs()
+    {
+        return paraArgs;
+    }
+    void setArgs(void** args, int n)
+    {
+        paraArgs = args;
+        nbArgs = n;
+    }
+    operator HWND()
+    {
+        return hwnd;
+    };
+    operator UINT()
+    {
+        return message;
+    }
+    operator WPARAM()
+    {
+        return wParam;
+    }
+    operator LPARAM()
+    {
+        return lParam;
+    }
+    operator int()
+    {
+        return id;
+    }
+    void* operator [](int id)
+    {
+        return paraArgs[id];
+    }
+};
+
 class CSARGS
 {
 public:
+
     CSARGS(unsigned int nArgs=0);
     void init(unsigned int _nbArgs);
     void* getArg(unsigned int i);
-    void  setArg(unsigned int i, void*arg);
-    void  setArg_int(unsigned int i, int arg);
+    void setArg(unsigned int i, void*arg);
+    void setArg_int(unsigned int i, int arg);
     void setArgNumber(unsigned int nbArgs);
-    void  setProcParams(HWND* hwnd, UINT* msg, WPARAM* wp, LPARAM* lp, int* id);
+    void setProcParams(HWND* hwnd, UINT* msg, WPARAM* wp, LPARAM* lp, int* id);
+    void setProcParams(void* hwnd, void* msg, void* wp, void* lp, void*id);
     void setId(void*id);
     void setHwnd(void*hwnd);
     void* getHwnd();
     void* getMessage();
     void* getWParam();
     void* getLParam();
-    void* getLID();
+    void* getId();
     void* getLRESULT();
     int regArg(void*arg);
     void  regArg(...);

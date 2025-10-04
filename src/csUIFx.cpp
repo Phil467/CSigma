@@ -567,17 +567,18 @@ void CSUIFX::_mouseHover_movePopup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                         TITLE[j].Text = t;
                         if(IsWindowVisible(w))
                         {
-                            //RECT rp = RECTWND[j];
+                            RECT rp = RECTWND[j];
+                            //RECT rp = CSUTILS::rectInParentRef(j);
 
-                            /*SetWindowPos(w,0,rp.left,rp.top,r1.right, r1.bottom,SWP_SHOWWINDOW);
+                            SetWindowPos(w,0,rp.left,rp.top,r1.right, r1.bottom,SWP_SHOWWINDOW);
                             InvalidateRect(w,0,1);
-                            AutoTransform[id].InitialRect=rp;
-                            AutoTransform[id].FinalRect={L-rp.left,T-rp.top,0,0};
-                            AutoTransform[id].Time=3;
-                            AutoTransform[id].Type=AUTO_TRANSF_LENGTH;
+                            AutoTransform[j].InitialRect=rp;
+                            AutoTransform[j].FinalRect={L-rp.left,T-rp.top,r1.right-rp.right+rp.left,r1.bottom-rp.bottom+rp.top};
+                            AutoTransform[j].Time=3;
+                            AutoTransform[j].Type = AUTO_TRANSF_LENGTH;
                             //TipsPopupParams[id].Geometry[i].left = L;
                             //TipsPopupParams[id].Geometry[i].top = T;
-                            AUTOTRANSCOUNT[j] = 0;*/
+                            AUTOTRANSCOUNT[j] = 0;
 
                         }
                         else
@@ -591,11 +592,11 @@ void CSUIFX::_mouseHover_movePopup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                             cv.cp[j]->AutoAlphaFade.ShowHide = 1;
                             cv.cp[j]->AutoAlphaFade.State = CS_AAF_SHOW_CNTR;
                             cv.cp[j]->AutoAlphaFade.Activate = 1;*/
-                            //SetWindowPos(w,0,L,T,r1.right,r1.bottom,SWP_SHOWWINDOW);
+                            SetWindowPos(w,0,L,T,r1.right,r1.bottom,SWP_SHOWWINDOW);
                         }
                         
                         GetWindowRect(w, &lastRect);
-                        SetWindowPos(w,0,L,T,r1.right,r1.bottom,SWP_SHOWWINDOW);
+                        //SetWindowPos(w,0,L,T,r1.right,r1.bottom,SWP_SHOWWINDOW);
                         bltRect[j].right = r1.right-m.text[i].marg.right-m.text[i].marg.left;
                         bltRect[j].left = 0;
                         bltRect[j].bottom = r1.bottom-m.text[i].marg.bottom;

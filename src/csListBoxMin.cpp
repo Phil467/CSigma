@@ -174,6 +174,9 @@ void CSLISTBOXMIN::init(int* idp, int _gridStyle, int _gridWidth)
 
     rbItem.title=0;
 
+    extFunc = 0;
+    extFuncArgs = 0;
+
     args.init(1);
 }
 
@@ -431,13 +434,22 @@ void CSLISTBOXMIN::setAllBackgrounds(COLORREF color, COLORREF highlightColor, CO
     }
 }
 
-void CSLISTBOXMIN::setDefaultColors(COLORREF color, COLORREF highlightColor, COLORREF selectionColor)
+void CSLISTBOXMIN::setDefaultTitleColors(COLORREF color, COLORREF highlightColor, COLORREF selectionColor, COLORREF disableColor)
 {
     dfltColor1 = color;
     dfltColor2 = highlightColor;
     dfltColor3 = selectionColor;
+    dfltColor4 = disableColor;
     defcol = {color&0xff, color>>8&0xff, color>>16&0xff};
 }
+void CSLISTBOXMIN::setDefaultBackgroundColors(COLORREF color, COLORREF highlightColor, COLORREF selectionColor, COLORREF disableColor)
+{
+    dfltBkgCol1 = color;
+    dfltBkgCol2 = highlightColor;
+    dfltBkgCol3 = selectionColor;
+    dfltBkgCol4 = disableColor;
+}
+
 void CSLISTBOXMIN::setDefaultSize(SIZE size)
 {
     dfltSz = size;
@@ -1097,6 +1109,9 @@ void CSLISTBOXMIN::organize()
 
 }
 
+extern vector<int> withHScroll;
+extern vector<int> withVScroll;
+
 void organize2(int parent, int n, SIZE imgSize,
                 RECT*pos,POINT*posImg,POINT*posTitle, HDC* dcs0, HFONT* font, COLORREF* color0, COLORREF* bkgcol0, wchar_t**title, HDC hdc,
                 int cxmax, int cymax)
@@ -1117,12 +1132,11 @@ void organize2(int parent, int n, SIZE imgSize,
     }
 
     int cx = cxmax*hZoom[parent], cy = cymax*vZoom[parent];
-    cx = cx < RECTCL[parent].right ? cx : RECTCL[parent].right - 10*dimFact /* scrollBar default width*/;
-    cy = cy < RECTCL[parent].bottom ? cy : RECTCL[parent].bottom - 10*dimFact /* scrollBar default width*/;
+    cx = cx < RECTCL[parent].right ? cx : RECTCL[parent].right - 10*dimFact*(withHScroll[parent] > 0 ? 1 : 0)  /* scrollBar default width*/;
+    cy = cy < RECTCL[parent].bottom ? cy : RECTCL[parent].bottom - 10*dimFact*(withVScroll[parent] > 0 ? 1 : 0) /* scrollBar default width*/;
     RECT r = {pos[0].left*hZoom[parent], pos[0].top*vZoom[parent], cx, cy};
-    InvalidateRect(SECTION[parent],&r,1);
+    InvalidateRect(SECTION[parent],&r,0);
 }
-
 
 
 void colorTracking(int parent, int lastItem, int currentItem, int n, SIZE imgSize,
@@ -1159,10 +1173,10 @@ void colorTracking(int parent, int lastItem, int currentItem, int n, SIZE imgSiz
     BitBlt(gdc,pos[i].left,pos[i].top,sz.cx,sz.cy, idc.dc,0,0,SRCCOPY);
     
     int cx = cxmax*hZoom[parent], cy = cymax*vZoom[parent];
-    cx = cx < RECTCL[parent].right ? cx : RECTCL[parent].right - 10*dimFact /* scrollBar default width*/;
-    cy = cy < RECTCL[parent].bottom ? cy : RECTCL[parent].bottom - 10*dimFact /* scrollBar default width*/;
+    cx = cx < RECTCL[parent].right ? cx : RECTCL[parent].right - 10*dimFact*(withHScroll[parent] > 0 ? 1 : 0) /* scrollBar default width*/;
+    cy = cy < RECTCL[parent].bottom ? cy : RECTCL[parent].bottom - 10*dimFact*(withVScroll[parent] > 0 ? 1 : 0) /* scrollBar default width*/;
     RECT r = {pos[0].left*hZoom[parent], pos[0].top*vZoom[parent], cx, cy};
-    InvalidateRect(SECTION[parent],&r,1);
+    InvalidateRect(SECTION[parent],&r,0);
     releaseGraphicContext(idc);
 }
 
@@ -1193,6 +1207,7 @@ void CSLISTBOXMIN::animate()
         poffset, pgridWidth, smoothRepos, smoothReposCount,
         cutPasteViewer, cutPasteStart, cutPasteDone, cutPasteDone0,copyPasteKeyDownState,click_message, &cxmax, &cymax,
         &itemAlign, extFunc, extFuncArgs);
+    
 
     if(!animated)
     {
@@ -1240,7 +1255,7 @@ RECT* CSLISTBOXMIN::getItemRectPtr(int id)
 {
     return &pos[id];
 }
-void CSLISTBOXMIN::addExternalFunction(void(*_extFunc)(CSARGS), CSARGS* _extFuncArgs)
+void CSLISTBOXMIN::addExternalFunction(void(*_extFunc)(CSPARAARGS), CSPARAARGS* _extFuncArgs)
 {
     extFunc = _extFunc;
     extFuncArgs = _extFuncArgs;
@@ -1273,7 +1288,7 @@ void CSLISTBOXMIN::update()
             pos.getTable(),posImg.getTable(),posTitle.getTable(),
             dcs4.getTable(), font.getTable(), color4.getTable(),bkgcol4.getTable(), title.getTable(), hdc, cxmax, cymax);
     }
-    InvalidateRect(SECTION[*parent], 0,1);
+    //InvalidateRect(SECTION[*parent], 0,1);
     //SendMessage(SECTION[*parent],WM_ERASEBKGND,0,0);
 }
 
@@ -1289,11 +1304,12 @@ void catchEvents(CSARGS Args)
     else if(msg == WM_KEYDOWN) vkeydownSelect(Args);
     //else if(msg == WM_TIMER) autoReposition(Args);
 
-    void(*extFunc)(CSARGS) = (void(*)(CSARGS))Args[43];
-    CSARGS*extFuncArgs = (CSARGS*)Args[43];
-    if(extFunc && extFuncArgs)
+    void(*extFunc)(CSPARAARGS) = (void(*)(CSPARAARGS))Args[43];
+    if(extFunc)
     {  
-        extFunc(*extFuncArgs);
+        CSPARAARGS* pArgs = (CSPARAARGS*)Args[44];
+        pArgs->setProcParams((HWND)Args, (UINT)Args, (WPARAM)Args, (LPARAM)Args, (int)Args);
+        extFunc(*pArgs);
     }
 }
 
