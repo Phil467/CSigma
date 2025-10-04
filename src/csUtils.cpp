@@ -71,6 +71,7 @@ extern vector<COLORREF> backgroundColor;
 extern vector<COLORREF> borderColor;
 
 extern vector<int> autoSizeFromTitle;
+extern vector<bool> autoSizeComplete;
 extern vector<MINMAXINFO> minMaxInfo;
 
 extern vector<vector<bool>> HIDEGROUPMSG;

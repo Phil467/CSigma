@@ -607,7 +607,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     hscroll3.setPositionRatio(0);
     vscroll3.setPositionRatio(0);
 
-
     return CSUIMAN::_CSIGMA_APP_RUN_();
 }
 

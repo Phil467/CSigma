@@ -297,16 +297,19 @@ void showHideLbm(CSARGS Args)
     }
 }
 
+extern vector<int> autoSizeFromTitle;
+extern vector<bool> autoSizeComplete;
+
 void resizeMenu(CSARGS Args)
 {
     static int count = 1, a=0, count1 = 0;
 
     UINT msg = (UINT)Args;
+    int id = (int)Args;
 
-    if(msg == WM_TIMER)
+    if(msg == WM_TIMER )
     {
-        int id = (int)Args;
-
+//cout<<<<"  "<<autoSizeFromTitle[id]<<"     ..............\n";
         vector<int> idSection = *(vector<int>*)Args[0];
         int n = idSection.size();
 
@@ -320,10 +323,11 @@ void resizeMenu(CSARGS Args)
             GetWindowRect(SECTION[idPrev], &r1);
             GetWindowRect(SECTION[i], &r2);
             
-            if(r1.right != r2.left)
+            if(r1.right != r2.left && (!autoSizeFromTitle[id] || (autoSizeFromTitle[id] && autoSizeComplete[id])))
             {
                 SetWindowPos(SECTION[i], 0, r1.right-RECTWND[id].left, r1.top-RECTWND[id].top, 0, 0, SWP_NOZORDER|SWP_NOSIZE);
                 a = 1;
+                autoSizeComplete[i] = 0;
             }
         }
         if(n && a && *bLastMenuItemRepos)
@@ -349,7 +353,7 @@ void resizeMenu(CSARGS Args)
             //count1++;
         }
 
-
+        autoSizeComplete[id] = 0;
     }
 
 }
