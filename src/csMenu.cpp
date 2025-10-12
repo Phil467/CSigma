@@ -14,7 +14,7 @@ void lastMenuItemRepos(CSARGS Args);
 void resizeMenu(CSARGS Args);
 void showHideLbm(CSARGS Args);
 
-extern float dimFact;
+extern float dimCoef;
 
 void initLbm(CSLISTBOXMIN*& lbm, int nbItem, wchar_t*defltTitle);
 void hideMenuContainer(CSPARAARGS pArgs);
@@ -23,18 +23,31 @@ CSLISTBOXMIN* lastlbm;
 
 CSMENU::CSMENU(int _idp, RECT r, bool _autoResize)
 {
+    init(_idp, r, _autoResize);
+
+}
+
+void CSMENU::init(int _idp, RECT r, bool _autoResize)
+{
     autoResize = _autoResize;
     bLastMenuItemRepos = csAlloc<bool>(1,0);
     idp = _idp;
-    id = CSUIMAN::createSection(idp, r,  RGB(15,15,15), {0,0,0,0});
-    CSBIND_GEOM_PARAMS bd = {id, {-0.5,0,0.5,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
-    CSUIMAN::bindGeometry(_idp, bd);
- 
-    if(autoResize)
-        CSUIMAN::addAction(id, resizeMenu, 3, &idSection, &idp, bLastMenuItemRepos);
+    idSection = 0;
+    idSection = new vector<int>;
 
     textPar = CSTEXT{.Font=L"Segoe UI", .FontSize=16, .Color={150,150,150},
-                                .Marging={32/dimFact,-5}, .Align = CS_TA_CENTER_LEFT, .Show=1};
+                                .Marging={32/dimCoef,-5}, .Align = CS_TA_CENTER_LEFT, .Show=1};
+    
+
+    id = CSUIMAN::createSection(idp, r,  RGB(15,15,15), {0,0,0,0});
+    
+    CSBIND_GEOM_PARAMS bd = {id, {-0.5,0,0.5,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
+    CSUIMAN::bindGeometry(_idp, bd);
+    SetTimer(SECTION[id], 0, 100, 0);
+
+    if(autoResize)
+        CSUIMAN::addAction(id, resizeMenu, 3, csAlloc(1,idp), bLastMenuItemRepos, idSection);
+
     
     int i;
     idPopup.push_back(i=CSUIMAN::createSection(0, {0,0,200,300},  RGB(100,100,100), {0}, 0, 0, 0));
@@ -42,12 +55,9 @@ CSMENU::CSMENU(int _idp, RECT r, bool _autoResize)
 
     //CSUIMAN::newMouseHook(i);
     csGraphics::setGraphicAreaColor(i, {30,30,30}, {0});
-    csGraphics::setGraphicAreaSize(i, {200*dimFact,300*dimFact});
+    csGraphics::setGraphicAreaSize(i, {200*dimCoef,300*dimCoef});
     csGraphics::updateGraphicArea(i, 1);
     sectionMouseHook[i].push_back(0);
-    
-        
-
 }
 
 int CSMENU::getId()
@@ -62,9 +72,9 @@ int CSMENU::getIdParent()
 
 int CSMENU::getIdButton(int idMenuItem)
 {
-    if(idMenuItem < idSection.size())
+    if(idMenuItem < idSection->size())
     {
-        return idSection[idMenuItem];
+        return (*idSection)[idMenuItem];
     }
     return -1;
 }
@@ -77,6 +87,7 @@ void CSMENU::setTextParams(CSTEXT _textPar)
 int CSMENU::newGroup(const wchar_t* title, const wchar_t* iconPath1, const wchar_t* iconPath2)
 {
     int BUTTON = CSUIMAN::createSection(id, {0,0,0,RECTCL[id].bottom-1},  RGB(30,30,30), {0,0,0,0});
+    //SetTimer(SECTION[BUTTON], 0, 90, 0);
     CSUIFX::setImageGradient(BUTTON, (char*)wcharPtrToCharPtr(iconPath1).c_str(), (char*)wcharPtrToCharPtr(iconPath2).c_str(), {4,4}, {20,20}, 0.1, 2, 2);
     CSUIFX::setBackgroundColorGradient(BUTTON, {5,5,5}, {20,20,20}, 2, 2);
     CSUIFX::setBackgroundColorClickEffect(BUTTON, {10,10,10});
@@ -92,17 +103,17 @@ int CSMENU::newGroup(const wchar_t* title, const wchar_t* iconPath1, const wchar
 
     static int ID_ACTION = 0;
 
-    if(idSection.size() >= 1)
+    if(idSection->size() >= 1)
     {
-        //CSUIMAN::removeLastAction(idSection[idSection.size()-1]);
-        CSUIMAN::removeAction(idSection[idSection.size()-1], ID_ACTION);
+        //CSUIMAN::removeLastAction((*idSection)[idSection.size()-1]);
+        CSUIMAN::removeAction((*idSection)[idSection->size()-1], ID_ACTION);
     }
 
-    CSUIMAN::joinPopup(BUTTON, idPopup[0], {0,0,160,255}, (POS_BOOL){.bLBottom=1}, 1, 1,0, &idSection);
-    idSection.push_back(BUTTON);
-    int id = idSection.size()-1;
+    CSUIMAN::joinPopup(BUTTON, idPopup[0], {0,0,160,255}, (POS_BOOL){.bLBottom=1}, 1, 1,0, idSection);
+    idSection->push_back(BUTTON);
+    int id = idSection->size()-1;
 
-    int lbmId = newlbm(&idPopup[0], &idSection[id], 8, (wchar_t*)(wstring(L"Menu-")+to_wstring(lbm.size())+L"-").c_str());
+    int lbmId = newlbm(&idPopup[0], &(*idSection)[id], 8, (wchar_t*)(wstring(L"Menu-")+to_wstring(lbm.size())+L"-").c_str());
     if(lastlbm) lastlbm->hide();
     lbm[lbmId]->show();
     lastlbm = lbm[lbmId];
@@ -150,13 +161,13 @@ void initLbm(CSLISTBOXMIN*& lbm, int nbItem, wchar_t*defltTitle)
     lbm->setItemAlign(CS_ALIGN_VERTICAL);
     lbm->setMarging({8,8});
     lbm->setOffset({0,1});
-    lbm->setDefaultSize({150*dimFact, 30*dimFact});
+    lbm->setDefaultSize({150*dimCoef, 30*dimCoef});
     lbm->setDefaultTitleColors(RGB(0,0,0), RGB(0,0,0), RGB(0,0,0), RGB(100,100,100));
     lbm->setDefaultBackgroundColors(RGB(120,120,120), RGB(140,140,140), RGB(120,120,120), RGB(100,100,100));
     lbm->setIconSize(0,{30,30});
 
     lbm->setIcon(0, L"img\\menulogo.bmp",L"img\\menulogo2.bmp", L"img\\menulogo2.bmp", L"img\\menulogo2.bmp");
-    lbm->setMaxTextWidth(120*dimFact);
+    lbm->setMaxTextWidth(120*dimCoef);
     lbm->setDefaultTitle(defltTitle);
     lbm->newItem(0,nbItem,0);
 
@@ -169,7 +180,7 @@ bool CSMENU::newItem(vector<int> _hierarchy, wchar_t* title, wchar_t*iconPath1, 
     int n = _hierarchy.size();
     if(n < 1) return 0;
 
-    //if(_hierarchy[0] >= idSection.size()) return 0;
+    //if(_hierarchy[0] >= idSection->size()) return 0;
 
     vector<vector<int>> v = hierarchy;
     vector<int> ids;
@@ -217,7 +228,7 @@ bool CSMENU::newItem(vector<int> _hierarchy, wchar_t* title, wchar_t*iconPath1, 
         idLast = lbm.size()-1;
         initLbm(lbm[idLast], _hierarchy[k]+1);*/
         
-        idLast = newlbm(&idPopup[k], &idSection[_hierarchy[0]], _hierarchy[k]+1);
+        idLast = newlbm(&idPopup[k], &(*idSection)[_hierarchy[0]], _hierarchy[k]+1);
         hierarchy.push_back(vh);
         lbmOfHierarchy.push_back(&lbm[idLast]);
         vh.push_back(_hierarchy[k]);
@@ -235,7 +246,7 @@ bool CSMENU::newItem(vector<int> _hierarchy, wchar_t* title, wchar_t*iconPath1, 
         lbmOfHierarchy.push_back(&lbm[idLast]);
         initLbm(lbm[idLast], _hierarchy[k]+1);*/
         
-        idLast = newlbm(&idPopup[k], &idSection[_hierarchy[0]], _hierarchy[k]+1);
+        idLast = newlbm(&idPopup[k], &(*idSection)[_hierarchy[0]], _hierarchy[k]+1);
         hierarchy.push_back(vh);
         lbmOfHierarchy.push_back(&lbm[idLast]);
         vh.push_back(_hierarchy[k]);
@@ -306,14 +317,14 @@ void resizeMenu(CSARGS Args)
 
     UINT msg = (UINT)Args;
     int id = (int)Args;
+    vector<int> idSection = *(vector<int>*)Args[2];
 
-    if(msg == WM_TIMER )
+    if(msg == WM_TIMER && idSection.size())
     {
 //cout<<<<"  "<<autoSizeFromTitle[id]<<"     ..............\n";
-        vector<int> idSection = *(vector<int>*)Args[0];
         int n = idSection.size();
 
-        bool* bLastMenuItemRepos = (bool*)Args[2];
+        bool* bLastMenuItemRepos = (bool*)Args[1];
         
         for(count = 1; count<n; count++)
         {
@@ -340,7 +351,7 @@ void resizeMenu(CSARGS Args)
                 int diff = abs(RECTPARREF[i].right - RECTCL[id].right);
                 if(diff > 3)
                 {
-                    int idp = *(int*)Args[1];
+                    int idp = *(int*)Args[0];
 
                     SetWindowPos(HWND(Args), 0, (RECTCL[idp].right-RECTPARREF[i].right)/2, RECTPARREF[id].top, RECTPARREF[i].right, RECTCL[id].bottom, SWP_NOZORDER);
                 }

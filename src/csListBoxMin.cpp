@@ -21,7 +21,7 @@ extern vector<HDC> hdcontextExt;
 extern vector<POINT> hdcontextExtInPos;
 extern vector<SIZE> hdcontextExtSize;
 extern vector<HDC> hdStackContext;
-extern float dimFact;
+extern float dimCoef;
 
 extern vector<float> hZoom;
 extern vector<float> vZoom;
@@ -1132,8 +1132,8 @@ void organize2(int parent, int n, SIZE imgSize,
     }
 
     int cx = cxmax*hZoom[parent], cy = cymax*vZoom[parent];
-    cx = cx < RECTCL[parent].right ? cx : RECTCL[parent].right - 10*dimFact*(withHScroll[parent] > 0 ? 1 : 0)  /* scrollBar default width*/;
-    cy = cy < RECTCL[parent].bottom ? cy : RECTCL[parent].bottom - 10*dimFact*(withVScroll[parent] > 0 ? 1 : 0) /* scrollBar default width*/;
+    cx = cx < RECTCL[parent].right ? cx : RECTCL[parent].right - 10*dimCoef*(withHScroll[parent] > 0 ? 1 : 0)  /* scrollBar default width*/;
+    cy = cy < RECTCL[parent].bottom ? cy : RECTCL[parent].bottom - 10*dimCoef*(withVScroll[parent] > 0 ? 1 : 0) /* scrollBar default width*/;
     RECT r = {pos[0].left*hZoom[parent], pos[0].top*vZoom[parent], cx, cy};
     InvalidateRect(SECTION[parent],&r,0);
 }
@@ -1173,8 +1173,8 @@ void colorTracking(int parent, int lastItem, int currentItem, int n, SIZE imgSiz
     BitBlt(gdc,pos[i].left,pos[i].top,sz.cx,sz.cy, idc.dc,0,0,SRCCOPY);
     
     int cx = cxmax*hZoom[parent], cy = cymax*vZoom[parent];
-    cx = cx < RECTCL[parent].right ? cx : RECTCL[parent].right - 10*dimFact*(withHScroll[parent] > 0 ? 1 : 0) /* scrollBar default width*/;
-    cy = cy < RECTCL[parent].bottom ? cy : RECTCL[parent].bottom - 10*dimFact*(withVScroll[parent] > 0 ? 1 : 0) /* scrollBar default width*/;
+    cx = cx < RECTCL[parent].right ? cx : RECTCL[parent].right - 10*dimCoef*(withHScroll[parent] > 0 ? 1 : 0) /* scrollBar default width*/;
+    cy = cy < RECTCL[parent].bottom ? cy : RECTCL[parent].bottom - 10*dimCoef*(withVScroll[parent] > 0 ? 1 : 0) /* scrollBar default width*/;
     RECT r = {pos[0].left*hZoom[parent], pos[0].top*vZoom[parent], cx, cy};
     InvalidateRect(SECTION[parent],&r,0);
     releaseGraphicContext(idc);

@@ -79,10 +79,10 @@ extern vector<vector<bool>> HIDEGROUPMSG;
 HINSTANCE hReditLib;
 
 extern int CURSOR_NCHITTEST_POS;
-extern float dimFact;
+extern float dimCoef;
 
-extern wchar_t* originalLanguageCode;
-extern wchar_t* viewLanguageCode;
+extern wchar_t* sourceLanguageCode;
+extern wchar_t* targetLanguageCode;
 
 extern wchar_t* appTitleFilePath;
 extern wchar_t* appTipsFilePath;
@@ -107,27 +107,29 @@ typedef enum
 extern vector<CSTEXT> TITLEFILE;
 extern vector<bool> setTitleInit;
 
-void CSUIMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _originalLanguage, const wchar_t* _viewLanguage, bool saveAppText, bool saveAppGeometry, void(*forceEventFunc)(CSARGS), CSARGS *forceEventArgs)
+bool END_CREATE = 0;
+
+void CSUIMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _originalLanguage, const wchar_t* _viewLanguage, bool saveAppStrings, bool saveAppGeometry, void(*forceEventFunc)(CSARGS), CSARGS *forceEventArgs)
 {
     _hInstance = hInstance;
-    originalLanguageCode = (wchar_t*)_originalLanguage;
-    viewLanguageCode = (wchar_t*)_viewLanguage;
+    sourceLanguageCode = (wchar_t*)_originalLanguage;
+    targetLanguageCode = (wchar_t*)_viewLanguage;
 
     wstring s = appTitleFilePath;
     size_t pos1 = s.find_last_of(L"/");
     size_t pos2 = s.find_last_of(L".");
 
-    appTitleFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + viewLanguageCode + s.substr(pos2, s.size()-pos2)).c_str());
+    appTitleFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + targetLanguageCode + s.substr(pos2, s.size()-pos2)).c_str());
 
     s = appTipsFilePath;
     pos1 = s.find_last_of(L"/");
     pos2 = s.find_last_of(L".");
 
-    appTipsFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + viewLanguageCode + s.substr(pos2, s.size()-pos2)).c_str());
+    appTipsFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + targetLanguageCode + s.substr(pos2, s.size()-pos2)).c_str());
 
-    CSFILESMAN::setSaveAppTitles(saveAppText);
+    CSFILESMAN::setSaveAppTitles(saveAppStrings);
     CSFILESMAN::setSaveAppSizes(saveAppGeometry);
-    CSFILESMAN::setSaveAppTips(saveAppText);
+    CSFILESMAN::setSaveAppTips(saveAppStrings);
 
     xdimFact = 1.0*GetSystemMetrics(SM_CXSCREEN)/(1920);
     ydimFact = 1.0*GetSystemMetrics(SM_CYSCREEN)/(1080);
@@ -162,6 +164,8 @@ extern bool CLICK_EFFECT_BOOL;
 
 int CSUIMAN::_CSIGMA_APP_RUN_()
 {
+    END_CREATE = 1;
+
     HHOOK mhook = setHook();
 
     while (GetMessage(&Messages, nullptr, 0, 0))
@@ -458,9 +462,9 @@ void CSUIMAN::bindGeometry(int id, int n, ...)
     free(tab);
 }
 
-void CSUIMAN::setSizeFactor(float factor)
+void CSUIMAN::setSizeCoef(float factor)
 {
-    dimFact = factor;
+    dimCoef = factor;
 }
 
 void CSUIMAN::setBorderThick(int id, int thick)
@@ -625,46 +629,46 @@ void CSUIMAN::_drawTitle(int id, HDC dc)
         if(textAlign == CS_TA_TOP_CENTER)
         {
             Title.TextRect.left = (rc.right-lps->cx)/2;
-            Title.TextRect.top = Title.Marging.top*dimFact*ydimFact;
+            Title.TextRect.top = Title.Marging.top*dimCoef*ydimFact;
         }
         if(textAlign == CS_TA_CENTER)
         {
             if(Title.Orientation == -900)
             {
-                Title.TextRect.left = (rc.right+lps->cy)/2 + Title.Marging.left*dimFact*xdimFact;
-                Title.TextRect.top = (rc.bottom-lps->cx)/2 + Title.Marging.top*dimFact*ydimFact;
+                Title.TextRect.left = (rc.right+lps->cy)/2 + Title.Marging.left*dimCoef*xdimFact;
+                Title.TextRect.top = (rc.bottom-lps->cx)/2 + Title.Marging.top*dimCoef*ydimFact;
             }
             else if(Title.Orientation == 900)
             {
-                Title.TextRect.left = (rc.right-lps->cy)/2 + Title.Marging.left*dimFact*xdimFact;
-                Title.TextRect.top = (rc.bottom+lps->cx)/2 + Title.Marging.top*dimFact*ydimFact;
+                Title.TextRect.left = (rc.right-lps->cy)/2 + Title.Marging.left*dimCoef*xdimFact;
+                Title.TextRect.top = (rc.bottom+lps->cx)/2 + Title.Marging.top*dimCoef*ydimFact;
             }
             else
             {
                 //cout<<Title.Marging.left<<" id ="<<id<<"\n";
-                Title.TextRect.left = (rc.right-lps->cx)/2 + Title.Marging.left*dimFact*xdimFact;
-                Title.TextRect.top = (rc.bottom-lps->cy)/2 + Title.Marging.top*dimFact*ydimFact;
+                Title.TextRect.left = (rc.right-lps->cx)/2 + Title.Marging.left*dimCoef*xdimFact;
+                Title.TextRect.top = (rc.bottom-lps->cy)/2 + Title.Marging.top*dimCoef*ydimFact;
             }
         }
         else if(textAlign == CS_TA_TOP_LEFT)
         {
-            Title.TextRect.left = Title.Marging.left*dimFact*xdimFact;
-            Title.TextRect.top = Title.Marging.top*dimFact*ydimFact;
+            Title.TextRect.left = Title.Marging.left*dimCoef*xdimFact;
+            Title.TextRect.top = Title.Marging.top*dimCoef*ydimFact;
         }
         else if(textAlign == CS_TA_CENTER_LEFT)
         {
-            Title.TextRect.left = Title.Marging.left*dimFact*xdimFact;
-            Title.TextRect.top = (rc.bottom-lps->cy)/2 + Title.Marging.top*dimFact*ydimFact;
+            Title.TextRect.left = Title.Marging.left*dimCoef*xdimFact;
+            Title.TextRect.top = (rc.bottom-lps->cy)/2 + Title.Marging.top*dimCoef*ydimFact;
         }
         else if(textAlign == CS_TA_TOP_RIGHT)
         {
-            Title.TextRect.left = (rc.right-lps->cx) + Title.Marging.left*dimFact*xdimFact;
-            Title.TextRect.top = Title.Marging.top*dimFact*ydimFact;
+            Title.TextRect.left = (rc.right-lps->cx) + Title.Marging.left*dimCoef*xdimFact;
+            Title.TextRect.top = Title.Marging.top*dimCoef*ydimFact;
         }
         else if(textAlign == CS_TA_CENTER_RIGHT)
         {
-            Title.TextRect.left = (rc.right-lps->cx) + Title.Marging.left*dimFact*xdimFact;
-            Title.TextRect.top = (rc.bottom-lps->cy)/2 + Title.Marging.top*dimFact*ydimFact;
+            Title.TextRect.left = (rc.right-lps->cx) + Title.Marging.left*dimCoef*xdimFact;
+            Title.TextRect.top = (rc.bottom-lps->cy)/2 + Title.Marging.top*dimCoef*ydimFact;
         }
 
         TextOutW(dc,Title.TextRect.left,Title.TextRect.top,title,
@@ -854,7 +858,7 @@ void CSUIMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay,
     TIPS_POPUP_PARAMS tpp;
     tpp.Ids.push_back(idPopup);
     tpp.Ids_src = idsSrc;
-    tpp.Geometry.push_back({0,0,rTips.right*dimFact, rTips.bottom*dimFact});
+    tpp.Geometry.push_back({0,0,rTips.right*dimCoef, rTips.bottom*dimCoef});
     tpp.Bpos.push_back(pb);
     if(withTips)
     {
@@ -1181,13 +1185,13 @@ int  CSUTILS::getAdjustedFontSizeX(int xbaseFontSize)
     }*/
    //cout<<ceil(xbaseFontSize*GetSystemMetrics(SM_CXSCREEN)/1366.0)<< " "<< adaptedSize<<"\n";
     //return ceil(xbaseFontSize*GetSystemMetrics(SM_CXSCREEN)/1366.0);
-    return ceil(xbaseFontSize*xdimFact*dimFact*0.7);
+    return ceil(xbaseFontSize*xdimFact*dimCoef*0.7);
     //return adaptedSize;
 }
 int  CSUTILS::getAdjustedFontSizeY(int ySize)
 {
-    //return ceil(dimFact*ySize*GetSystemMetrics(SM_CYSCREEN)/768.0);
-    return ceil(ySize*ydimFact*dimFact*0.7);
+    //return ceil(dimCoef*ySize*GetSystemMetrics(SM_CYSCREEN)/768.0);
+    return ceil(ySize*ydimFact*dimCoef*0.7);
     //return ySize;
 }
 

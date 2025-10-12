@@ -45,17 +45,17 @@ class CSSCROLLBAR
     bool* orient;
     csSB_PROPORTION* prp;
     int*tLength;
-    vector<RECT> rcs;
-    vector<vector<HDC>> cloths;
-    vector<vector<CSRGBA>> colors;
+    vector<RECT>* rcs;
+    vector<vector<HDC>>* cloths;
+    vector<vector<CSRGBA>>* colors;
     float *value, *value0, *scval;
-    int *hmarg, *vmarg, *width, *rectSelect, *mhId, mhId0;
+    int *hmarg, *vmarg, *width, *rectSelect, *mhId,*mhId0;
     SIZE* szzoom, *oldClientSize;
     POINT *oldClientPos;
     CSARGS Args;
-    int CX, CY;
-    bool threadBool, bSize;
-    int vEdge, hEdge;
+    int *CX, *CY;
+    bool *threadBool, bSize;
+    int *vEdge, *hEdge;
 };
 
 

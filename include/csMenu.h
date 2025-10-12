@@ -8,6 +8,7 @@ class CSMENU
 {
     public:
         CSMENU(int idp, RECT r, bool autoResize);
+        void init(int _idp, RECT r, bool _autoResize);
         int getId();
         int getIdParent();
         int getIdButton(int idMenuItem);
@@ -24,7 +25,7 @@ class CSMENU
         int idp;
         vector<int> idPopup;
         bool autoResize;
-        vector<int> idSection;
+        vector<int> *idSection;
         CSTEXT textPar;
         bool* bLastMenuItemRepos;
         vector<CSLISTBOXMIN*> lbm;

@@ -123,6 +123,7 @@ extern vector<bool> updateTitleSectionBool;
 
 vector<int> autoSizeFromTitle;
 vector<bool> autoSizeComplete;
+extern bool END_CREATE;
 
 extern bool __translateTitles();
 extern bool __translateTips();
@@ -138,7 +139,7 @@ TASKBAR_INFO taskbarInfo;
 WNDCLASS wc0 = { 0 };
 RECT LAST_WORKAREA;
 
-float dimFact = 1.0;
+float dimCoef = 1.0;
 int CAPTION_AREA_SIZE = GetSystemMetrics(SM_CYCAPTION);
 
 UINT LAST_TASKBAR_POS = 0;
@@ -160,7 +161,7 @@ int SMX, SMY;
 int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeResize, bool show, bool isRoot, bool attach)
 {
     int i = SECTION.size();
-    RECT geom = r(_geom.left*dimFact, _geom.top*dimFact, _geom.right*dimFact, _geom.bottom*dimFact, i);
+    RECT geom = r(_geom.left*dimCoef, _geom.top*dimCoef, _geom.right*dimCoef, _geom.bottom*dimCoef, i);
     
     if(i == 1)
     {
@@ -961,7 +962,7 @@ cout<<"gesture\n";
             CSUIMAN::_updateApp(0);
 
             // autoFitToTitle
-            if(autoSizeFromTitle[id])
+            if(autoSizeFromTitle[id] && END_CREATE)
             {
                 int a = TITLE[id].TextRect.right + autoSizeFromTitle[id];
                 if(a != RECTCL[id].right)
@@ -986,29 +987,29 @@ cout<<"gesture\n";
             MINMAXINFO MMI = minMaxInfo[id];
             //std::cout<<HWND(lp);
             if(MMI.ptMaxTrackSize.x > 0)
-                mmi->ptMaxTrackSize.x = MMI.ptMaxTrackSize.x*dimFact;
+                mmi->ptMaxTrackSize.x = MMI.ptMaxTrackSize.x*dimCoef;
             else if(MMI.ptMaxTrackSize.x < 0 )
             {
                 mmi->ptMaxTrackSize.x = RECTCL[PARID[id]].right
                                     -(RECTWND[PARID[id]].right - RECTWND[id].right)
-                                    + MMI.ptMaxTrackSize.x*dimFact;
+                                    + MMI.ptMaxTrackSize.x*dimCoef;
             }
             if(MMI.ptMaxTrackSize.y > 0)
-                mmi->ptMaxTrackSize.y = MMI.ptMaxTrackSize.y*dimFact;
+                mmi->ptMaxTrackSize.y = MMI.ptMaxTrackSize.y*dimCoef;
             else if(MMI.ptMaxTrackSize.y < 0 )
             {
                 mmi->ptMaxTrackSize.y = RECTCL[PARID[id]].bottom
                                     -(RECTWND[PARID[id]].bottom - RECTWND[id].bottom)
-                                    + MMI.ptMaxTrackSize.y*dimFact;
+                                    + MMI.ptMaxTrackSize.y*dimCoef;
             }
 
-            mmi->ptMinTrackSize.x = MMI.ptMinTrackSize.x*dimFact;
-            mmi->ptMinTrackSize.y = MMI.ptMinTrackSize.y*dimFact;
+            mmi->ptMinTrackSize.x = MMI.ptMinTrackSize.x*dimCoef;
+            mmi->ptMinTrackSize.y = MMI.ptMinTrackSize.y*dimCoef;
 
             if(MMI.ptMaxSize.x > 0)
-                mmi->ptMaxSize.x = MMI.ptMaxSize.x*dimFact;
+                mmi->ptMaxSize.x = MMI.ptMaxSize.x*dimCoef;
             if(MMI.ptMaxSize.y > 0)
-                mmi->ptMaxSize.y = MMI.ptMaxSize.y*dimFact;
+                mmi->ptMaxSize.y = MMI.ptMaxSize.y*dimCoef;
 
         }
 

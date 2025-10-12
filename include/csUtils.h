@@ -52,7 +52,7 @@ using namespace  std;
 namespace CSUIMAN
 {
 
-void _CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* originalLanguageCode=L"us", const wchar_t* viewLanguageCode=L"fr", bool saveAppText=0, bool saveAppGeometry=0, void(*forceEventFunc)(CSARGS)=0, CSARGS* forceEventArgs=0);
+void _CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* sourceLanguageCode=L"us", const wchar_t* targetLanguageCode=L"fr", bool saveAppStrings=0, bool saveAppGeometry=0, void(*forceEventFunc)(CSARGS)=0, CSARGS* forceEventArgs=0);
 int _CSIGMA_APP_RUN_();
 void __setAllRects();
 void catchEventsGroup(int id, int idEvents, bool b);
@@ -81,7 +81,7 @@ void inert(int id, BYTE alphaLevel=255);
 void setTransparent(int id);
 void setTransparency(int id, char level);
 void printRect(RECT r, char* title="rect");
-void setSizeFactor(float factor);
+void setSizeCoef(float factor);
 
 void bindGeometry(int id, int n, ...);
 void bindGeometry_(int id, CSBIND_GEOM_PARAMS*& Args, int& n);

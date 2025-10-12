@@ -39,7 +39,7 @@ extern vector<bool> halftoneMode;
 
 extern vector<HCURSOR> cursor;
 extern POINT LBD_POINT;
-extern float dimFact;
+extern float dimCoef;
 extern HINSTANCE _hInstance;
 int IDCAPTURE;
 
@@ -67,6 +67,8 @@ void longPress1(CSARGS Args);
 void mouseMoveSetColor(CSARGS Args);
 void clientGesture(CSARGS Args);
 void mouseWheel(CSARGS Args);
+
+extern bool END_CREATE;
 
 void groupMsg(CSARGS Args)
 {
@@ -99,7 +101,7 @@ void groupMsg(CSARGS Args)
     {
         mouseLeave_(Args);
     }
-    else if(msg == WM_TIMER)
+    else if(msg == WM_TIMER /*  && END_CREATE  */)
     {
         
        // if(WPARAM(Args) == SCROLLBAR_AUTO_REPOS_TIMER_ID)
@@ -165,13 +167,13 @@ void CSSCROLLBAR::update()
 
 void CSSCROLLBAR::setScrollColors(CSRGBA c1, CSRGBA c2)
 {
-    colors[2][0] = c1;
-    colors[2][0] = c2;
+    (*colors)[2][0] = c1;
+    (*colors)[2][0] = c2;
 
-    if(Args.getArgNumber())
+    /*if(Args.getArgNumber())
     {
-        Args.setArg(1, &colors);
-    }
+        Args.setArg(1, colors);
+    }*/
 }
 
 void CSSCROLLBAR::setBackgroundColor(COLORREF color)
@@ -192,12 +194,12 @@ void CSSCROLLBAR::setBackgroundColor(COLORREF color)
 void CSSCROLLBAR::setViewFrameRightMarging(int marging)
 {
     if(*idc)
-        viewedAreaRightMarging[*idc] = marging*dimFact;
+        viewedAreaRightMarging[*idc] = marging*dimCoef;
 }
 void CSSCROLLBAR::setViewFrameBottomMarging(int marging)
 {
     if(*idc)
-        viewedAreaBottomMarging[*idc] = marging*dimFact;
+        viewedAreaBottomMarging[*idc] = marging*dimCoef;
 }
 
 void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
@@ -207,9 +209,9 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
     idc = csAlloc<int>(1,0);
     idMask = csAlloc<int>(1,0);
     if(orientation == CS_SBAR_HORIZONTAL)
-        width = csAlloc<int>(1,geometry.bottom*dimFact);
+        width = csAlloc<int>(1,geometry.bottom*dimCoef);
     else
-        width = csAlloc<int>(1,geometry.right*dimFact);
+        width = csAlloc<int>(1,geometry.right*dimCoef);
     orient = csAlloc<bool>(1,orientation);
     scType = csAlloc<int>(1,_sctype);
     tLength = csAlloc<int>(1,0);
@@ -223,100 +225,105 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
     szzoom = csAlloc<SIZE>(1,{200,100});
     oldClientPos = csAlloc<POINT>(1,{0,0});
     oldClientSize = csAlloc<SIZE>(1,{0,0});
-    CX = 0; CY = 0;
-    threadBool = 0;
-    mhId0 = -1;
-    vEdge = 0;
-    hEdge = 0;
+    CX = csAlloc(1,0); CY = csAlloc(1,0);
+    threadBool = csAlloc<bool>(1,0);
+    mhId0 = csAlloc(1,-1);
+    vEdge = csAlloc(1,0);
+    hEdge = csAlloc(1,0);
     bSize = 0;
+    
+    rcs = new vector<RECT>;
+    colors = new vector<vector<CSRGBA>>;
+    cloths = new vector<vector<HDC>>;
+    
 
     //if(orientation == CS_SBAR_HORIZONTAL)
     {
-        rcs.push_back({*hmarg,*vmarg,*width-*hmarg,*width-*vmarg});
-        rcs.push_back({rcs[0].right,*vmarg,rcs[0].right,*width-*vmarg});
-        rcs.push_back({rcs[1].right,*vmarg,rcs[1].right+szzoom->cx+(szzoom->cy)/2,*width-*vmarg});
-        rcs.push_back({rcs[2].right,*vmarg,geometry.right*dimFact-*width-*hmarg,*width-*vmarg});
-        rcs.push_back({rcs[3].right,*vmarg,geometry.right*dimFact-*hmarg,*width-*vmarg});
+        rcs->push_back({*hmarg,*vmarg,*width-*hmarg,*width-*vmarg});
+        rcs->push_back({(*rcs)[0].right,*vmarg,(*rcs)[0].right,*width-*vmarg});
+        rcs->push_back({(*rcs)[1].right,*vmarg,(*rcs)[1].right+szzoom->cx+(szzoom->cy)/2,*width-*vmarg});
+        rcs->push_back({(*rcs)[2].right,*vmarg,geometry.right*dimCoef-*width-*hmarg,*width-*vmarg});
+        rcs->push_back({(*rcs)[3].right,*vmarg,geometry.right*dimCoef-*hmarg,*width-*vmarg});
 
     }
-    colors.push_back(newVector<CSRGBA>());
-    colors.push_back(newVector<CSRGBA>());
-    colors.push_back(newVector<CSRGBA>());
-    colors.push_back(newVector<CSRGBA>());
-    colors.push_back(newVector<CSRGBA>());
+    (*colors).push_back(newVector<CSRGBA>());
+    (*colors).push_back(newVector<CSRGBA>());
+    (*colors).push_back(newVector<CSRGBA>());
+    (*colors).push_back(newVector<CSRGBA>());
+    (*colors).push_back(newVector<CSRGBA>());
 
     goto dark;
 
     light:
     {
-        colors[0].push_back({150,150,15});
-        colors[0].push_back({150,150,150});
-        colors[0].push_back({240,240,240});
-        colors[0].push_back({150,150,150});
-        colors[0].push_back({150,150,15});
+        (*colors)[0].push_back({150,150,15});
+        (*colors)[0].push_back({150,150,150});
+        (*colors)[0].push_back({240,240,240});
+        (*colors)[0].push_back({150,150,150});
+        (*colors)[0].push_back({150,150,15});
 
-        colors[1].push_back({150,150,15});
-        colors[1].push_back({150,150,150});
-        colors[1].push_back({240,240,240});
-        colors[1].push_back({150,150,150});
-        colors[1].push_back({150,150,15});
+        (*colors)[1].push_back({150,150,15});
+        (*colors)[1].push_back({150,150,150});
+        (*colors)[1].push_back({240,240,240});
+        (*colors)[1].push_back({150,150,150});
+        (*colors)[1].push_back({150,150,15});
 
-        colors[2].push_back({200,200,30});
-        colors[2].push_back({180,180,180});
-        colors[2].push_back({255,255,255});
-        colors[2].push_back({180,180,180});
-        colors[2].push_back({200,200,30});
+        (*colors)[2].push_back({200,200,30});
+        (*colors)[2].push_back({180,180,180});
+        (*colors)[2].push_back({255,255,255});
+        (*colors)[2].push_back({180,180,180});
+        (*colors)[2].push_back({200,200,30});
 
-        colors[3].push_back({200,200,30});
-        colors[3].push_back({180,180,180});
-        colors[3].push_back({30,30,30});
-        colors[3].push_back({180,180,180});
-        colors[3].push_back({200,200,30});
+        (*colors)[3].push_back({200,200,30});
+        (*colors)[3].push_back({180,180,180});
+        (*colors)[3].push_back({30,30,30});
+        (*colors)[3].push_back({180,180,180});
+        (*colors)[3].push_back({200,200,30});
     }
 
     dark:
     {
-        colors[0].push_back({200,200,30});
-        colors[0].push_back({30,30,30});
-        colors[0].push_back({70,70,70});
-        colors[0].push_back({30,30,30});
-        colors[0].push_back({200,200,30});
+        (*colors)[0].push_back({200,200,30});
+        (*colors)[0].push_back({30,30,30});
+        (*colors)[0].push_back({70,70,70});
+        (*colors)[0].push_back({30,30,30});
+        (*colors)[0].push_back({200,200,30});
 
-        colors[1].push_back({150,150,15});
-        colors[1].push_back({35,35,35});
-        colors[1].push_back({80,80,80});
-        colors[1].push_back({35,35,35});
-        colors[1].push_back({150,150,15});
+        (*colors)[1].push_back({150,150,15});
+        (*colors)[1].push_back({35,35,35});
+        (*colors)[1].push_back({80,80,80});
+        (*colors)[1].push_back({35,35,35});
+        (*colors)[1].push_back({150,150,15});
 
-        colors[2].push_back({30,30,30});
-        colors[2].push_back({50,50,50});
-        colors[2].push_back({55,55,55});
-        colors[2].push_back({50,50,50});
-        colors[2].push_back({200,200,30});
+        (*colors)[2].push_back({30,30,30});
+        (*colors)[2].push_back({50,50,50});
+        (*colors)[2].push_back({55,55,55});
+        (*colors)[2].push_back({50,50,50});
+        (*colors)[2].push_back({200,200,30});
 
-        colors[3].push_back({200,200,30});
-        colors[3].push_back({180,180,180});
-        colors[3].push_back({30,30,30});
-        colors[3].push_back({180,180,180});
-        colors[3].push_back({200,200,30});
+        (*colors)[3].push_back({200,200,30});
+        (*colors)[3].push_back({180,180,180});
+        (*colors)[3].push_back({30,30,30});
+        (*colors)[3].push_back({180,180,180});
+        (*colors)[3].push_back({200,200,30});
     }
 
     
-    cloths.push_back(newVector<HDC>());
-    cloths.push_back(newVector<HDC>());
-    cloths.push_back(newVector<HDC>());
-    cloths.push_back(newVector<HDC>());
-    cloths.push_back(newVector<HDC>());
+    (*cloths).push_back(newVector<HDC>());
+    (*cloths).push_back(newVector<HDC>());
+    (*cloths).push_back(newVector<HDC>());
+    (*cloths).push_back(newVector<HDC>());
+    (*cloths).push_back(newVector<HDC>());
 
 
     int cx = RECTCL[idp].right;
     int cy = RECTCL[idp].bottom;
     if(orientation == CS_SBAR_HORIZONTAL)
     {
-        int edge = hEdge;
-        int thick = geometry.bottom*dimFact;
+        int edge = *hEdge;
+        int thick = geometry.bottom*dimCoef;
         int t2 = thick;
-        *id = CSUIMAN::createSection(_idp, {edge/dimFact, (cy - edge - thick)/dimFact, (cx - 2*edge - thick)/dimFact, thick/dimFact},  RGB(200,200,200), {0,0,0,0});
+        *id = CSUIMAN::createSection(_idp, {edge/dimCoef, (cy - edge - thick)/dimCoef, (cx - 2*edge - thick)/dimCoef, thick/dimCoef},  RGB(200,200,200), {0,0,0,0});
             
         cursor[*id] = LoadCursor(0,IDC_SIZEWE);
         
@@ -330,29 +337,29 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
 
         CSGRAPHIC_CONTEXT gc01 = csGraphics::getImageGraphicContextResizedW(L"img/back.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc01.hbmp);
-        cloths[0].push_back(gc01.dc);
+        (*cloths)[0].push_back(gc01.dc);
         CSGRAPHIC_CONTEXT gc02 = csGraphics::getImageGraphicContextResizedW(L"img/back2.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc02.hbmp);
-        cloths[0].push_back(gc02.dc);
-        cloths[0].push_back(gc02.dc);
-        cloths[0].push_back(gc01.dc);
+        (*cloths)[0].push_back(gc02.dc);
+        (*cloths)[0].push_back(gc02.dc);
+        (*cloths)[0].push_back(gc01.dc);
 
         CSGRAPHIC_CONTEXT gc11 = csGraphics::getImageGraphicContextResizedW(L"img/next.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc11.hbmp);
-        cloths[4].push_back(gc11.dc);
+        (*cloths)[4].push_back(gc11.dc);
         CSGRAPHIC_CONTEXT gc12 = csGraphics::getImageGraphicContextResizedW(L"img/next2.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc12.hbmp);
-        cloths[4].push_back(gc12.dc);
-        cloths[4].push_back(gc12.dc);
-        cloths[4].push_back(gc11.dc);
+        (*cloths)[4].push_back(gc12.dc);
+        (*cloths)[4].push_back(gc12.dc);
+        (*cloths)[4].push_back(gc11.dc);
 
     }
     else
     {
-        int edge = vEdge;
-        int thick = geometry.right*dimFact;
+        int edge = *vEdge;
+        int thick = geometry.right*dimCoef;
         int t2 = thick;
-        *id = CSUIMAN::createSection(_idp, {(cx - edge - thick)/dimFact, edge/dimFact, thick/dimFact, (cy - 2*edge - thick)/dimFact},  RGB(200,200,200), {0,0,0,0});
+        *id = CSUIMAN::createSection(_idp, {(cx - edge - thick)/dimCoef, edge/dimCoef, thick/dimCoef, (cy - 2*edge - thick)/dimCoef},  RGB(200,200,200), {0,0,0,0});
 
         hdStackContext[*id] = CreateCompatibleDC(hdcontext[_idp]);
         hStackBmp[*id] = CreateCompatibleBitmap(hdcontext[_idp], thick, GetSystemMetrics(SM_CYSCREEN));
@@ -365,21 +372,21 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
         
         CSGRAPHIC_CONTEXT gc01 = csGraphics::getImageGraphicContextResizedW(L"img/up.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc01.hbmp);
-        cloths[0].push_back(gc01.dc);
+        (*cloths)[0].push_back(gc01.dc);
         CSGRAPHIC_CONTEXT gc02 = csGraphics::getImageGraphicContextResizedW(L"img/up2.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc02.hbmp);
-        cloths[0].push_back(gc02.dc);
-        cloths[0].push_back(gc02.dc);
-        cloths[0].push_back(gc01.dc);
+        (*cloths)[0].push_back(gc02.dc);
+        (*cloths)[0].push_back(gc02.dc);
+        (*cloths)[0].push_back(gc01.dc);
 
         CSGRAPHIC_CONTEXT gc11 = csGraphics::getImageGraphicContextResizedW(L"img/down.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc11.hbmp);
-        cloths[4].push_back(gc11.dc);
+        (*cloths)[4].push_back(gc11.dc);
         CSGRAPHIC_CONTEXT gc12 = csGraphics::getImageGraphicContextResizedW(L"img/down2.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc12.hbmp);
-        cloths[4].push_back(gc12.dc);
-        cloths[4].push_back(gc12.dc);
-        cloths[4].push_back(gc11.dc);
+        (*cloths)[4].push_back(gc12.dc);
+        (*cloths)[4].push_back(gc12.dc);
+        (*cloths)[4].push_back(gc11.dc);
     }
 
     setBackgroundColor(RGB(35,35,35));
@@ -389,10 +396,10 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
     bool*block = csAlloc<bool>(1,0);
 
     Args.init(26);
-    Args.regArg(&rcs, &colors, value, value0, hmarg, vmarg, 
+    Args.regArg(rcs, colors, value, value0, hmarg, vmarg, 
                     width, szzoom, orient, tLength, rectSelect, mhId, scval, idc, 
-                    scType, idMask, block, oldClientPos, oldClientSize, &CX, &CY, &cloths, 
-                    &threadBool, &mhId0, &hEdge, &vEdge);
+                    scType, idMask, block, oldClientPos, oldClientSize, CX, CY, cloths, 
+                    threadBool, mhId0, hEdge, vEdge);
     
     CSUIMAN::addAction(*id, groupMsg, Args);
     //CSUIMAN::addAction(idp, parentResize, 9, idc, id, &hEdge, &vEdge, &CX, &CY, &bSize, orient, &idp);
@@ -733,15 +740,16 @@ void autoRepos(CSARGS Args)
 
         int idc = *(int*)Args[13];
         int id = (int)Args;
+
         if(orientation == CS_SBAR_HORIZONTAL)
         {
             int thick = RECTCL[id].bottom;
             RECT r = RECTPARREFSAVED[id];
             int edge = *(int*)Args[24];
-            
+
             int a = withVScroll[idp] ? thick : 0;
             MoveWindow(SECTION[id], /*r.left + */edge, cy /*- r.top*/ - edge - thick, 
-                                            cx /*- r.left*/ - 2*edge - a, thick, 1);
+                                            cx /*- r.left*/ - 2*edge - a, thick, 0);
         }
         else if(orientation == CS_SBAR_VERTICAL)
         {
@@ -751,9 +759,9 @@ void autoRepos(CSARGS Args)
 
             MoveWindow(SECTION[id], cx /*- r.left*/ - edge - thick, /*r.top +*/ edge,  
                                             thick, cy /*- r.top*/ - 2*edge, 1);
-        }
-        *(int*)Args[19] = cx;
-        *(int*)Args[20] = cy;
+         }
+         *(int*)Args[19] = cx;
+         *(int*)Args[20] = cy;
     }
 }
 void autoRepos_parentContext(CSARGS Args)

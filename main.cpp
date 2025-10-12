@@ -62,15 +62,17 @@ int GA_CLIENT, PROGRESS_INFO_SECTION, IMAGE_LIST_SECTION;
 int smx = GetSystemMetrics(SM_CXSCREEN);
 int smy = GetSystemMetrics(SM_CYSCREEN);
 
-// WinMain
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
-{
-    CSUIMAN::_CSIGMA_APP_INIT_(hInstance, L"fr-fr", L"fr-fr", 1, 1, forceEventFunction, &forceEventArgs);
 
-    //float dimFact = GetSystemMetrics(SM_CXSCREEN)*GetSystemMetrics(SM_CYSCREEN)/(1366.0*768);
-    float dimFact = 1.5;
-    setSizeFactor(dimFact);
-    /***************************** Root ********************************** */
+
+    
+CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
+
+{
+
+    // //float dimCoef = GetSystemMetrics(SM_CXSCREEN)*GetSystemMetrics(SM_CYSCREEN)/(1366.0*768);
+    float dimCoef = 1.5;
+    setSizeCoef(dimCoef);
+    // /***************************** Root ********************************** */
 
     ROOT = createSection(-1, {100,25,600,500},  RGB(30,30,30), {1,1,1,1,1,1,1,1});
     int ICON_ROOT  = setIcon(ROOT, L"icon.ico", L"icon.ico");
@@ -85,8 +87,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     /*************************************** MIDDLE_SECTION ************************************ */
     CSBIND_GEOM_PARAMS bd;
-    MIDDLE_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/dimFact+6,smx/dimFact,smy/dimFact},  RGB(40,40,40), {0,0,0,0});
-    /*MIDDLE_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/dimFact+6,515+77,450+10},  RGB(40,5,5), {0,0,0,0});
+    MIDDLE_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/dimCoef+6,smx/dimCoef,smy/dimCoef},  RGB(40,40,40), {0,0,0,0});
+    /*MIDDLE_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/dimCoef+6,515+77,450+10},  RGB(40,5,5), {0,0,0,0});
 
     bd = {MIDDLE_SECTION, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE,BIND_DEST_BOTTOM_EDGE,BIND_DEST_RIGHT_EDGE,BIND_DEST_BOTTOM_EDGE}};
     bindGeometry(ROOT, bd); // cpp version*/
@@ -133,8 +135,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     bindGeometry(ROOT, bd);
     bd = {MIDDLE_MIDDLE_SECTION, {-1,0,1,0}, BIND_DEST_RIGHT_EDGE,0,BIND_DEST_RIGHT_EDGE,0};
     bindGeometry(ROOT, bd);
-    /*bd = {MIDDLE_SECTION, {0,0,1,0}, 0,0,BIND_DEST_RIGHT_EDGE,0};
-    bindGeometry(ROOT, bd);*/
     bd = {RIGHT_SECTION, {0,0,0,1}, {0,0, 0, BIND_DEST_TOP_EDGE|BIND_DEST_BOTTOM_EDGE}};
     bindGeometry(MIDDLE_TOP_SECTION, 1, bd);
     bd = {RIGHT_SECTION, {-1,-1,1,1}, {BIND_DEST_LEFT_EDGE,BIND_DEST_BOTTOM_EDGE,
@@ -242,14 +242,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tips0.paragraph.push_back(CSTEXT{.Text=L"Modifie la taille de la police.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tips0.pSpace.push_back(5);
-    CSUIMAN::addTips(fontSizeInc.idSection, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bRBottom=1}, 3, 0, tips0);
+    CSUIMAN::addTips(fontSizeInc.idSection, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bRBottom=1}, 3, 0, tips0);
 
 
     /********************************************************************************** */
-    int cy = CAPTION_AREA_SIZE/dimFact-2;
+    int cy = CAPTION_AREA_SIZE/dimCoef-2;
     int cx = 70;
 
-    CSMENU menu(ROOT, {(sRectClient(ROOT).right/dimFact-cx*6)/2,0,0,cy}, 1);
+    CSMENU menu(ROOT, {(sRectClient(ROOT).right/dimCoef-cx*6)/2,0,0,cy}, 1);
 
     menu.newGroup( L"Fichier\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
     menu.newGroup( L"Edition\0", L"img/Settings01.bmp", L"img/Settings01.bmp");
@@ -262,14 +262,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     ABOUT_UI = createSection(0, {100,25,600,500},  RGB(40,40,40), {1,1,1,1,1,1,1,1}, 0, 1, 0);
     CSUIMAN::enableDarkEdge(ABOUT_UI);
     CSUIMAN::setIcon(ABOUT_UI, ICON_ROOT);
-    CSUICONTROLS::addTitle(ABOUT_UI, L"About",{60,CAPTION_AREA_SIZE/dimFact}, "img/About01.bmp", 20, L"Arial black");
+    CSUICONTROLS::addTitle(ABOUT_UI, L"About",{60,CAPTION_AREA_SIZE/dimCoef}, "img/About01.bmp", 20, L"Arial black");
 
-    ABOUT_UI_CLIENT = createSection(ABOUT_UI, {10/dimFact,CAPTION_AREA_SIZE/dimFact,590-10/dimFact,500-CAPTION_AREA_SIZE/dimFact-10-20},  RGB(0,0,0), {0}, 1);
+    ABOUT_UI_CLIENT = createSection(ABOUT_UI, {10/dimCoef,CAPTION_AREA_SIZE/dimCoef,590-10/dimCoef,500-CAPTION_AREA_SIZE/dimCoef-10-20},  RGB(0,0,0), {0}, 1);
     bd = {ABOUT_UI_CLIENT, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE, BIND_DEST_BOTTOM_EDGE,
                                         BIND_DEST_RIGHT_EDGE, BIND_DEST_BOTTOM_EDGE}};
     bindGeometry(ABOUT_UI, bd);
 
-    ABOUT_UI_BOTTOM = createSection(ABOUT_UI, {1,(CAPTION_AREA_SIZE+sRectClient(ABOUT_UI_CLIENT).bottom)/dimFact,590,20},  RGB(40,40,40), {0}, 1);
+    ABOUT_UI_BOTTOM = createSection(ABOUT_UI, {1,(CAPTION_AREA_SIZE+sRectClient(ABOUT_UI_CLIENT).bottom)/dimCoef,590,20},  RGB(40,40,40), {0}, 1);
     bd = {ABOUT_UI_BOTTOM, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE, BIND_DEST_TOP_EDGE,
                                         BIND_DEST_RIGHT_EDGE, BIND_DEST_TOP_EDGE}};
     bindGeometry(ABOUT_UI, bd);
@@ -278,8 +278,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
                                    .Bold=0, .Color={180,180,180},
                                    .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1});
 
-    int h = (CAPTION_AREA_SIZE-2)/dimFact, w=30, marg = 1, total = w+marg;
-    ABOUT_SUB_MENU = createSection(ABOUT_UI, {(sRectClient(ABOUT_UI).right/dimFact-total*4)/2,0,total*4,h},  RGB(20,20,20), {0});
+    int h = (CAPTION_AREA_SIZE-2)/dimCoef, w=30, marg = 1, total = w+marg;
+    ABOUT_SUB_MENU = createSection(ABOUT_UI, {(sRectClient(ABOUT_UI).right/dimCoef-total*4)/2,0,total*4,h},  RGB(20,20,20), {0});
     bd = {ABOUT_SUB_MENU, {-0.5,0,0.5,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
     bindGeometry(ABOUT_UI, bd);
 
@@ -339,7 +339,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tips.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tips.pSpace.push_back(5);
-    CSUIMAN::addTips(internPrec.idSection, {0,0,250/dimFact, 200/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tips);
+    CSUIMAN::addTips(internPrec.idSection, {0,0,250/dimCoef, 200/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips);
 
     CS_NUMERIC_INCREMENTER_PARAMS externPrec = CSUICONTROLS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*1,65,h}, L"1", L"1", INPUT_FORMAT_INTERGER);
     externPrec.setMinBound("1");
@@ -354,7 +354,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tips1.paragraph.push_back(CSTEXT{.Text=L"Représente la précision d'affichqge des numbres.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tips1.pSpace.push_back(5);
-    CSUIMAN::addTips(externPrec.idSection, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tips1);
+    CSUIMAN::addTips(externPrec.idSection, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips1);
 
 
     CS_NUMERIC_INCREMENTER_PARAMS Nnb = CSUICONTROLS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*2,65,h}, L"500", L"1", INPUT_FORMAT_INTERGER);
@@ -370,7 +370,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tips2.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tips2.pSpace.push_back(5);
-    CSUIMAN::addTips(Nnb.idSection, {0,0,200/dimFact, 170/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tips2);
+    CSUIMAN::addTips(Nnb.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips2);
 
     /********************************************************************************** */
     //BTN_NEW_OUTPUT = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"New Output\0", {5,5+total*1,65,h});
@@ -388,7 +388,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tips3.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tips3.pSpace.push_back(5);
-    CSUIMAN::addTips(minDigit.idSection, {0,0,200/dimFact, 170/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
+    CSUIMAN::addTips(minDigit.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
 
     /********************************************************************************** */
     //BTN_REMOVE_FILE = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Remove File\0", {5,5+total*2,65,h});
@@ -397,7 +397,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     maxDigit.setMinBound("0");
     maxDigit.setMaxBound("9");
 
-    CSUIMAN::addTips(maxDigit.idSection, {0,0,200/dimFact, 170/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
+    CSUIMAN::addTips(maxDigit.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
     /********************************************************************************** */
 
     void getRandomData(CSARGS Args);
@@ -415,7 +415,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMSG.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMSG.pSpace.push_back(5);
-    CSUIMAN::addTips(BNT_RANDOM_NUMBER, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG);
+    CSUIMAN::addTips(BNT_RANDOM_NUMBER, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG);
 
     /********************************************************************************** */
 
@@ -430,7 +430,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Ajouter une donnée à la liste.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMSG1.pSpace.push_back(5);
-    CSUIMAN::addTips(BTN_ADD_TO_DATA_LIST, {0,0,200/dimFact, 150/dimFact}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG1);
+    CSUIMAN::addTips(BTN_ADD_TO_DATA_LIST, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG1);
     /********************************************************************************** */
     //BTN_REMOVE_SAVE_1 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Save 1\0", {5,5+total*6,65,h});
     CS_NUMERIC_INCREMENTER_PARAMS activeNum = CSUICONTROLS::numericIncrementerExt2(MIDDLE_LEFT_SECTION, {5,5+total*7,65,h}, L"0", L"1", INPUT_FORMAT_INTERGER);
@@ -513,7 +513,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
 
     // /*********************************************************** */
 
-    //RIGHT_SECTION_CHILD = createSection(RIGHT_SECTION, {5,0,1500/dimFact,1000/dimFact},  RGB(30,30,30), {0,0,0,0});
+    //RIGHT_SECTION_CHILD = createSection(RIGHT_SECTION, {5,0,1500/dimCoef,1000/dimCoef},  RGB(30,30,30), {0,0,0,0});
 
     CSSCROLLBAR hscroll2 = CSUICONTROLS::addHScrollBar(&RIGHT_SECTION, &RIGHT_SECTION, 0, 10);
     CSSCROLLBAR vscroll2 = CSUICONTROLS::addVScrollBar(&RIGHT_SECTION, &RIGHT_SECTION, 0, 10);
@@ -524,7 +524,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     csGraphics::setMouseWheelPreference(RIGHT_SECTION, CS_MOUSEWHEEL_VSCROLL);
 
 
-    PROGRESS_INFO_SECTION = createSection(BOTTOM_SECTION, {0,0, 300/dimFact, (sRectClient(BOTTOM_SECTION).bottom/dimFact)},  RGB(20,20,20), {0,0,1});
+    PROGRESS_INFO_SECTION = createSection(BOTTOM_SECTION, {0,0, 300/dimCoef, (sRectClient(BOTTOM_SECTION).bottom/dimCoef)},  RGB(20,20,20), {0,0,1});
     CSUIFX::setTitleColorGradient(PROGRESS_INFO_SECTION, {180,180,180},{220,220,200},3,3);
     CSUIFX::setTitleColorClickEffect(PROGRESS_INFO_SECTION, {220,220,120});
     CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"No Task", .Font=L"calibri", .FontSize = 16, .Italic=1,
@@ -537,11 +537,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     lbm->setDefaultFont(L"calibri",{14,0});
     lbm->setItemAlign(CS_ALIGN_VERTICAL);
     lbm->setOffset({0,0});
-    lbm->setDefaultSize({150*dimFact, 15*dimFact});
+    lbm->setDefaultSize({150*dimCoef, 15*dimCoef});
     //lbm->setIconSize(0,{26,26});
 
     lbm->setIcon(0, L"img\\langIcon2.bmp",L"img\\langIcon.bmp", L"img\\langIcon.bmp", L"img\\langIcon.bmp");
-    lbm->setMaxTextWidth(120*dimFact);
+    lbm->setMaxTextWidth(120*dimCoef);
     lbm->setDefaultTitle(L"Index");
 
     int langCount = 0;
@@ -589,13 +589,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     lbm1->setItemAlign(CS_ALIGN_VERTICAL);
     lbm1->setOffset({0,0});
     lbm1->setMarging({2,0});
-    lbm1->setDefaultSize({75*dimFact, 25*dimFact});
+    lbm1->setDefaultSize({75*dimCoef, 25*dimCoef});
     //lbm1->setAllTitleColors(RGB(200,200,200), RGB(200,200,200), RGB(0,0,0));
     //lbm1->setDefaultTitleColors(RGB(23,23,23), RGB(40,40,40), RGB(100,100,100));
     lbm1->setIconSize(0,{20,20});
 
     lbm1->setIcon(0, L"img\\img.bmp",L"img\\img2.bmp", L"img\\img2.bmp", L"img\\img2.bmp");
-    lbm1->setMaxTextWidth(120*dimFact);
+    lbm1->setMaxTextWidth(120*dimCoef);
     lbm1->setDefaultTitle(L"Image");
     lbm1->newItem(0,100,0);
     //lbm->newFilePath(L"Bitmap 24-bits\0*.bmp\0");
@@ -607,9 +607,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow)
     hscroll3.setPositionRatio(0);
     vscroll3.setPositionRatio(0);
 
-    return CSUIMAN::_CSIGMA_APP_RUN_();
+    
+    //void cameraTop();
+    //cameraTop();
+
+    //void sym();
+    //sym();
 }
 
+CSIGMA_MAIN_END
 
 
 HWND btnTracked;
@@ -861,7 +867,6 @@ void checkInstalledLanguages(CSLISTBOXMIN*& lbm)
 
             while (1)
             {
-
                 std::vector<std::wstring> installedLanguages = CSLANGMAN::getInstalledLanguages();
                 if(installedLanguages.size())
                 {
@@ -1018,4 +1023,52 @@ void stretchLogo(CSARGS Args)
             }
         }
     }*/
+}
+
+void cameraTop()
+{
+    HWND hwnd = FindWindow(0,L"Webcam");
+    SetWindowPos(hwnd, HWND_TOPMOST, 0,0,0,0, SWP_NOSIZE|SWP_NOMOVE);
+}
+
+void sym()
+{
+    /*int n = 13;
+    POINT pts[n] = {{395,350},{471,239},{298,227},{184,309},{249,406},{218,536},{298,648},{417,648},{476,484},{395,350},{249,406},{325,380},{365,648}};
+    POINT symLine1[2] = {{298,648},{417,648}};*/
+    
+    int n = 26;
+    POINT pts[n] = {{395,350},{471,239},{298,227},{184,309},{249,406},{218,536},{298,648},{417,648},{476,484},{395,350},{249,406},{325,380},{365,648},
+                    {395,946},{471,1057},{298,1069},{184,987},{249,890},{218,760},{298,648},{417,648},{476,812},{395,946},{249,890},{325,916},{365,648},
+                    
+                   };
+    POINT symLine1[2] = {{653,916},{471,239}};
+
+    /*int n = 26*2;
+    POINT pts[n] = {{395,350},{471,239},{298,227},{184,309},{249,406},{218,536},{298,648},{417,648},{476,484},{395,350},{249,406},{325,380},{365,648},
+                    {395,946},{471,1057},{298,1069},{184,987},{249,890},{218,760},{298,648},{417,648},{476,812},{395,946},{249,890},{325,916},{365,648},
+                    {593,297},{471,240},{615,142},{755,156},{747,273},{839,370},{826,507},{723,566},{590,454},{593,297},{747,273},{669,288},{768,540},
+                    {892,813},{882,947},{1037,871},{1095,743},{990,691},{952,563},{826,507},{723,566},{754,738},{892,813},{990,691},{937,752},{768,540},
+                   };
+    POINT symLine1[2] = {{653,916},{471,239}};*/
+
+    POINT pts2[n];
+
+    float a = (symLine1[1].y-symLine1[0].y)*1.0/(symLine1[1].x-symLine1[0].x);
+    float a2 = a*a, b = symLine1[0].y - a*symLine1[0].x;
+
+    cout<<"\n";
+    for(int i=0; i<n; i++)
+    {
+        cout<<"("<<pts[i].x<<","<<pts[i].y<<"),";
+    }
+    
+    cout<<"\n";
+
+    for(int i=0; i<n; i++)
+    {
+        pts2[i].x = ceil(((1-a2)*pts[i].x + 2*a*(pts[i].y-b))/(1+a2));
+        pts2[i].y = ceil(((a2-1)*pts[i].y + 2*(a*pts[i].x+b))/(1+a2));
+        cout<<"("<<pts2[i].x<<","<<pts2[i].y<<"),";
+    }
 }

@@ -113,8 +113,8 @@ const wchar_t* languagesW[] = {
 
 wchar_t* KEY = L"";
 
-wchar_t* originalLanguageCode = L"en-us";
-wchar_t* viewLanguageCode = L"fr";
+wchar_t* sourceLanguageCode = L"en-us";
+wchar_t* targetLanguageCode = L"fr";
 
 extern int MAX_TRANSLATION_TEXT_LENGTH_REQUESTED;
 
