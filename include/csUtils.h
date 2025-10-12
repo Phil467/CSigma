@@ -56,12 +56,12 @@ void _CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* sourceLanguageCode=L"
 int _CSIGMA_APP_RUN_();
 void __setAllRects();
 void catchEventsGroup(int id, int idEvents, bool b);
-int createSection(int id, RECT geom,  COLORREF color, BOOL_RECT edgeResize, bool show=1, bool isRoot=0, bool attach=1);
+int createSection(int id, RECT geom,  COLORREF color, CSRESIZE_EDGE edgeResize, bool show=1, bool isRoot=0, bool attach=1);
 int addAction(int id, void(*f)(CSARGS), CSARGS& args);
 int addAction(int id, void(*f)(CSARGS), int nbArgs, ...);
 bool removeAction(int id, int idAction);
 bool removeLastAction(int id);
-int setIcon(int id, wchar_t*pathSmallIcon, wchar_t*pathBigIcon);
+int setIcon(int id, wchar_t*pathSmallIcon, wchar_t*pathBigIcon, RECT rectSmall = {2,2,0,0});
 void setIcon(int id, int idIcon);
 HWND sHandle(int id);
 CSTEXT& sTitle(int id);

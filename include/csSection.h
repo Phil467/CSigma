@@ -24,7 +24,7 @@
 #define CSIGMA_MAIN_START(sourceLang, targetLang, saveAppStrings, saveAppGeometry) \
     int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) \
     { \
-        CSUIMAN::_CSIGMA_APP_INIT_(hInstance, sourceLang, targetLang, 1, 1);
+        CSUIMAN::_CSIGMA_APP_INIT_(hInstance, sourceLang, targetLang, saveAppStrings, saveAppGeometry);
 
 #define CSIGMA_MAIN_END \
         return CSUIMAN::_CSIGMA_APP_RUN_(); \

@@ -124,6 +124,7 @@ extern vector<bool> updateTitleSectionBool;
 vector<int> autoSizeFromTitle;
 vector<bool> autoSizeComplete;
 extern bool END_CREATE;
+vector<int> ICONID;
 
 extern bool __translateTitles();
 extern bool __translateTips();
@@ -158,7 +159,7 @@ int SMX, SMY;
 
 #include "csTranslator.h"
 
-int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeResize, bool show, bool isRoot, bool attach)
+int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE edgeResize, bool show, bool isRoot, bool attach)
 {
     int i = SECTION.size();
     RECT geom = r(_geom.left*dimCoef, _geom.top*dimCoef, _geom.right*dimCoef, _geom.bottom*dimCoef, i);
@@ -293,6 +294,8 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, BOOL_RECT edgeRes
     updateAfterResizeMsg.push_back(0);
 
     dynSimpleText.push_back({newVector<CSTEXT>(),newVector<int>(),0});
+
+    ICONID.push_back(-1);
 
     updateTitleSectionBool.push_back(0);
     zoomParams.push_back({0.2, 15, 0.2, 15, 1, 1, 100, {GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)}});
@@ -1267,6 +1270,18 @@ void _blitExtDc(int id)
                         hdcontextExt[id], pin.x + zoomParams[id].focus.x, pin.y + zoomParams[id].focus.y, 
                         bltRect[id].right/hZoom[id], bltRect[id].bottom/vZoom[id], SRCCOPY);
         }
+    }
+
+    if(ICONID[id] > -1)
+    {
+        CSAPP_ICON& appIc = appIcon[ICONID[id]];
+        float cf = 1.0;
+        if(TITLE[id].Text) cf = getAdjustedFontSizeX(TITLE[id].FontSize.cx)*1.0/TITLE[id].FontSize.cx;
+
+        if(!appIc.centered)
+        DrawIconEx(hdStackContext[id], appIc.rectSmall.left*cf, appIc.rectSmall.top*cf, appIc.smallIcon, appIc.rectSmall.right*cf, appIc.rectSmall.bottom*cf, 0, NULL, DI_NORMAL);
+        else
+        DrawIconEx(hdStackContext[id], appIc.rectSmall.left*cf, (RECTCL[id].bottom-appIc.rectSmall.bottom*cf)/2, appIc.smallIcon, appIc.rectSmall.right*cf, appIc.rectSmall.bottom*cf, 0, NULL, DI_NORMAL);
     }
 }
 

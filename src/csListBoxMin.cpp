@@ -119,10 +119,10 @@ void CSLISTBOXMIN::init(int* idp, int _gridStyle, int _gridWidth)
     marging = {1,1};
     offset = {5,5};
     imgSize = {15,15};
-    imgdc1 = getImageGraphicContextResizedW(L"img\\combo_12.bmp", {15,15});
-    imgdc2 = getImageGraphicContextResizedW(L"img\\combo_12.bmp", {15,15});
-    imgdc3 = getImageGraphicContextResizedW(L"img\\combo_1.bmp", {15,15});
-    imgdc4 = getImageGraphicContextResizedW(L"img\\combo_1.bmp", {15,15});
+    imgdc1 = createGraphicContextResizedFromFileW(L"img\\combo_12.bmp", {15,15});
+    imgdc2 = createGraphicContextResizedFromFileW(L"img\\combo_12.bmp", {15,15});
+    imgdc3 = createGraphicContextResizedFromFileW(L"img\\combo_1.bmp", {15,15});
+    imgdc4 = createGraphicContextResizedFromFileW(L"img\\combo_1.bmp", {15,15});
     icons.insertEnd({imgdc1.dc, imgdc2.dc, imgdc3.dc, imgdc4.dc});
     gridStyle = _gridStyle;
     textOrientation = CS_RDBTN_TEXT_H;
@@ -214,10 +214,10 @@ void CSLISTBOXMIN::setIcon(int idi, wchar_t*path1, wchar_t*path2,wchar_t*path3,w
     wchar_t* p3 = path3 != 0 ? path3 : path1;
     wchar_t* p4 = path4 != 0 ? path4 : path1;
     SIZE size = imgSize;
-    imgdc1 = getImageGraphicContextResizedW(path1, {size.cx,size.cy});
-    imgdc2 = getImageGraphicContextResizedW(p2, {size.cx,size.cy});
-    imgdc3 = getImageGraphicContextResizedW(p3, {size.cx,size.cy});
-    imgdc4 = getImageGraphicContextResizedW(p4, {size.cx,size.cy});
+    imgdc1 = createGraphicContextResizedFromFileW(path1, {size.cx,size.cy});
+    imgdc2 = createGraphicContextResizedFromFileW(p2, {size.cx,size.cy});
+    imgdc3 = createGraphicContextResizedFromFileW(p3, {size.cx,size.cy});
+    imgdc4 = createGraphicContextResizedFromFileW(p4, {size.cx,size.cy});
 
     DeleteBitmap(imgdc1.hbmp);
     DeleteBitmap(imgdc2.hbmp);

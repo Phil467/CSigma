@@ -173,15 +173,28 @@ CSSYSCOMMAND_SECTION CSUICONTROLS::addSysCommand(int& id, POINT pos)
 {
     CSSYSCOMMAND_SECTION sc;
     int width = (GetSystemMetrics(SM_CYCAPTION)-2);
-    sc.SYSCOMMAND_SECTION = CSUIMAN::createSection(id, {RECTCL[id].right/dimCoef-3*width-2,pos.y,3*width,width},  RGB(5,5,5), {0,0,0,0});
+    if(dimCoef < 1.5)
+        sc.SYSCOMMAND_SECTION = CSUIMAN::createSection(id, {RECTCL[id].right/dimCoef-3*width-2-6,pos.y,3*width+3,width},  RGB(5,5,5), {0,0,0,0});
+    else
+        sc.SYSCOMMAND_SECTION = CSUIMAN::createSection(id, {RECTCL[id].right/dimCoef-3*width-2,pos.y,3*width,width},  RGB(5,5,5), {0,0,0,0});
     CSBIND_GEOM_PARAMS bd = {sc.SYSCOMMAND_SECTION, {-1,0,1,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
     CSUIMAN::bindGeometry(id, bd);
     CSUIMAN::setBorderColorAndThick(sc.SYSCOMMAND_SECTION, RGB(20,20,20), 1);
 
     width -= 2;
-    sc.SYS_MIN = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_min02.bmp\0", "img/_min01.bmp\0", {1,1,width,width});
-    sc.SYS_MAX = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_max02.bmp\0", "img/_max01.bmp\0", {1+width,1,width,width});
-    sc.SYS_CLOSE = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_close02.bmp\0", "img/_close01.bmp\0", {1+width*2,1,width,width});
+    if(dimCoef < 1.5)
+    {
+        width+=3;
+        sc.SYS_MIN = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/min20.bmp\0", "img/min20.bmp\0", {-1,-1,width,width});
+        sc.SYS_MAX = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/max20.bmp\0", "img/max20.bmp\0", {-1+width,-1,width,width});
+        sc.SYS_CLOSE = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/close20.bmp\0", "img/close20.bmp\0", {-1+width*2,-1,width,width});
+    }
+    else
+    {
+        sc.SYS_MIN = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_min02.bmp\0", "img/_min01.bmp\0", {1,1,width,width});
+        sc.SYS_MAX = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_max02.bmp\0", "img/_max01.bmp\0", {1+width,1,width,width});
+        sc.SYS_CLOSE = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_close02.bmp\0", "img/_close01.bmp\0", {1+width*2,1,width,width});
+    }
     CSUIMAN::setAsMinButton(sc.SYS_MIN, id);
     CSUIMAN::setAsMaxButton(sc.SYS_MAX, id);
     CSUIMAN::setAsCloseButton(sc.SYS_CLOSE, id);
@@ -215,6 +228,63 @@ int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, char*iconPath, int
     CSUIMAN::setTitle(TITLE_SECTION, CSTEXT{.Text=title, .Font=fontName, .FontSize = fontSize, .Italic=0,
                                    .Bold=0, .Color={150,150,150},
                                    .Marging={35/dimCoef,0}, .Align = CS_TA_CENTER_LEFT, .Show=1});
+    
+    CSUIMAN::inert(TITLE_SECTION,190);
+    SetWindowTextW(SECTION[id], title);
+
+    CSUIMAN::autoFitToTitle(TITLE_SECTION, 10);
+
+    auto f = [](CSARGS Args)
+    {
+        if(UINT(Args) == WM_TIMER)
+        {
+            int id = (int)Args;
+            if(!updateTitleSectionBool[id] && IsWindowVisible(GetParent(HWND(Args))))
+            {
+                InvalidateRect(HWND(Args),0,1);
+                updateTitleSectionBool[id] = 1;
+                RECT r = TITLE[id].TextRect;
+                SetWindowPos(SECTION[id], 0, 0,0,r.right, 20*dimCoef, SWP_NOMOVE|SWP_NOZORDER);
+            }
+        }
+    };
+
+    CSUIMAN::addAction(TITLE_SECTION, f, 0);
+    
+    return TITLE_SECTION;
+}
+
+extern std::vector<CSAPP_ICON> appIcon;
+extern vector<HDC> hdcontext;
+extern vector<HDC> hdStackContext;
+extern vector<int> ICONID;
+
+int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, int fontSize, wchar_t*fontName, int iconId)
+{
+
+    if(size.cx == 0 || size.cy == 0)
+    {
+        HFONT hf = CreateFontW(CSUTILS::getAdjustedFontSizeX(fontSize),
+                              0,
+                              0, 0, 0, 0,0,0,DEFAULT_CHARSET,
+                              OUT_DEFAULT_PRECIS,CLIP_STROKE_PRECIS, CLEARTYPE_QUALITY, DEFAULT_PITCH|FF_DONTCARE, fontName);
+        LPSIZE lps = CSUTILS::textExtentW(SECTION[id], hf, title);
+        size = {lps->cx, lps->cy};
+        free(lps);
+        DeleteFont(hf);
+
+        if(iconId > -1) // remplace par autoFitToTitle()
+            size.cx += appIcon[iconId].rectSmall.left+appIcon[iconId].rectSmall.right;
+    }
+    
+    int TITLE_SECTION = CSUIMAN::createSection(id, {2,0,size.cx,size.cy},  RGB(5,5,5), {0,0,0,0});
+
+    CSUIMAN::setBorderColorAndThick(TITLE_SECTION, RGB(20,20,20), 1);
+    CSUIMAN::setTitle(TITLE_SECTION, CSTEXT{.Text=title, .Font=fontName, .FontSize = fontSize, .Italic=0,
+                                   .Bold=0, .Color={150,150,150},
+                                   .Marging={(iconId>-1?appIcon[iconId].rectSmall.left+appIcon[iconId].rectSmall.right:0)+5,0}, .Align = CS_TA_CENTER_LEFT, .Show=1});
+    ICONID[TITLE_SECTION] = iconId;
+    
     
     CSUIMAN::inert(TITLE_SECTION,190);
     SetWindowTextW(SECTION[id], title);

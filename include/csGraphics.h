@@ -15,12 +15,14 @@ using namespace std;
 namespace csGraphics
 {
 vector<CSGRAPHIC_CONTEXT> getImageGradient(CSIMAGE_GRADIENT mhg, CSRGBA bkgColor);
-CSGRAPHIC_CONTEXT getImageGraphicContext(char*path);
-CSGRAPHIC_CONTEXT getImageGraphicContextW(wchar_t*path);
-CSGRAPHIC_CONTEXT getImageGraphicContextResized(char*path, SIZE size);
-CSGRAPHIC_CONTEXT getImageGraphicContextResizedW(wchar_t*path, SIZE size);
-CSGRAPHIC_CONTEXT_EXT getImageGraphicContextExt(char*path, BITMAPINFO*bmi);
-CSGRAPHIC_CONTEXT_EXT getImageGraphicContextExtW(wchar_t*path, BITMAPINFO*bmi);
+CSGRAPHIC_CONTEXT createGraphicContextFromFile(char*path);
+CSGRAPHIC_CONTEXT createGraphicContextFromFileW(wchar_t*path);
+CSGRAPHIC_CONTEXT createGraphicContextResizedFromFile(char*path, SIZE size);
+CSGRAPHIC_CONTEXT createGraphicContextResizedFromFileW(wchar_t*path, SIZE size);
+CSGRAPHIC_CONTEXT_EXT createGraphicContextFromFileExt(char*path, BITMAPINFO*bmi);
+CSGRAPHIC_CONTEXT_EXT createGraphicContextFromFileExtW(wchar_t*path, BITMAPINFO*bmi);
+CSGRAPHIC_CONTEXT_EXT createGraphicContextResizedFromFileExt(char*path, SIZE size);
+CSGRAPHIC_CONTEXT_EXT createGraphicContextResizedFromFileExtW(wchar_t* path, SIZE size);
 CSGRAPHIC_CONTEXT_EXT createGraphicContextExt(SIZE sz, BITMAPINFO*bmi);
 CSGRAPHIC_CONTEXT createGraphicContext(SIZE sz);
 CSGRAPHIC_CONTEXT createCompatibleGraphicContext(HDC hdc, SIZE sz, CSRGBA bkgColor, CSRGBA brdColor);

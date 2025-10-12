@@ -1,6 +1,12 @@
 #ifndef CSTYPES_H
 #define CSTYPES_H
 
+#if defined(UNICODE) && !defined(_UNICODE)
+#define _UNICODE
+#elif defined(_UNICODE) && !defined(UNICODE)
+#define UNICODE
+#endif
+
 #include <windows.h>
 #include <windowsx.h>
 #include <iostream>
@@ -483,6 +489,8 @@ typedef struct
 typedef struct
 {
     HICON smallIcon, bigIcon;
+    RECT rectSmall;
+    bool centered;
 }CSAPP_ICON;
 
 template<class T> vector<T> newVector()
@@ -604,4 +612,5 @@ typedef struct
 
 
 typedef CSIMAGE_GRADIENT CSMOUSE_HOVER_EFFECT;
+typedef BOOL_RECT CSRESIZE_EDGE;
 #endif // CSTYPES_H

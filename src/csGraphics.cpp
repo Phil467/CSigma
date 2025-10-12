@@ -40,7 +40,7 @@ extern vector<vector<CSLOADED_IMAGE>> loadedImage;
 BYTE interpByte(char b1, char b2, char b3, char b4,float dx, float dy);
 
 
-CSGRAPHIC_CONTEXT csGraphics::getImageGraphicContext(char*path)
+CSGRAPHIC_CONTEXT csGraphics::createGraphicContextFromFile(char*path)
 {
     CSGRAPHIC_CONTEXT_EXT gce;
     gce.hbmp=(HBITMAP)LoadImageA(NULL,path,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
@@ -59,7 +59,7 @@ CSGRAPHIC_CONTEXT csGraphics::getImageGraphicContext(char*path)
     return gc;
 }
 
-CSGRAPHIC_CONTEXT csGraphics::getImageGraphicContextW(wchar_t*path)
+CSGRAPHIC_CONTEXT csGraphics::createGraphicContextFromFileW(wchar_t*path)
 {
     CSGRAPHIC_CONTEXT_EXT gce;
     gce.hbmp=(HBITMAP)LoadImageW(NULL,path,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
@@ -78,7 +78,7 @@ CSGRAPHIC_CONTEXT csGraphics::getImageGraphicContextW(wchar_t*path)
     return gc;
 }
 
-CSGRAPHIC_CONTEXT csGraphics::getImageGraphicContextResizedW(wchar_t*path, SIZE size)
+CSGRAPHIC_CONTEXT csGraphics::createGraphicContextResizedFromFileW(wchar_t*path, SIZE size)
 {
     CSGRAPHIC_CONTEXT_EXT gce;
     gce.hbmp=(HBITMAP)LoadImageW(NULL,path,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
@@ -103,6 +103,7 @@ CSGRAPHIC_CONTEXT csGraphics::getImageGraphicContextResizedW(wchar_t*path, SIZE 
     //cout<<size.cx<<" -- "<<size.cy<<"\n";
     DeleteDC(gce.dc);
     ReleaseDC(0,dc);
+    DeleteBitmap(bm);
 
     CSGRAPHIC_CONTEXT gc;
     gc.dc = rdc;
@@ -111,7 +112,7 @@ CSGRAPHIC_CONTEXT csGraphics::getImageGraphicContextResizedW(wchar_t*path, SIZE 
     return gc;
 }
 
-CSGRAPHIC_CONTEXT csGraphics::getImageGraphicContextResized(char*path, SIZE size)
+CSGRAPHIC_CONTEXT csGraphics::createGraphicContextResizedFromFile(char*path, SIZE size)
 {
     CSGRAPHIC_CONTEXT_EXT gce;
     gce.hbmp=(HBITMAP)LoadImageA(NULL,path,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
@@ -135,6 +136,7 @@ CSGRAPHIC_CONTEXT csGraphics::getImageGraphicContextResized(char*path, SIZE size
 
     DeleteDC(gce.dc);
     ReleaseDC(0,dc);
+    DeleteBitmap(bm);
 
     CSGRAPHIC_CONTEXT gc;
     gc.dc = rdc;
@@ -143,7 +145,89 @@ CSGRAPHIC_CONTEXT csGraphics::getImageGraphicContextResized(char*path, SIZE size
     return gc;
 }
 
-CSGRAPHIC_CONTEXT_EXT csGraphics::getImageGraphicContextExt(char*path, BITMAPINFO*bmi)
+CSGRAPHIC_CONTEXT_EXT csGraphics::createGraphicContextResizedFromFileExt(char*path, SIZE size)
+{
+    CSGRAPHIC_CONTEXT_EXT gce;
+    gce.hbmp=(HBITMAP)LoadImageA(NULL,path,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+    GetObjectA((HGDIOBJ)gce.hbmp, sizeof(gce.bm), (PVOID)&gce.bm);
+    //char*buf0 = (char*)gce.bm.bmBits;
+    HDC dc=GetDC(0);
+    gce.dc=CreateCompatibleDC(dc);
+    SelectBitmap(gce.dc,gce.hbmp);
+    DeleteBitmap(gce.hbmp);
+
+    if(size.cx == 0 && size.cy == 0) 
+    {
+        size.cx = gce.bm.bmWidth;
+        size.cy = gce.bm.bmHeight;
+    }
+    HDC rdc = CreateCompatibleDC(dc);
+    HBITMAP bm = CreateCompatibleBitmap(dc, size.cx, size.cy);
+    SelectBitmap(rdc, bm);
+    SetStretchBltMode(rdc, HALFTONE);
+    StretchBlt(rdc, 0,0, size.cx, size.cy, gce.dc, 0,0, gce.bm.bmWidth, gce.bm.bmHeight, SRCCOPY);
+
+    BITMAPINFO bmi = setBMI(size);
+    unsigned char* bits = csAlloc<unsigned char>(size.cx*size.cy*4+1);
+    GetDIBits(rdc, bm, 0, size.cy, bits, &bmi, DIB_RGB_COLORS);
+
+    DeleteDC(gce.dc);
+    ReleaseDC(0,dc);
+    DeleteBitmap(bm);
+
+    CSGRAPHIC_CONTEXT_EXT gc;
+    gc.dc = rdc;
+    gc.bm.bmBits = bits;
+    gc.bm.bmPlanes = bmi.bmiHeader.biPlanes;
+    gc.bm.bmBitsPixel = 32;
+    gc.bm.bmWidth = size.cx;
+    gc.bm.bmWidth = size.cy;
+
+    return gc;
+}
+
+CSGRAPHIC_CONTEXT_EXT csGraphics::createGraphicContextResizedFromFileExtW(wchar_t* path, SIZE size)
+{
+    CSGRAPHIC_CONTEXT_EXT gce;
+    gce.hbmp=(HBITMAP)LoadImageW(NULL,path,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
+    GetObjectW((HGDIOBJ)gce.hbmp, sizeof(gce.bm), (PVOID)&gce.bm);
+    //char*buf0 = (char*)gce.bm.bmBits;
+    HDC dc=GetDC(0);
+    gce.dc=CreateCompatibleDC(dc);
+    SelectBitmap(gce.dc,gce.hbmp);
+    DeleteBitmap(gce.hbmp);
+
+    if(size.cx == 0 && size.cy == 0) 
+    {
+        size.cx = gce.bm.bmWidth;
+        size.cy = gce.bm.bmHeight;
+    }
+    HDC rdc = CreateCompatibleDC(dc);
+    HBITMAP bm = CreateCompatibleBitmap(dc, size.cx, size.cy);
+    SelectBitmap(rdc, bm);
+    SetStretchBltMode(rdc, HALFTONE);
+    StretchBlt(rdc, 0,0, size.cx, size.cy, gce.dc, 0,0, gce.bm.bmWidth, gce.bm.bmHeight, SRCCOPY);
+
+    BITMAPINFO bmi = setBMI(size);
+    unsigned char* bits = csAlloc<unsigned char>(size.cx*size.cy*4+1);
+    GetDIBits(rdc, bm, 0, size.cy, bits, &bmi, DIB_RGB_COLORS);
+
+    DeleteDC(gce.dc);
+    ReleaseDC(0,dc);
+    DeleteBitmap(bm);
+
+    CSGRAPHIC_CONTEXT_EXT gc;
+    gc.dc = rdc;
+    gc.bm.bmBits = bits;
+    gc.bm.bmPlanes = bmi.bmiHeader.biPlanes;
+    gc.bm.bmBitsPixel = 32;
+    gc.bm.bmWidth = size.cx;
+    gc.bm.bmWidth = size.cy;
+
+    return gc;
+}
+
+CSGRAPHIC_CONTEXT_EXT csGraphics::createGraphicContextFromFileExt(char*path, BITMAPINFO*bmi)
 {
     CSGRAPHIC_CONTEXT_EXT gce;
     gce.hbmp=(HBITMAP)LoadImageA(NULL,path,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
@@ -160,7 +244,7 @@ CSGRAPHIC_CONTEXT_EXT csGraphics::getImageGraphicContextExt(char*path, BITMAPINF
     return gce;
 }
 
-CSGRAPHIC_CONTEXT_EXT csGraphics::getImageGraphicContextExtW(wchar_t*path, BITMAPINFO*bmi)
+CSGRAPHIC_CONTEXT_EXT csGraphics::createGraphicContextFromFileExtW(wchar_t*path, BITMAPINFO*bmi)
 {
     CSGRAPHIC_CONTEXT_EXT gce;
     gce.hbmp=(HBITMAP)LoadImageW(NULL,path,IMAGE_BITMAP,0,0,LR_LOADFROMFILE);
@@ -273,8 +357,8 @@ vector<CSGRAPHIC_CONTEXT> csGraphics::getImageGradient(CSIMAGE_GRADIENT mhg, CSR
     vector<CSGRAPHIC_CONTEXT> dcs;
     BITMAPINFO bmi = setBMI(sz);
     
-    CSGRAPHIC_CONTEXT_EXT bmp1 = getImageGraphicContextExt(path1, &bmi);
-    CSGRAPHIC_CONTEXT_EXT bmp2 = getImageGraphicContextExt(path2, &bmi);
+    CSGRAPHIC_CONTEXT_EXT bmp1 = createGraphicContextFromFileExt(path1, &bmi);
+    CSGRAPHIC_CONTEXT_EXT bmp2 = createGraphicContextFromFileExt(path2, &bmi);
     CSGRAPHIC_CONTEXT_EXT fbmp1 = createGraphicContextExt(sz, &bmi);
     CSGRAPHIC_CONTEXT_EXT fbmp2 = createGraphicContextExt(sz, &bmi);
 
@@ -472,7 +556,7 @@ CSGRAPHIC_CONTEXT csGraphics::viewImage(int id, wchar_t*path, POINT position, SI
 {
     if(hdcontextExt[id])
     {
-        CSGRAPHIC_CONTEXT gc = csGraphics::getImageGraphicContextResizedW(path, size);
+        CSGRAPHIC_CONTEXT gc = csGraphics::createGraphicContextResizedFromFileW(path, size);
         BitBlt(hdcontextExt[id],position.x,position.y,gc.sz.cx,gc.sz.cy, gc.dc,0,0, SRCCOPY);
         InvalidateRect(SECTION[id], 0, 1);
         return gc;
@@ -483,7 +567,7 @@ CSGRAPHIC_CONTEXT csGraphics::viewImage(int id, wchar_t*path, POINT position, SI
 
 int csGraphics::loadImage(int id, wchar_t*path, POINT position, SIZE size)
 {
-    CSGRAPHIC_CONTEXT gc = csGraphics::getImageGraphicContextResizedW(path, size);
+    CSGRAPHIC_CONTEXT gc = csGraphics::createGraphicContextResizedFromFileW(path, size);
         CSLOADED_IMAGE li = {0};
         li.outPos = position;
         li.size = gc.sz;

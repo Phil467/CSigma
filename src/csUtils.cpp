@@ -335,7 +335,7 @@ bool CSUIMAN::removeLastAction(int id)
 
 extern vector<CSAPP_ICON> appIcon;
 
-int CSUIMAN::setIcon(int id, wchar_t*pathSmallIcon, wchar_t*pathBigIcon)
+int CSUIMAN::setIcon(int id, wchar_t*pathSmallIcon, wchar_t*pathBigIcon, RECT rectSmall)
 {
     HICON hIcon = (HICON)LoadImageW(
                       NULL,
@@ -352,22 +352,38 @@ int CSUIMAN::setIcon(int id, wchar_t*pathSmallIcon, wchar_t*pathBigIcon)
                        LR_LOADFROMFILE | LR_DEFAULTSIZE | LR_SHARED
                    );
 
-    if (hIcon && hIcon2)
+    if (rectSmall.right == 0 || rectSmall.bottom == 0)
     {
-        SendMessage(SECTION[id], WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-        SendMessage(SECTION[id], WM_SETICON, ICON_BIG, (LPARAM)hIcon2);
-
-        appIcon.push_back({hIcon, hIcon2});
-
+        ICONINFO iconInfo;
+        GetIconInfo(hIcon, &iconInfo);
+        
+        BITMAP bm;
+        GetObject(iconInfo.hbmColor ? iconInfo.hbmColor : iconInfo.hbmMask, 
+                sizeof(BITMAP), &bm);
+        
+        rectSmall.right = bm.bmWidth;
+        rectSmall.bottom = bm.bmHeight;
+        // Libérer les ressources
+        
+        DeleteObject(iconInfo.hbmColor);
+        DeleteObject(iconInfo.hbmMask);
     }
+        
+
+    SendMessage(SECTION[id], WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+    SendMessage(SECTION[id], WM_SETICON, ICON_BIG, (LPARAM)hIcon2);
+
+    appIcon.push_back({hIcon, hIcon2, rectSmall, 1});
+
     
     return appIcon.size()-1;
 }
 
+
 void CSUIMAN::setIcon(int id, int idIcon)
 {
     SendMessage(SECTION[id], WM_SETICON, ICON_SMALL, (LPARAM)appIcon[idIcon].smallIcon);
-    SendMessage(SECTION[id], WM_SETICON, ICON_BIG, (LPARAM)appIcon[idIcon].bigIcon);
+    SendMessage(SECTION[id], WM_SETICON, ICON_BIG, (LPARAM)appIcon[idIcon].bigIcon);  
 }
 
 HWND CSUIMAN::sHandle(int id)
@@ -1185,13 +1201,15 @@ int  CSUTILS::getAdjustedFontSizeX(int xbaseFontSize)
     }*/
    //cout<<ceil(xbaseFontSize*GetSystemMetrics(SM_CXSCREEN)/1366.0)<< " "<< adaptedSize<<"\n";
     //return ceil(xbaseFontSize*GetSystemMetrics(SM_CXSCREEN)/1366.0);
-    return ceil(xbaseFontSize*xdimFact*dimCoef*0.7);
+    //return ceil(xbaseFontSize*xdimFact*dimCoef*0.7);
+    return ceil(xbaseFontSize*xdimFact*dimCoef);
     //return adaptedSize;
 }
 int  CSUTILS::getAdjustedFontSizeY(int ySize)
 {
     //return ceil(dimCoef*ySize*GetSystemMetrics(SM_CYSCREEN)/768.0);
-    return ceil(ySize*ydimFact*dimCoef*0.7);
+    //return ceil(ySize*ydimFact*dimCoef*0.7);
+    return ceil(ySize*ydimFact*dimCoef);
     //return ySize;
 }
 

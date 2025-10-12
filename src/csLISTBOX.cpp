@@ -353,37 +353,37 @@ void csLISTBOX::_drawText(HDC dc, wchar_t* text, POINT pos, CSRGBA color, csLIST
 
 csLISTBOX::IMAGE_PARAMS csLISTBOX::loadImages(csLISTBOX::IMAGE_PATH ip, POINT imgPos)
 {
-    CSGRAPHIC_CONTEXT gc1 = csGraphics::getImageGraphicContextW(ip.normal);
+    CSGRAPHIC_CONTEXT gc1 = csGraphics::createGraphicContextFromFileW(ip.normal);
 
     CSGRAPHIC_CONTEXT gc2;
     if(ip.mouseOver == 0)
         gc2 = gc1;
     else
-        gc2 = csGraphics::getImageGraphicContextW(ip.mouseOver);
+        gc2 = csGraphics::createGraphicContextFromFileW(ip.mouseOver);
 
     CSGRAPHIC_CONTEXT gc3;
     if(ip.inMouseOver == 0)
         gc3 = gc1;
     else
-        gc3 = csGraphics::getImageGraphicContextW(ip.inMouseOver);
+        gc3 = csGraphics::createGraphicContextFromFileW(ip.inMouseOver);
 
     CSGRAPHIC_CONTEXT gc4;
     if(ip.actived == 0)
         gc4 = gc1;
     else
-        gc4 = csGraphics::getImageGraphicContextW(ip.actived);
+        gc4 = csGraphics::createGraphicContextFromFileW(ip.actived);
 
     CSGRAPHIC_CONTEXT gc5;
     if(ip.inActived == 0)
         gc5 = gc1;
     else
-        gc5 = csGraphics::getImageGraphicContextW(ip.inActived);
+        gc5 = csGraphics::createGraphicContextFromFileW(ip.inActived);
 
     CSGRAPHIC_CONTEXT gc6;
     if(ip.disabled == 0)
         gc6 = gc1;
     else
-        gc6 = csGraphics::getImageGraphicContextW(ip.disabled);
+        gc6 = csGraphics::createGraphicContextFromFileW(ip.disabled);
 
     IMAGE_PARAMS ipar;
 
@@ -401,37 +401,37 @@ csLISTBOX::IMAGE_PARAMS csLISTBOX::loadImages(csLISTBOX::IMAGE_PATH ip, POINT im
 
 csLISTBOX::IMAGE_PARAMS csLISTBOX::loadImagesExt(csLISTBOX::IMAGE_PATH ip, POINT imgPos, SIZE imgSize)
 {
-    CSGRAPHIC_CONTEXT gc1 = csGraphics::getImageGraphicContextResizedW(ip.normal, imgSize);
+    CSGRAPHIC_CONTEXT gc1 = csGraphics::createGraphicContextResizedFromFileW(ip.normal, imgSize);
 
     CSGRAPHIC_CONTEXT gc2;
     if(ip.mouseOver == 0)
         gc2 = gc1;
     else
-        gc2 = csGraphics::getImageGraphicContextResizedW(ip.mouseOver, imgSize);
+        gc2 = csGraphics::createGraphicContextResizedFromFileW(ip.mouseOver, imgSize);
 
     CSGRAPHIC_CONTEXT gc3;
     if(ip.inMouseOver == 0)
         gc3 = gc1;
     else
-        gc3 = csGraphics::getImageGraphicContextResizedW(ip.inMouseOver, imgSize);
+        gc3 = csGraphics::createGraphicContextResizedFromFileW(ip.inMouseOver, imgSize);
 
     CSGRAPHIC_CONTEXT gc4;
     if(ip.actived == 0)
         gc4 = gc1;
     else
-        gc4 = csGraphics::getImageGraphicContextResizedW(ip.actived, imgSize);
+        gc4 = csGraphics::createGraphicContextResizedFromFileW(ip.actived, imgSize);
 
     CSGRAPHIC_CONTEXT gc5;
     if(ip.inActived == 0)
         gc5 = gc1;
     else
-        gc5 = csGraphics::getImageGraphicContextResizedW(ip.inActived, imgSize);
+        gc5 = csGraphics::createGraphicContextResizedFromFileW(ip.inActived, imgSize);
 
     CSGRAPHIC_CONTEXT gc6;
     if(ip.disabled == 0)
         gc6 = gc1;
     else
-        gc6 = csGraphics::getImageGraphicContextResizedW(ip.disabled, imgSize);
+        gc6 = csGraphics::createGraphicContextResizedFromFileW(ip.disabled, imgSize);
 
     IMAGE_PARAMS ipar;
 
