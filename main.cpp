@@ -1,22 +1,3 @@
-#if defined(UNICODE) && !defined(_UNICODE)
-#define _UNICODE
-#elif defined(_UNICODE) && !defined(UNICODE)
-#define UNICODE
-#endif
-
-#include <windows.h>
-#include <windowsx.h>
-#include <commdlg.h>
-#include <vector>
-#include <string>
-#include <sstream>
-#include <iostream>
-#include <fcntl.h>
-
-#include <fstream>
-#include <stdexcept>
-#include <codecvt>
-#include <locale>
 
 #include "csSection.h"
 #include "csUIControls.h"
@@ -33,16 +14,6 @@ using namespace CSUTILS;
 using namespace CSSECMAN;
 using namespace CSSTRUTILS;
 
-
-typedef struct ADATA
-{
-    CSARITHMETIC::csRNUMBER number, root, outRoot, error;
-    double execTime;
-    char* method;
-    char* param;
-};
-
-vector<ADATA> adata;
 
 extern int CAPTION_AREA_SIZE;
 
@@ -607,12 +578,6 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     hscroll3.setPositionRatio(0);
     vscroll3.setPositionRatio(0);
 
-    
-    //void cameraTop();
-    //cameraTop();
-
-    //void sym();
-    //sym();
 }
 
 CSIGMA_MAIN_END
@@ -1023,52 +988,4 @@ void stretchLogo(CSARGS Args)
             }
         }
     }*/
-}
-
-void cameraTop()
-{
-    HWND hwnd = FindWindow(0,L"Webcam");
-    SetWindowPos(hwnd, HWND_TOPMOST, 0,0,0,0, SWP_NOSIZE|SWP_NOMOVE);
-}
-
-void sym()
-{
-    /*int n = 13;
-    POINT pts[n] = {{395,350},{471,239},{298,227},{184,309},{249,406},{218,536},{298,648},{417,648},{476,484},{395,350},{249,406},{325,380},{365,648}};
-    POINT symLine1[2] = {{298,648},{417,648}};*/
-    
-    int n = 26;
-    POINT pts[n] = {{395,350},{471,239},{298,227},{184,309},{249,406},{218,536},{298,648},{417,648},{476,484},{395,350},{249,406},{325,380},{365,648},
-                    {395,946},{471,1057},{298,1069},{184,987},{249,890},{218,760},{298,648},{417,648},{476,812},{395,946},{249,890},{325,916},{365,648},
-                    
-                   };
-    POINT symLine1[2] = {{653,916},{471,239}};
-
-    /*int n = 26*2;
-    POINT pts[n] = {{395,350},{471,239},{298,227},{184,309},{249,406},{218,536},{298,648},{417,648},{476,484},{395,350},{249,406},{325,380},{365,648},
-                    {395,946},{471,1057},{298,1069},{184,987},{249,890},{218,760},{298,648},{417,648},{476,812},{395,946},{249,890},{325,916},{365,648},
-                    {593,297},{471,240},{615,142},{755,156},{747,273},{839,370},{826,507},{723,566},{590,454},{593,297},{747,273},{669,288},{768,540},
-                    {892,813},{882,947},{1037,871},{1095,743},{990,691},{952,563},{826,507},{723,566},{754,738},{892,813},{990,691},{937,752},{768,540},
-                   };
-    POINT symLine1[2] = {{653,916},{471,239}};*/
-
-    POINT pts2[n];
-
-    float a = (symLine1[1].y-symLine1[0].y)*1.0/(symLine1[1].x-symLine1[0].x);
-    float a2 = a*a, b = symLine1[0].y - a*symLine1[0].x;
-
-    cout<<"\n";
-    for(int i=0; i<n; i++)
-    {
-        cout<<"("<<pts[i].x<<","<<pts[i].y<<"),";
-    }
-    
-    cout<<"\n";
-
-    for(int i=0; i<n; i++)
-    {
-        pts2[i].x = ceil(((1-a2)*pts[i].x + 2*a*(pts[i].y-b))/(1+a2));
-        pts2[i].y = ceil(((a2-1)*pts[i].y + 2*(a*pts[i].x+b))/(1+a2));
-        cout<<"("<<pts2[i].x<<","<<pts2[i].y<<"),";
-    }
 }
