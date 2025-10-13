@@ -323,7 +323,7 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
         int edge = *hEdge;
         int thick = geometry.bottom*dimCoef;
         int t2 = thick;
-        *id = CSUIMAN::createSection(_idp, {edge/dimCoef, (cy - edge - thick)/dimCoef, (cx - 2*edge - thick)/dimCoef, thick/dimCoef},  RGB(200,200,200), {0,0,0,0});
+        *id = CSSECMAN::createSection(_idp, {edge/dimCoef, (cy - edge - thick)/dimCoef, (cx - 2*edge - thick)/dimCoef, thick/dimCoef},  RGB(200,200,200), {0,0,0,0});
             
         cursor[*id] = LoadCursor(0,IDC_SIZEWE);
         
@@ -359,7 +359,7 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
         int edge = *vEdge;
         int thick = geometry.right*dimCoef;
         int t2 = thick;
-        *id = CSUIMAN::createSection(_idp, {(cx - edge - thick)/dimCoef, edge/dimCoef, thick/dimCoef, (cy - 2*edge - thick)/dimCoef},  RGB(200,200,200), {0,0,0,0});
+        *id = CSSECMAN::createSection(_idp, {(cx - edge - thick)/dimCoef, edge/dimCoef, thick/dimCoef, (cy - 2*edge - thick)/dimCoef},  RGB(200,200,200), {0,0,0,0});
 
         hdStackContext[*id] = CreateCompatibleDC(hdcontext[_idp]);
         hStackBmp[*id] = CreateCompatibleBitmap(hdcontext[_idp], thick, GetSystemMetrics(SM_CYSCREEN));
@@ -401,8 +401,8 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
                     scType, idMask, block, oldClientPos, oldClientSize, CX, CY, cloths, 
                     threadBool, mhId0, hEdge, vEdge);
     
-    CSUIMAN::addAction(*id, groupMsg, Args);
-    //CSUIMAN::addAction(idp, parentResize, 9, idc, id, &hEdge, &vEdge, &CX, &CY, &bSize, orient, &idp);
+    CSSECMAN::addAction(*id, groupMsg, Args);
+    //CSSECMAN::addAction(idp, parentResize, 9, idc, id, &hEdge, &vEdge, &CX, &CY, &bSize, orient, &idp);
 }
 
 int CSSCROLLBAR::getId()
@@ -499,8 +499,8 @@ void CSSCROLLBAR::setClient(int _idc, int _idMask)
             hdcontextExtSize[*idc] = hdcSize[*idc];
         }
         
-        //CSUIMAN::addAction(*idc, clientGesture, 0);
-        CSUIMAN::addAction(*idc, mouseWheel, 0);
+        //CSSECMAN::addAction(*idc, clientGesture, 0);
+        CSSECMAN::addAction(*idc, mouseWheel, 0);
     }
 }
 

@@ -35,25 +35,25 @@ void CSMENU::init(int _idp, RECT r, bool _autoResize)
     idSection = 0;
     idSection = new vector<int>;
 
-    textPar = CSTEXT{.Font=L"Segoe UI", .FontSize=16, .Color={150,150,150},
+    textPar = CSTEXT{.Font=L"Segoe UI", .FontSize=12, .Color={150,150,150},
                                 .Marging={32/dimCoef,-5}, .Align = CS_TA_CENTER_LEFT, .Show=1};
     
 
-    id = CSUIMAN::createSection(idp, r,  RGB(15,15,15), {0,0,0,0});
+    id = CSSECMAN::createSection(idp, r,  RGB(15,15,15), {0,0,0,0});
     
     CSBIND_GEOM_PARAMS bd = {id, {-0.5,0,0.5,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
-    CSUIMAN::bindGeometry(_idp, bd);
+    CSSECMAN::bindGeometry(_idp, bd);
     SetTimer(SECTION[id], 0, 100, 0);
 
     if(autoResize)
-        CSUIMAN::addAction(id, resizeMenu, 3, csAlloc(1,idp), bLastMenuItemRepos, idSection);
+        CSSECMAN::addAction(id, resizeMenu, 3, csAlloc(1,idp), bLastMenuItemRepos, idSection);
 
     
     int i;
-    idPopup.push_back(i=CSUIMAN::createSection(0, {0,0,200,300},  RGB(100,100,100), {0}, 0, 0, 0));
+    idPopup.push_back(i=CSSECMAN::createSection(0, {0,0,200,300},  RGB(100,100,100), {0}, 0, 0, 0));
     SetTimer(SECTION[i], 0, 20, 0);
 
-    //CSUIMAN::newMouseHook(i);
+    //CSSECMAN::newMouseHook(i);
     csGraphics::setGraphicAreaColor(i, {30,30,30}, {0});
     csGraphics::setGraphicAreaSize(i, {200*dimCoef,300*dimCoef});
     csGraphics::updateGraphicArea(i, 1);
@@ -86,7 +86,7 @@ void CSMENU::setTextParams(CSTEXT _textPar)
 
 int CSMENU::newGroup(const wchar_t* title, const wchar_t* iconPath1, const wchar_t* iconPath2)
 {
-    int BUTTON = CSUIMAN::createSection(id, {0,0,0,RECTCL[id].bottom-1},  RGB(30,30,30), {0,0,0,0});
+    int BUTTON = CSSECMAN::createSection(id, {0,0,0,RECTCL[id].bottom-1},  RGB(30,30,30), {0,0,0,0});
     //SetTimer(SECTION[BUTTON], 0, 90, 0);
     CSUIFX::setImageGradient(BUTTON, (char*)wcharPtrToCharPtr(iconPath1).c_str(), (char*)wcharPtrToCharPtr(iconPath2).c_str(), {4,4}, {20,20}, 0.1, 2, 2);
     CSUIFX::setBackgroundColorGradient(BUTTON, {5,5,5}, {20,20,20}, 2, 2);
@@ -95,21 +95,21 @@ int CSMENU::newGroup(const wchar_t* title, const wchar_t* iconPath1, const wchar
     CSUIFX::setTitleColorClickEffect(BUTTON, {220,220,120});
     CSUIFX::setBorderColorGradient(BUTTON, {10,10,10}, {25,25,25}, 2, 2);
     CSUIFX::setBorderColorClickEffect(BUTTON, {20,20,20});
-    CSUIMAN::setBorderThick(BUTTON, 2);
-    CSUIMAN::setTitle(BUTTON, CSTEXT{.Text=(wchar_t*)title, .Font=textPar.Font, .FontSize=textPar.FontSize, .Color=textPar.Color,
+    CSSECMAN::setBorderThick(BUTTON, 2);
+    CSSECMAN::setTitle(BUTTON, CSTEXT{.Text=(wchar_t*)title, .Font=textPar.Font, .FontSize=textPar.FontSize, .Color=textPar.Color,
                             .Marging=textPar.Marging, .Align = textPar.Align, .Show=1});
 
-    CSUIMAN::autoFitToTitle(BUTTON, 10);
+    CSSECMAN::autoFitToTitle(BUTTON, 10);
 
     static int ID_ACTION = 0;
 
     if(idSection->size() >= 1)
     {
-        //CSUIMAN::removeLastAction((*idSection)[idSection.size()-1]);
-        CSUIMAN::removeAction((*idSection)[idSection->size()-1], ID_ACTION);
+        //CSSECMAN::removeLastAction((*idSection)[idSection.size()-1]);
+        CSSECMAN::removeAction((*idSection)[idSection->size()-1], ID_ACTION);
     }
 
-    CSUIMAN::joinPopup(BUTTON, idPopup[0], {0,0,160,255}, (POS_BOOL){.bLBottom=1}, 1, 1,0, idSection);
+    CSSECMAN::joinPopup(BUTTON, idPopup[0], {0,0,160,255}, (POS_BOOL){.bLBottom=1}, 1, 1,0, idSection);
     idSection->push_back(BUTTON);
     int id = idSection->size()-1;
 
@@ -118,8 +118,8 @@ int CSMENU::newGroup(const wchar_t* title, const wchar_t* iconPath1, const wchar
     lbm[lbmId]->show();
     lastlbm = lbm[lbmId];
 
-    ID_ACTION = CSUIMAN::addAction(BUTTON, lastMenuItemRepos, 1, bLastMenuItemRepos);
-    CSUIMAN::addAction(BUTTON, showHideLbm, 1, lbm[lbmId]);
+    ID_ACTION = CSSECMAN::addAction(BUTTON, lastMenuItemRepos, 1, bLastMenuItemRepos);
+    CSSECMAN::addAction(BUTTON, showHideLbm, 1, lbm[lbmId]);
 
     
     
@@ -157,11 +157,11 @@ int CSMENU::newlbm(int* idp, int* idSec, int nbItem, wchar_t*defltTitle)
 
 void initLbm(CSLISTBOXMIN*& lbm, int nbItem, wchar_t*defltTitle)
 {
-    lbm->setDefaultFont(L"calibri",{16,0});
+    lbm->setDefaultFont(L"calibri",{12,0});
     lbm->setItemAlign(CS_ALIGN_VERTICAL);
     lbm->setMarging({8,8});
     lbm->setOffset({0,1});
-    lbm->setDefaultSize({150*dimCoef, 30*dimCoef});
+    lbm->setDefaultSize({150*dimCoef, 25*dimCoef});
     lbm->setDefaultTitleColors(RGB(0,0,0), RGB(0,0,0), RGB(0,0,0), RGB(100,100,100));
     lbm->setDefaultBackgroundColors(RGB(120,120,120), RGB(140,140,140), RGB(120,120,120), RGB(100,100,100));
     lbm->setIconSize(0,{30,30});
@@ -237,7 +237,7 @@ bool CSMENU::newItem(vector<int> _hierarchy, wchar_t* title, wchar_t*iconPath1, 
     for(int k=vlast.size(); k<n; k++)
     {
         int j = idPopup.size();
-        idPopup.push_back(CSUIMAN::createSection(0, {0,0,200,300},  RGB(15,15,15), {0,0,0,0}, 0, 0, 0));
+        idPopup.push_back(CSSECMAN::createSection(0, {0,0,200,300},  RGB(15,15,15), {0,0,0,0}, 0, 0, 0));
         SetTimer(SECTION[j], 0, 20, 0);
         /*lbm.push_back(csNewMinimalListBoxPtr(&idPopup[j], 100, 1000));
         lbmItemRectLock.push_back(vector<RECT*>());
@@ -373,7 +373,7 @@ void hideMenuContainer(CSPARAARGS pArgs)
 {
     int id = (int)pArgs;
     HWND hwnd = (HWND)pArgs;
-    if((UINT)pArgs == WM_TIMER && CSUIMAN::getMouseHook(id,0) && IsWindowVisible(hwnd))
+    if((UINT)pArgs == WM_TIMER && CSSECMAN::getMouseHook(id,0) && IsWindowVisible(hwnd))
     {
         RECT* rlock = (RECT*)pArgs[0];
         int n = *(int*)pArgs[1];
@@ -388,7 +388,7 @@ void hideMenuContainer(CSPARAARGS pArgs)
         {
             if(PtInRect(&rlock[i], p))
             {
-                CSUIMAN::printRect(rlock[i], "r = ");
+                CSSECMAN::printRect(rlock[i], "r = ");
                 b = 1;
                 break;
             }
@@ -399,6 +399,6 @@ void hideMenuContainer(CSPARAARGS pArgs)
             ShowWindow(hwnd,0);
         }
         
-        CSUIMAN::resetMouseHook(id,0);
+        CSSECMAN::resetMouseHook(id,0);
     }
 }

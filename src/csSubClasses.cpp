@@ -221,7 +221,7 @@ int csCreateRichEdit(int idpar, RECT marging, const wchar_t* defaultText, int st
     HIDERICHEDITGROUPMSG.push_back(0);
 
     ShowWindow(hRichEdit,0);
-    CSUIMAN::addAction(idpar, _showRichEditAction, 1, csAlloc<int>(1, richEdits.size()-1));
+    CSSECMAN::addAction(idpar, _showRichEditAction, 1, csAlloc<int>(1, richEdits.size()-1));
 
     return richEdits.size()-1;
 }
@@ -463,8 +463,18 @@ void _showRichEditAction(CSARGS Args)
 
 void setRichEditColors(int idEdit, COLORREF textColor, COLORREF bkgColor)
 {
+    /*cout<<"\n"<<recol.size()<<"  idedit\n";*/
     recol[idEdit] = {bkgColor, textColor};
     recol[idEdit].bkgBrush = CreateSolidBrush(bkgColor);
+
+    SendMessageW(richEdits[idEdit], EM_SETBKGNDCOLOR, 0, bkgColor);
+
+    CHARFORMAT cf;
+    ZeroMemory(&cf, sizeof(cf));
+    cf.cbSize = sizeof(cf);
+    cf.dwMask = CFM_COLOR;
+    cf.crTextColor = textColor; // gris clair
+    SendMessageW(richEdits[idEdit], EM_SETCHARFORMAT, SCF_ALL, (LPARAM)&cf);
 }
 
 HWND richEditHandle(int id)

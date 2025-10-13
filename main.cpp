@@ -30,7 +30,7 @@
 
 using namespace std;
 using namespace CSUTILS;
-using namespace CSUIMAN;
+using namespace CSSECMAN;
 using namespace CSSTRUTILS;
 
 
@@ -65,7 +65,7 @@ int smy = GetSystemMetrics(SM_CYSCREEN);
 
 
     
-CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
+CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
 
 {
 
@@ -75,11 +75,11 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     // /***************************** Root ********************************** */
 
     ROOT = createSection(-1, {100,25,600,500},  RGB(30,30,30), {1,1,1,1,1,1,1,1});
-    int ICON_ROOT  = setIcon(ROOT, L"icon.ico", L"icon.ico");
-    CSUIMAN::enableDarkEdge(ROOT);
-    CSUIMAN::setMinMaxInfo(ROOT, MINMAXINFO{.ptMinTrackSize={400,250}});
+    int ICON_ROOT  = setIcon(ROOT, L"icon.ico", L"icon.ico", {2,2,21,21});
+    CSSECMAN::enableDarkEdge(ROOT);
+    CSSECMAN::setMinMaxInfo(ROOT, MINMAXINFO{.ptMinTrackSize={400,250}});
 
-    CSUICONTROLS::addTitle(ROOT, L"TEST BIBLIOTHEQUE CSIGMA",{0}, "img/icon.bmp\0", 22, L"Arial Black");
+    CSUICONTROLS::addTitle(ROOT, L"TEST BIBLIOTHEQUE CSIGMA",{0}, 16, L"Arial Black", ICON_ROOT);
     CSSYSCOMMAND_SECTION SYS_CMD = CSUICONTROLS::addSysCommand(ROOT, {600});
 
     /******************************** ToolTips **************************************** */
@@ -101,7 +101,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     bd = {MIDDLE_LEFT_SECTION, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE, 0, BIND_DEST_BOTTOM_EDGE}};
     bindGeometry(ROOT, 1, bd); // C version
 
-    CSUIMAN::setMinMaxInfo(MIDDLE_LEFT_SECTION, MINMAXINFO{.ptMinTrackSize={50}, .ptMaxTrackSize={172}});
+    CSSECMAN::setMinMaxInfo(MIDDLE_LEFT_SECTION, MINMAXINFO{.ptMinTrackSize={50}, .ptMaxTrackSize={172}});
 
     /*************************************** MIDDLE_TOP_SECTION ************************************ */
 
@@ -110,7 +110,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     bindGeometry(MIDDLE_TOP_SECTION, bd); // cpp version
     bd = {MIDDLE_TOP_SECTION, {-1,0,1,0}, {BIND_DEST_RIGHT_EDGE,0,BIND_DEST_RIGHT_EDGE,0}};
     bindGeometry(ROOT, bd); // cpp version
-    CSUIMAN::setMinMaxInfo(MIDDLE_TOP_SECTION, MINMAXINFO{.ptMinTrackSize={0,17}, .ptMaxTrackSize={0,100}});
+    CSSECMAN::setMinMaxInfo(MIDDLE_TOP_SECTION, MINMAXINFO{.ptMinTrackSize={0,17}, .ptMaxTrackSize={0,100}});
 
     /***********************************MIDDLE_MIDDLE_SECTION *************************************** */
 
@@ -143,8 +143,8 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
          };
     bindGeometry(ROOT, bd);
 
-    CSUIMAN::setMinMaxInfo(RIGHT_SECTION, MINMAXINFO{.ptMinTrackSize={50}, .ptMaxTrackSize={162}});
-    CSUIMAN::updateAfterReceivingResizeMessage(RIGHT_SECTION);
+    CSSECMAN::setMinMaxInfo(RIGHT_SECTION, MINMAXINFO{.ptMinTrackSize={50}, .ptMaxTrackSize={162}});
+    CSSECMAN::updateAfterReceivingResizeMessage(RIGHT_SECTION);
 
     /**************************************************************************************************** */
 
@@ -153,7 +153,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     bindGeometry(MIDDLE_TOP_SECTION, bd);
     bd = {NR_SECTION, {0,0,0.5,0}, 0,0,BIND_DEST_RIGHT_EDGE,0};
     bindGeometry(ROOT, bd);
-    CSUIMAN::updateAfterReceivingResizeMessage(NR_SECTION);
+    CSSECMAN::updateAfterReceivingResizeMessage(NR_SECTION);
 
     CS_NUMERIC_INCREMENTER_PARAMS nrIds01 = CSUICONTROLS::numericIncrementerExt(NR_SECTION, {2,2,70,15}, L"10", L"1", INPUT_FORMAT_INTERGER);
     CS_NUMERIC_INCREMENTER_PARAMS nrIds02 = CSUICONTROLS::numericIncrementerExt(NR_SECTION, {2+73,2,70,15}, L"12", L"1", INPUT_FORMAT_INTERGER);
@@ -172,7 +172,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     bindGeometry(BIS_SECTION, bd);
     bd = {BIS_SECTION, {0,0,0.5,0}, 0,0,BIND_DEST_LEFT_EDGE|BIND_DEST_RIGHT_EDGE_ONE,0};
     bindGeometry(ROOT, bd);
-    CSUIMAN::updateAfterReceivingResizeMessage(BIS_SECTION);
+    CSSECMAN::updateAfterReceivingResizeMessage(BIS_SECTION);
     CS_NUMERIC_INCREMENTER_PARAMS bisIds01 = CSUICONTROLS::numericIncrementerExt(BIS_SECTION, {2,2,70,15}, L"10", L"1", INPUT_FORMAT_INTERGER);
     CS_NUMERIC_INCREMENTER_PARAMS bisIds02 = CSUICONTROLS::numericIncrementerExt(BIS_SECTION, {2+73,2,70,15}, L"12", L"1", INPUT_FORMAT_INTERGER);
     CS_NUMERIC_INCREMENTER_PARAMS bisIds03 = CSUICONTROLS::numericIncrementerExt(BIS_SECTION, {2+73*2,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
@@ -190,7 +190,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     bindGeometry(MIDDLE_TOP_SECTION, bd);
     bd = {CS_SECTION, {-1,0,1,0}, BIND_DEST_RIGHT_EDGE,0,BIND_DEST_LEFT_EDGE,0};
     bindGeometry(ROOT, bd);
-    CSUIMAN::updateAfterReceivingResizeMessage(CS_SECTION);
+    CSSECMAN::updateAfterReceivingResizeMessage(CS_SECTION);
     CS_NUMERIC_INCREMENTER_PARAMS csIds01 = CSUICONTROLS::numericIncrementerExt(CS_SECTION, {2,2,70,15}, L"10", L"1", INPUT_FORMAT_INTERGER);
     CS_NUMERIC_INCREMENTER_PARAMS csIds02 = CSUICONTROLS::numericIncrementerExt(CS_SECTION, {2+73,2,70,15}, L"12", L"1", INPUT_FORMAT_INTERGER);
     CS_NUMERIC_INCREMENTER_PARAMS csIds03 = CSUICONTROLS::numericIncrementerExt(CS_SECTION, {2+73*2,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
@@ -213,7 +213,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     bindGeometry(ROOT, bd);
     CSUIFX::setBorderColorGradient(STATIC_SEARCH, {100,100,100}, {40,40,40}, 2, 2);
     setBorderThick(STATIC_SEARCH, 2);
-    setTitle(STATIC_SEARCH, CSTEXT{.Text=L"Rechercher...\0", .Font=L"Arial", .FontSize=16, .Italic=1, .Color={100,100,100},
+    setTitle(STATIC_SEARCH, CSTEXT{.Text=L"Rechercher...\0", .Font=L"Arial", .FontSize=14, .Italic=1, .Color={100,100,100},
                                    .Marging={-15,0}, .Align = CS_TA_CENTER, .Show=1});
 
     BUTTON_SEARCH = CSUICONTROLS::iconButton01(STATIC_SEARCH, "img/search02.bmp\0", "img/search01.bmp\0", {200-14-1,1,14,14});
@@ -226,7 +226,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
                                                             {-1,0,1,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0});
     fontSizeInc.setMinBound("8");
     fontSizeInc.setMaxBound("30");
-    CSUIMAN::setBorderColorAndThick(fontSizeInc.idSection, RGB(60,60,60), 1);
+    CSSECMAN::setBorderColorAndThick(fontSizeInc.idSection, RGB(60,60,60), 1);
 
     void setFontSize(CSARGS Args);
     csSetUpdatingFunction(fontSizeInc.idText, setFontSize, 2, &MIDDLE_MIDDLE_SECTION, &fontSizeInc.idSection);
@@ -235,14 +235,14 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     tips0.marg = {10,10,10,10};
     tips0.updateGASize = 1;
     tips0.view = 1;
-    tips0.paragraph.push_back(CSTEXT{.Text=L"Taille de la police\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tips0.paragraph.push_back(CSTEXT{.Text=L"Taille de la police\0", .Font=L"calibri", .FontSize = 14, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tips0.pSpace.push_back(5);
 
-    tips0.paragraph.push_back(CSTEXT{.Text=L"Modifie la taille de la police.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
+    tips0.paragraph.push_back(CSTEXT{.Text=L"Modifie la taille de la police.\0", .Font=L"calibri", .FontSize = 12, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tips0.pSpace.push_back(5);
-    CSUIMAN::addTips(fontSizeInc.idSection, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bRBottom=1}, 3, 0, tips0);
+    CSSECMAN::addTips(fontSizeInc.idSection, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bRBottom=1}, 3, 0, tips0);
 
 
     /********************************************************************************** */
@@ -260,9 +260,9 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
 
 
     ABOUT_UI = createSection(0, {100,25,600,500},  RGB(40,40,40), {1,1,1,1,1,1,1,1}, 0, 1, 0);
-    CSUIMAN::enableDarkEdge(ABOUT_UI);
-    CSUIMAN::setIcon(ABOUT_UI, ICON_ROOT);
-    CSUICONTROLS::addTitle(ABOUT_UI, L"About",{60,CAPTION_AREA_SIZE/dimCoef}, "img/About01.bmp", 20, L"Arial black");
+    CSSECMAN::enableDarkEdge(ABOUT_UI);
+    CSSECMAN::setIcon(ABOUT_UI, ICON_ROOT);
+    CSUICONTROLS::addTitle(ABOUT_UI, L"About",{60,CAPTION_AREA_SIZE/dimCoef}, 18, L"Arial black", ICON_ROOT);
 
     ABOUT_UI_CLIENT = createSection(ABOUT_UI, {10/dimCoef,CAPTION_AREA_SIZE/dimCoef,590-10/dimCoef,500-CAPTION_AREA_SIZE/dimCoef-10-20},  RGB(0,0,0), {0}, 1);
     bd = {ABOUT_UI_CLIENT, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE, BIND_DEST_BOTTOM_EDGE,
@@ -274,7 +274,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
                                         BIND_DEST_RIGHT_EDGE, BIND_DEST_TOP_EDGE}};
     bindGeometry(ABOUT_UI, bd);
 
-    CSUIMAN::setTitle(ABOUT_UI_BOTTOM, CSTEXT{.Text=L"Logo CSigma", .Font=L"calibri", .FontSize = 16, .Italic=0,
+    CSSECMAN::setTitle(ABOUT_UI_BOTTOM, CSTEXT{.Text=L"Logo CSigma", .Font=L"calibri", .FontSize = 12, .Italic=0,
                                    .Bold=0, .Color={180,180,180},
                                    .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1});
 
@@ -306,7 +306,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     csGraphics::setVzoom(ABOUT_UI_CLIENT, 0.1);
     hscrollAbout.setPositionRatio(0.5);
     void showAboutUi(CSARGS Args);
-    CSUIMAN::addAction(MENU_ABOUT, showAboutUi, 1, &ABOUT_UI);
+    CSSECMAN::addAction(MENU_ABOUT, showAboutUi, 1, &ABOUT_UI);
 
     /*CSLOCKED_MODE lm;
     lm.Lockable = 1;
@@ -316,10 +316,10 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     lm.LockingTitleColor = {0};
     lm.LockingBorderColor = {130,130,130};
 
-    CSUIMAN::setLockable(MENU_NS, lm);
+    CSSECMAN::setLockable(MENU_NS, lm);
     lm.Locked = 0;
-    CSUIMAN::setLockable(MENU_BIS, lm);
-    CSUIMAN::setLockable(MENU_CS, lm);*/
+    CSSECMAN::setLockable(MENU_BIS, lm);
+    CSSECMAN::setLockable(MENU_CS, lm);*/
 
 
     /********************************************************************************** */
@@ -332,14 +332,14 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     tips.marg = {10,10,10,10};
     tips.updateGASize = 1;
     tips.view = 1;
-    tips.paragraph.push_back(CSTEXT{.Text=L"Précision des opérations\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tips.paragraph.push_back(CSTEXT{.Text=L"Précision des opérations\0", .Font=L"calibri", .FontSize = 14, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tips.pSpace.push_back(5);
     wchar_t* txt = L"Représente la précision des opérations. Plus elle est grande, plus les calculs sont précis, et par conséquent lents.\0";
-    tips.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
+    tips.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 12, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tips.pSpace.push_back(5);
-    CSUIMAN::addTips(internPrec.idSection, {0,0,250/dimCoef, 200/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips);
+    CSSECMAN::addTips(internPrec.idSection, {0,0,250/dimCoef, 200/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips);
 
     CS_NUMERIC_INCREMENTER_PARAMS externPrec = CSUICONTROLS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*1,65,h}, L"1", L"1", INPUT_FORMAT_INTERGER);
     externPrec.setMinBound("1");
@@ -347,14 +347,14 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     tips1.marg = {10,10,10,10};
     tips1.updateGASize = 1;
     tips1.view = 1;
-    tips1.paragraph.push_back(CSTEXT{.Text=L"Précision des nombres\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tips1.paragraph.push_back(CSTEXT{.Text=L"Précision des nombres\0", .Font=L"calibri", .FontSize = 14, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tips1.pSpace.push_back(5);
 
-    tips1.paragraph.push_back(CSTEXT{.Text=L"Représente la précision d'affichqge des numbres.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
+    tips1.paragraph.push_back(CSTEXT{.Text=L"Représente la précision d'affichqge des numbres.\0", .Font=L"calibri", .FontSize = 12, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tips1.pSpace.push_back(5);
-    CSUIMAN::addTips(externPrec.idSection, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips1);
+    CSSECMAN::addTips(externPrec.idSection, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips1);
 
 
     CS_NUMERIC_INCREMENTER_PARAMS Nnb = CSUICONTROLS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*2,65,h}, L"500", L"1", INPUT_FORMAT_INTERGER);
@@ -363,14 +363,14 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     tips2.marg = {10,10,10,10};
     tips2.updateGASize = 1;
     tips2.view = 1;
-    tips2.paragraph.push_back(CSTEXT{.Text=L"Nombre de chiffres\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tips2.paragraph.push_back(CSTEXT{.Text=L"Nombre de chiffres\0", .Font=L"calibri", .FontSize = 14, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tips2.pSpace.push_back(5);
     txt = L"Représente le numbre de chiffres du nombre aléatoire à générer.\0";
-    tips2.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
+    tips2.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 12, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tips2.pSpace.push_back(5);
-    CSUIMAN::addTips(Nnb.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips2);
+    CSSECMAN::addTips(Nnb.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips2);
 
     /********************************************************************************** */
     //BTN_NEW_OUTPUT = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"New Output\0", {5,5+total*1,65,h});
@@ -381,14 +381,14 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     tips3.marg = {10,10,10,10};
     tips3.updateGASize = 1;
     tips3.view = 1;
-    tips3.paragraph.push_back(CSTEXT{.Text=L"Borne du chiffre\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tips3.paragraph.push_back(CSTEXT{.Text=L"Borne du chiffre\0", .Font=L"calibri", .FontSize = 14, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tips3.pSpace.push_back(5);
     txt = L"Represent l'une ou l'autre des deux bornes des chiffres constituant le nombre aléatoire généré.\0";
-    tips3.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
+    tips3.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 12, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tips3.pSpace.push_back(5);
-    CSUIMAN::addTips(minDigit.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
+    CSSECMAN::addTips(minDigit.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
 
     /********************************************************************************** */
     //BTN_REMOVE_FILE = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Remove File\0", {5,5+total*2,65,h});
@@ -397,25 +397,25 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     maxDigit.setMinBound("0");
     maxDigit.setMaxBound("9");
 
-    CSUIMAN::addTips(maxDigit.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
+    CSSECMAN::addTips(maxDigit.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
     /********************************************************************************** */
 
     void getRandomData(CSARGS Args);
     BNT_RANDOM_NUMBER = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Nombre aléatoire\0", {5,5+total*5,65,h});
-    CSUIMAN::addAction(BNT_RANDOM_NUMBER, getRandomData, 4, &Nnb.idSection, &minDigit.idSection, &maxDigit.idSection, &MIDDLE_MIDDLE_SECTION);
+    CSSECMAN::addAction(BNT_RANDOM_NUMBER, getRandomData, 4, &Nnb.idSection, &minDigit.idSection, &maxDigit.idSection, &MIDDLE_MIDDLE_SECTION);
 
     CSDYNAMIC_SIMPLE_TEXT tipsMSG;
     tipsMSG.marg = {10,10,10,10};
     tipsMSG.updateGASize = 1;
     tipsMSG.view = 1;
-    tipsMSG.paragraph.push_back(CSTEXT{.Text=L"Nombre aléatoire\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMSG.paragraph.push_back(CSTEXT{.Text=L"Nombre aléatoire\0", .Font=L"calibri", .FontSize = 14, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMSG.pSpace.push_back(5);
     txt = L"Génère un entier aléatoire.\0";
-    tipsMSG.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 16, .Italic=1,
+    tipsMSG.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 12, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMSG.pSpace.push_back(5);
-    CSUIMAN::addTips(BNT_RANDOM_NUMBER, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG);
+    CSSECMAN::addTips(BNT_RANDOM_NUMBER, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG);
 
     /********************************************************************************** */
 
@@ -424,13 +424,13 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     tipsMSG1.marg = {10,10,10,10};
     tipsMSG1.updateGASize = 1;
     tipsMSG1.view = 1;
-    tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Ajouter\0", .Font=L"calibri", .FontSize = 18, .Italic=0,
+    tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Ajouter\0", .Font=L"calibri", .FontSize = 14, .Italic=0,
                                    .Bold=FW_BOLD, .Color={150,150,100}});
     tipsMSG1.pSpace.push_back(5);
-    tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Ajouter une donnée à la liste.\0", .Font=L"calibri", .FontSize = 16, .Italic=1,
+    tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Ajouter une donnée à la liste.\0", .Font=L"calibri", .FontSize = 12, .Italic=1,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     tipsMSG1.pSpace.push_back(5);
-    CSUIMAN::addTips(BTN_ADD_TO_DATA_LIST, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG1);
+    CSSECMAN::addTips(BTN_ADD_TO_DATA_LIST, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG1);
     /********************************************************************************** */
     //BTN_REMOVE_SAVE_1 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Save 1\0", {5,5+total*6,65,h});
     CS_NUMERIC_INCREMENTER_PARAMS activeNum = CSUICONTROLS::numericIncrementerExt2(MIDDLE_LEFT_SECTION, {5,5+total*7,65,h}, L"0", L"1", INPUT_FORMAT_INTERGER);
@@ -476,7 +476,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     CSDYNAMIC_SIMPLE_TEXT dst;
     dst.marg = {10,10};
     dst.updateGASize = 1;
-    dst.paragraph.push_back(CSTEXT{.Text=L"0\0", .Font=L"calibri light", .FontSize = 16, .Italic=0,
+    dst.paragraph.push_back(CSTEXT{.Text=L"0\0", .Font=L"calibri light", .FontSize = 12, .Italic=0,
                                    .Bold=FW_THIN, .Color={150,150,150}});
     dst.pSpace.push_back(12);
     dst.view = 0;
@@ -505,10 +505,10 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     vscroll1.setPositionRatio(0.5);
 
     void showHideLogo(CSARGS Args);
-    CSUIMAN::addAction(BTN_1, showHideLogo, 2, &GA_CLIENT, &idlogo1);
+    CSSECMAN::addAction(BTN_1, showHideLogo, 2, &GA_CLIENT, &idlogo1);
 
     void stretchLogo(CSARGS Args);
-    CSUIMAN::addAction(BTN_2, stretchLogo, 4, &GA_CLIENT, &idlogo1, &logoPos, &logoSize);
+    CSSECMAN::addAction(BTN_2, stretchLogo, 4, &GA_CLIENT, &idlogo1, &logoPos, &logoSize);
 
 
     // /*********************************************************** */
@@ -527,14 +527,14 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     PROGRESS_INFO_SECTION = createSection(BOTTOM_SECTION, {0,0, 300/dimCoef, (sRectClient(BOTTOM_SECTION).bottom/dimCoef)},  RGB(20,20,20), {0,0,1});
     CSUIFX::setTitleColorGradient(PROGRESS_INFO_SECTION, {180,180,180},{220,220,200},3,3);
     CSUIFX::setTitleColorClickEffect(PROGRESS_INFO_SECTION, {220,220,120});
-    CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"No Task", .Font=L"calibri", .FontSize = 16, .Italic=1,
+    CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"No Task", .Font=L"calibri", .FontSize = 12, .Italic=1,
         .Bold=0, .Color={180,180,180},
         .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1});
-    //CSUIMAN::autoFitToTitle(PROGRESS_INFO_SECTION, 10);
+    //CSSECMAN::autoFitToTitle(PROGRESS_INFO_SECTION, 10);
     CSLANGMAN::translateTitle(PROGRESS_INFO_SECTION, 0);
 
     CSLISTBOXMIN* lbm = csNewMinimalListBoxPtr(&RIGHT_SECTION, 100, 220);
-    lbm->setDefaultFont(L"calibri",{14,0});
+    lbm->setDefaultFont(L"calibri",{12,0});
     lbm->setItemAlign(CS_ALIGN_VERTICAL);
     lbm->setOffset({0,0});
     lbm->setDefaultSize({150*dimCoef, 15*dimCoef});
@@ -566,7 +566,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     vscroll2.setPositionRatio(0);
 
     void appTranslateStrings(CSARGS Args);
-    CSUIMAN::addAction(lbm->getId(), appTranslateStrings, 1, lbm);
+    CSSECMAN::addAction(lbm->getId(), appTranslateStrings, 1, lbm);
 
     IMAGE_LIST_SECTION = createSection(MIDDLE_LEFT_SECTION, {5,300, 65, 110},  RGB(22,22,22), {0});
     bd = {IMAGE_LIST_SECTION, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE, 0, BIND_DEST_BOTTOM_EDGE}};
@@ -585,7 +585,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
 
 
     CSLISTBOXMIN* lbm1 = csNewMinimalListBoxPtr(&IMAGE_LIST_SECTION, 100, 50);
-    lbm1->setDefaultFont(L"calibri",{14,0});
+    lbm1->setDefaultFont(L"calibri",{12,0});
     lbm1->setItemAlign(CS_ALIGN_VERTICAL);
     lbm1->setOffset({0,0});
     lbm1->setMarging({2,0});
@@ -607,6 +607,12 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     hscroll3.setPositionRatio(0);
     vscroll3.setPositionRatio(0);
 
+    
+    //void cameraTop();
+    //cameraTop();
+
+    //void sym();
+    //sym();
 }
 
 CSIGMA_MAIN_END
@@ -756,25 +762,25 @@ void appTranslateStrings(CSARGS Args)
             thread t2(
                 []()
                 {
-                    const wchar_t* title = CSUIMAN::getTitleText(PROGRESS_INFO_SECTION);
+                    const wchar_t* title = CSSECMAN::getTitleText(PROGRESS_INFO_SECTION);
                     long iter = 0;
 
                     while (1)
                     {
                         if(iter == 50)
                         {
-                            CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation in progress ."}, 1);
-                            CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                            CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation in progress ."}, 1);
+                            CSSECMAN::updateSection(PROGRESS_INFO_SECTION);
                         }
                         else if(iter == 100)
                         {
-                            CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation in progress . ."}, 1);
-                            CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                            CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation in progress . ."}, 1);
+                            CSSECMAN::updateSection(PROGRESS_INFO_SECTION);
                         }
                         else if(iter == 150)
                         {
-                            CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation in progress . . ."}, 1);
-                            CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                            CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation in progress . . ."}, 1);
+                            CSSECMAN::updateSection(PROGRESS_INFO_SECTION);
                         }
                         else if(iter > 150)
                         {
@@ -797,8 +803,8 @@ void appTranslateStrings(CSARGS Args)
             thread t3(
                 []()
                 {
-                    //const wchar_t* title = CSUIMAN::getTitleText(PROGRESS_INFO_SECTION);
-                    //CSRGBA titleColor = CSUIMAN::getTitleColor(PROGRESS_INFO_SECTION);
+                    //const wchar_t* title = CSSECMAN::getTitleText(PROGRESS_INFO_SECTION);
+                    //CSRGBA titleColor = CSSECMAN::getTitleColor(PROGRESS_INFO_SECTION);
                     CSRGBA titleColor = {220,220,220};
 
                     while (1)
@@ -809,23 +815,23 @@ void appTranslateStrings(CSARGS Args)
                             statusIter++;
                             if(CSLANGMAN::getTranslationProcessStatus())
                             {
-                                CSUIMAN::setTitleColor(PROGRESS_INFO_SECTION, {70,200,70});
-                                CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation succeeded !"}, 1);
-                                CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                                CSSECMAN::setTitleColor(PROGRESS_INFO_SECTION, {70,200,70});
+                                CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation succeeded !"}, 1);
+                                CSSECMAN::updateSection(PROGRESS_INFO_SECTION);
                             }
                             else
                             {
-                                CSUIMAN::setTitleColor(PROGRESS_INFO_SECTION, {200,70,70});
-                                CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation failed !"}, 1);
-                                CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                                CSSECMAN::setTitleColor(PROGRESS_INFO_SECTION, {200,70,70});
+                                CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation failed !"}, 1);
+                                CSSECMAN::updateSection(PROGRESS_INFO_SECTION);
                             }
 
 
                             if(statusIter > 900)
                             {
-                                CSUIMAN::setTitleColor(PROGRESS_INFO_SECTION, titleColor);
-                                CSUIMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"No task."}, 1);
-                                CSUIMAN::updateSection(PROGRESS_INFO_SECTION);
+                                CSSECMAN::setTitleColor(PROGRESS_INFO_SECTION, titleColor);
+                                CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"No task."}, 1);
+                                CSSECMAN::updateSection(PROGRESS_INFO_SECTION);
                                 statusIter = 0;
                                 showStatus = 0;
                                 break;
@@ -938,7 +944,7 @@ void showHideLogo(CSARGS Args)
         {
             csGraphics::showImage(idga, idImg, 1);
         }
-        //CSUIMAN::updateSection(idga);
+        //CSSECMAN::updateSection(idga);
         csGraphics::updateGraphicArea(idga,1);
         
     }
@@ -1012,9 +1018,57 @@ void stretchLogo(CSARGS Args)
                 int tlen = 2*count;
                 csGraphics::setImageSize(idga, idImg, {imgSz.cx+tlen, imgSz.cy+tlen});
                 csGraphics::setImagePos(idga, idImg, {imgPos.x-tlen/2, imgPos.y-tlen/2});
-                //CSUIMAN::updateSection(idga);
+                //CSSECMAN::updateSection(idga);
                 csGraphics::updateGraphicArea(idga,1);
             }
         }
     }*/
+}
+
+void cameraTop()
+{
+    HWND hwnd = FindWindow(0,L"Webcam");
+    SetWindowPos(hwnd, HWND_TOPMOST, 0,0,0,0, SWP_NOSIZE|SWP_NOMOVE);
+}
+
+void sym()
+{
+    /*int n = 13;
+    POINT pts[n] = {{395,350},{471,239},{298,227},{184,309},{249,406},{218,536},{298,648},{417,648},{476,484},{395,350},{249,406},{325,380},{365,648}};
+    POINT symLine1[2] = {{298,648},{417,648}};*/
+    
+    int n = 26;
+    POINT pts[n] = {{395,350},{471,239},{298,227},{184,309},{249,406},{218,536},{298,648},{417,648},{476,484},{395,350},{249,406},{325,380},{365,648},
+                    {395,946},{471,1057},{298,1069},{184,987},{249,890},{218,760},{298,648},{417,648},{476,812},{395,946},{249,890},{325,916},{365,648},
+                    
+                   };
+    POINT symLine1[2] = {{653,916},{471,239}};
+
+    /*int n = 26*2;
+    POINT pts[n] = {{395,350},{471,239},{298,227},{184,309},{249,406},{218,536},{298,648},{417,648},{476,484},{395,350},{249,406},{325,380},{365,648},
+                    {395,946},{471,1057},{298,1069},{184,987},{249,890},{218,760},{298,648},{417,648},{476,812},{395,946},{249,890},{325,916},{365,648},
+                    {593,297},{471,240},{615,142},{755,156},{747,273},{839,370},{826,507},{723,566},{590,454},{593,297},{747,273},{669,288},{768,540},
+                    {892,813},{882,947},{1037,871},{1095,743},{990,691},{952,563},{826,507},{723,566},{754,738},{892,813},{990,691},{937,752},{768,540},
+                   };
+    POINT symLine1[2] = {{653,916},{471,239}};*/
+
+    POINT pts2[n];
+
+    float a = (symLine1[1].y-symLine1[0].y)*1.0/(symLine1[1].x-symLine1[0].x);
+    float a2 = a*a, b = symLine1[0].y - a*symLine1[0].x;
+
+    cout<<"\n";
+    for(int i=0; i<n; i++)
+    {
+        cout<<"("<<pts[i].x<<","<<pts[i].y<<"),";
+    }
+    
+    cout<<"\n";
+
+    for(int i=0; i<n; i++)
+    {
+        pts2[i].x = ceil(((1-a2)*pts[i].x + 2*a*(pts[i].y-b))/(1+a2));
+        pts2[i].y = ceil(((a2-1)*pts[i].y + 2*(a*pts[i].x+b))/(1+a2));
+        cout<<"("<<pts2[i].x<<","<<pts2[i].y<<"),";
+    }
 }

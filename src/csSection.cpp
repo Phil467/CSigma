@@ -151,7 +151,7 @@ void sizeMoveWaitListExecute(int id);
 void sizeMoveAll(int _id, bool automatic=1, SIZE _deltaSize= {0}, POINT _deltaPos= {0});
 void _blitDynamicSimpleText(int id);
 
-using namespace CSUIMAN;
+using namespace CSSECMAN;
 using namespace CSUTILS;
 using namespace CSFILESMAN;
 
@@ -159,7 +159,7 @@ int SMX, SMY;
 
 #include "csTranslator.h"
 
-int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE edgeResize, bool show, bool isRoot, bool attach)
+int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE edgeResize, bool show, bool isRoot, bool attach)
 {
     int i = SECTION.size();
     RECT geom = r(_geom.left*dimCoef, _geom.top*dimCoef, _geom.right*dimCoef, _geom.bottom*dimCoef, i);
@@ -197,7 +197,7 @@ int CSUIMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE edg
     allowTranslation.push_back(1);
     csLIST<wchar_t**> regStr;
     registeredStrings.push_back(regStr);
-    //CSUIMAN::printRect(geom);
+    //CSSECMAN::printRect(geom);
     RESIZE_EDGE.push_back(edgeResize);
     RECTPARREF.push_back({0});
     RECTCL.push_back({0,0,geom.right, geom.bottom});
@@ -849,7 +849,7 @@ cout<<"gesture\n";
         else if(msg == WM_DESTROY)
         {
             KillTimer(hwnd, 0);
-            CSUIMAN::__setAllRects();
+            CSSECMAN::__setAllRects();
             CSFILESMAN::__saveAppSizes();
             CSFILESMAN::__saveAppTitles();
             CSFILESMAN::__saveAppTips();
@@ -916,7 +916,7 @@ cout<<"gesture\n";
 
             if(id == 0)
             {
-                taskbarInfo = CSUIMAN::getTaskbarInfo();
+                taskbarInfo = CSSECMAN::getTaskbarInfo();
                 if(taskbarInfo.autoHide) taskbarInfo.edge = 10;
             }
 
@@ -962,7 +962,7 @@ cout<<"gesture\n";
             }*/
             /***************************************************************************** */
 
-            CSUIMAN::_updateApp(0);
+            CSSECMAN::_updateApp(0);
 
             // autoFitToTitle
             if(autoSizeFromTitle[id] && END_CREATE)

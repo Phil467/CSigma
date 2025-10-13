@@ -157,7 +157,7 @@ void csLISTBOX::deleteActiveIds()
 int csLISTBOX::getIdFromPosition_timer()
 {
     POINT _p = TIMER_POINT;
-    ScreenToClient(CSUIMAN::sHandle(idp), &_p);
+    ScreenToClient(CSSECMAN::sHandle(idp), &_p);
     POINT p = {_p.x-hdcontextExtOutPos[idp].x, _p.y-hdcontextExtOutPos[idp].y};
     int i = p.x/lbs.CX;
     int j = p.y/lbs.CY;
@@ -198,8 +198,8 @@ int csLISTBOX::getIdFromPosition_timer()
                     lbs.lastMouseId = lbs.mouseId;
                     lbs.mouseInId = -1;
                 }
-                SendMessage(CSUIMAN::sHandle(idp), WM_PAINT, 0,0);
-                InvalidateRect(CSUIMAN::sHandle(idp), 0,1);
+                SendMessage(CSSECMAN::sHandle(idp), WM_PAINT, 0,0);
+                InvalidateRect(CSSECMAN::sHandle(idp), 0,1);
             }
 
             timerIter++;

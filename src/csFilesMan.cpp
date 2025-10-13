@@ -472,7 +472,7 @@ void CSFILESMAN::__setAppTitles()
             free(t);
             InvalidateRect(SECTION[i],0,1);
         }
-        /*CSUIMAN::setTitle(i, TITLEFILE[i], 0);
+        /*CSSECMAN::setTitle(i, TITLEFILE[i], 0);
         InvalidateRect(SECTION[i],0,1);*/
     }
 }

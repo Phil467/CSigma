@@ -109,7 +109,7 @@ extern vector<bool> setTitleInit;
 
 bool END_CREATE = 0;
 
-void CSUIMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _originalLanguage, const wchar_t* _viewLanguage, bool saveAppStrings, bool saveAppGeometry, void(*forceEventFunc)(CSARGS), CSARGS *forceEventArgs)
+void CSSECMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _originalLanguage, const wchar_t* _viewLanguage, bool saveAppStrings, bool saveAppGeometry, void(*forceEventFunc)(CSARGS), CSARGS *forceEventArgs)
 {
     _hInstance = hInstance;
     sourceLanguageCode = (wchar_t*)_originalLanguage;
@@ -162,7 +162,7 @@ void CSUIMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _originalLan
 
 extern bool CLICK_EFFECT_BOOL;
 
-int CSUIMAN::_CSIGMA_APP_RUN_()
+int CSSECMAN::_CSIGMA_APP_RUN_()
 {
     END_CREATE = 1;
 
@@ -199,7 +199,7 @@ int CSUIMAN::_CSIGMA_APP_RUN_()
     return (int) Messages.wParam;
 }
 
-void CSUIMAN::__setAllRects()
+void CSSECMAN::__setAllRects()
 {
     int n = RECTWND.size();
     for(int i=0; i<n; i++)
@@ -210,7 +210,7 @@ void CSUIMAN::__setAllRects()
     }
 }
 
-void CSUIMAN::catchEventsGroup(int id, int idEvents, bool b)
+void CSSECMAN::catchEventsGroup(int id, int idEvents, bool b)
 {
     HIDEGROUPMSG[id][idEvents] = !b;
 }
@@ -255,13 +255,13 @@ HHOOK setHook()
     return mhook;
 }
 
-int CSUIMAN::attach(int id, int idp)
+int CSSECMAN::attach(int id, int idp)
 {
     attached[id] = 1;
     PARID[id] = idp;
     SetParent(SECTION[id], SECTION[idp]);
 }
-int CSUIMAN::detach(int id)
+int CSSECMAN::detach(int id)
 {
     attached[id] = 0;
     PARID[id] = 0;
@@ -269,23 +269,23 @@ int CSUIMAN::detach(int id)
 }
 
 
-int CSUIMAN::newMouseHook(int id)
+int CSSECMAN::newMouseHook(int id)
 {
     sectionMouseHook[id].push_back(0);
     //cout<<sectionMouseHook.size()<<"   mouseHook\n";
 }
 
-int CSUIMAN::getMouseHook(int id, int idHook)
+int CSSECMAN::getMouseHook(int id, int idHook)
 {
     return sectionMouseHook[id][idHook];
 }
 
-void CSUIMAN::resetMouseHook(int id, int idHook)
+void CSSECMAN::resetMouseHook(int id, int idHook)
 {
     sectionMouseHook[id][idHook] = 0;
 }
 
-int CSUIMAN::addAction(int id, void(*f)(CSARGS), CSARGS& args)
+int CSSECMAN::addAction(int id, void(*f)(CSARGS), CSARGS& args)
 {
     GROUPED_EVENTS_FUNC[id].push_back(f);
     GROUPED_EVENTS_ARGS[id].push_back(args);
@@ -293,7 +293,7 @@ int CSUIMAN::addAction(int id, void(*f)(CSARGS), CSARGS& args)
     return GROUPED_EVENTS_FUNC[id].size()-1;
 }
 
-int CSUIMAN::addAction(int id, void(*f)(CSARGS), int nbArgs, ...)
+int CSSECMAN::addAction(int id, void(*f)(CSARGS), int nbArgs, ...)
 {
     CSARGS args(nbArgs);
     va_list adArgs;
@@ -311,7 +311,7 @@ int CSUIMAN::addAction(int id, void(*f)(CSARGS), int nbArgs, ...)
 }
 
 
-bool CSUIMAN::removeAction(int id, int idAction)
+bool CSSECMAN::removeAction(int id, int idAction)
 {
     if(idAction < GROUPED_EVENTS_ARGS[id].size())
     {
@@ -323,7 +323,7 @@ bool CSUIMAN::removeAction(int id, int idAction)
     return 0;
 }
 
-bool CSUIMAN::removeLastAction(int id)
+bool CSSECMAN::removeLastAction(int id)
 {
     int idAction = GROUPED_EVENTS_ARGS[id].size()-1;
     GROUPED_EVENTS_ARGS[id][idAction].clear();
@@ -335,7 +335,7 @@ bool CSUIMAN::removeLastAction(int id)
 
 extern vector<CSAPP_ICON> appIcon;
 
-int CSUIMAN::setIcon(int id, wchar_t*pathSmallIcon, wchar_t*pathBigIcon, RECT rectSmall)
+int CSSECMAN::setIcon(int id, wchar_t*pathSmallIcon, wchar_t*pathBigIcon, RECT rectSmall)
 {
     HICON hIcon = (HICON)LoadImageW(
                       NULL,
@@ -380,64 +380,64 @@ int CSUIMAN::setIcon(int id, wchar_t*pathSmallIcon, wchar_t*pathBigIcon, RECT re
 }
 
 
-void CSUIMAN::setIcon(int id, int idIcon)
+void CSSECMAN::setIcon(int id, int idIcon)
 {
     SendMessage(SECTION[id], WM_SETICON, ICON_SMALL, (LPARAM)appIcon[idIcon].smallIcon);
     SendMessage(SECTION[id], WM_SETICON, ICON_BIG, (LPARAM)appIcon[idIcon].bigIcon);  
 }
 
-HWND CSUIMAN::sHandle(int id)
+HWND CSSECMAN::sHandle(int id)
 {
     return SECTION[id];
 }
 
-CSTEXT& CSUIMAN::sTitle(int id)
+CSTEXT& CSSECMAN::sTitle(int id)
 {
     return TITLE[id];
 }
 
-CSDYNAMIC_SIMPLE_TEXT& CSUIMAN::sDynSimpleText(int id)
+CSDYNAMIC_SIMPLE_TEXT& CSSECMAN::sDynSimpleText(int id)
 {
     return dynSimpleText[id];
 }
 
-RECT CSUIMAN::sRectParentContext(int id)
+RECT CSSECMAN::sRectParentContext(int id)
 {
     return RECTPARREF[id];
 }
 
-RECT CSUIMAN::sRectParentContextStatic(int id)
+RECT CSSECMAN::sRectParentContextStatic(int id)
 {
     return RECTPARREFSAVED[id];
 }
 
-RECT CSUIMAN::sRectClient(int id)
+RECT CSSECMAN::sRectClient(int id)
 {
     return RECTCL[id];
 }
 
-POINT CSUIMAN::sDeltaPos(int id)
+POINT CSSECMAN::sDeltaPos(int id)
 {
     return DELTAPOS[id];
 }
 
-SIZE CSUIMAN::sDeltaSize(int id)
+SIZE CSSECMAN::sDeltaSize(int id)
 {
     return DELTASIZE[id];
 }
 
-void CSUIMAN::printRect(RECT r, char*title)
+void CSSECMAN::printRect(RECT r, char*title)
 {
     wcout<<title<<L" : "<<r.left<<L" "<<r.top<<L" "<<r.right<<L" "<<r.bottom<<L"\n";
 }
 
 
-void CSUIMAN::bindGeometry_(int id, CSBIND_GEOM_PARAMS*& Args, int& n)
+void CSSECMAN::bindGeometry_(int id, CSBIND_GEOM_PARAMS*& Args, int& n)
 {
 
 }
 
-void CSUIMAN::bindGeometry(int id, CSBIND_GEOM_PARAMS* bgps, int n)
+void CSSECMAN::bindGeometry(int id, CSBIND_GEOM_PARAMS* bgps, int n)
 {
     for(int i=0; i<n; i++)
     {
@@ -461,7 +461,7 @@ void CSUIMAN::bindGeometry(int id, CSBIND_GEOM_PARAMS* bgps, int n)
     }
 }
 
-void CSUIMAN::bindGeometry(int id, int n, ...)
+void CSSECMAN::bindGeometry(int id, int n, ...)
 {
     va_list adArgs ;
     CSBIND_GEOM_PARAMS* tab = csAlloc<CSBIND_GEOM_PARAMS>(n);
@@ -473,17 +473,17 @@ void CSUIMAN::bindGeometry(int id, int n, ...)
     }
     va_end(adArgs);
 
-    CSUIMAN::bindGeometry(id, tab, n);
+    CSSECMAN::bindGeometry(id, tab, n);
 
     free(tab);
 }
 
-void CSUIMAN::setSizeCoef(float factor)
+void CSSECMAN::setSizeCoef(float factor)
 {
     dimCoef = factor;
 }
 
-void CSUIMAN::setBorderThick(int id, int thick)
+void CSSECMAN::setBorderThick(int id, int thick)
 {
     if(!hdStackContext[id])
     {
@@ -494,7 +494,7 @@ void CSUIMAN::setBorderThick(int id, int thick)
     BORDERTHICK[id] = thick;
 }
 
-void CSUIMAN::setBorderColorAndThick(int id, COLORREF color, int thick)
+void CSSECMAN::setBorderColorAndThick(int id, COLORREF color, int thick)
 {
     if(!hdStackContext[id])
     {
@@ -506,7 +506,7 @@ void CSUIMAN::setBorderColorAndThick(int id, COLORREF color, int thick)
     BORDERTHICK[id] = thick;
 }
 
-void CSUIMAN::setTitle(int id, CSTEXT title, bool textOnly)
+void CSSECMAN::setTitle(int id, CSTEXT title, bool textOnly)
 {
     if(title.Text)
     {
@@ -563,7 +563,7 @@ void CSUIMAN::setTitle(int id, CSTEXT title, bool textOnly)
     }
 }
 
-const wchar_t* CSUIMAN::getTitleText(int id)
+const wchar_t* CSSECMAN::getTitleText(int id)
 {
     /*if(TITLEFILE.size())
         return (const wchar_t*)TITLEFILE[id].Text;
@@ -571,12 +571,12 @@ const wchar_t* CSUIMAN::getTitleText(int id)
         */return (const wchar_t*)TITLE[id].Text;
 }
 
-CSRGBA CSUIMAN::getTitleColor(int id)
+CSRGBA CSSECMAN::getTitleColor(int id)
 {
     return TITLE[id].Color;
 }
 
-void CSUIMAN::setTitleColor(int id, CSRGBA color)
+void CSSECMAN::setTitleColor(int id, CSRGBA color)
 {
     TITLE[id].Color = color;
     if(mhgradient[id].TitleGradient)
@@ -586,7 +586,7 @@ void CSUIMAN::setTitleColor(int id, CSRGBA color)
     }
 }
 
-void CSUIMAN::inert(int id, BYTE alphaLevel)
+void CSSECMAN::inert(int id, BYTE alphaLevel)
 {
     SetWindowLongW(sHandle(id), GWL_EXSTYLE, GetWindowLongW(sHandle(id), GWL_EXSTYLE)|WS_EX_LAYERED|WS_EX_TRANSPARENT);
     SetLayeredWindowAttributes(sHandle(id), 0, alphaLevel, LWA_ALPHA);
@@ -596,18 +596,18 @@ void CSUIMAN::inert(int id, BYTE alphaLevel)
     SetWindowPos(SECTION[id],0, 0,0,r.right, r.bottom, SWP_NOMOVE|SWP_NOZORDER);*/
 }
 
-void CSUIMAN::setTransparent(int id)
+void CSSECMAN::setTransparent(int id)
 {
     SetWindowLongW(sHandle(id), GWL_EXSTYLE, GetWindowLongW(sHandle(id), GWL_EXSTYLE)|WS_EX_LAYERED);
 }
 
-void CSUIMAN::setTransparency(int id, char level)
+void CSSECMAN::setTransparency(int id, char level)
 {
     SetLayeredWindowAttributes(sHandle(id), 0, level, LWA_ALPHA);
     InvalidateRect(sHandle(id), 0, 1);
 }
 
-void CSUIMAN::_drawTitle(int id, HDC dc)
+void CSSECMAN::_drawTitle(int id, HDC dc)
 {
    CSTEXT& Title = TITLE[id];
    if(Title.Text && Title.Show)
@@ -706,7 +706,7 @@ void CSUIMAN::_drawTitle(int id, HDC dc)
     }
 }
 
-void CSUIMAN::setAsCloseButton(int id, int& id_close)
+void CSSECMAN::setAsCloseButton(int id, int& id_close)
 {
     auto f = [](CSARGS Args)
     {
@@ -724,7 +724,7 @@ void CSUIMAN::setAsCloseButton(int id, int& id_close)
     addAction(id, f, 1, &id_close);
 }
 
-void CSUIMAN::setAsMinButton(int id, int& id_minimize)
+void CSSECMAN::setAsMinButton(int id, int& id_minimize)
 {
     auto f = [](CSARGS Args)
     {
@@ -767,7 +767,7 @@ void __getHiddenWindowPart(int id, RECT r)
 }
 
 
-void CSUIMAN::setAsMaxButton(int& id, int& id_maximize)
+void CSSECMAN::setAsMaxButton(int& id, int& id_maximize)
 {
     auto f = [](CSARGS Args)
     {
@@ -841,14 +841,14 @@ void CSUIMAN::setAsMaxButton(int& id, int& id_maximize)
     addAction(id_maximize, f2, 1, &id);
 }
 
-RECT CSUIMAN::getTaskbarRect()
+RECT CSSECMAN::getTaskbarRect()
 {
     APPBARDATA abd = {sizeof(APPBARDATA)};
     SHAppBarMessage(ABM_GETTASKBARPOS, &abd);
     return abd.rc;
 }
 
-TASKBAR_INFO CSUIMAN::getTaskbarInfo()
+TASKBAR_INFO CSSECMAN::getTaskbarInfo()
 {
     TASKBAR_INFO ti = {0};
     APPBARDATA abd = {sizeof(APPBARDATA)};
@@ -869,7 +869,7 @@ extern bool saveAppTips;
 extern vector<vector<vector<wchar_t*>>> TIPSFILE;
 vector<int> tips_src_ids;
 
-void CSUIMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips, bool withTips, vector<int>*idsSrc)
+void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips, bool withTips, vector<int>*idsSrc)
 {
     TIPS_POPUP_PARAMS tpp;
     tpp.Ids.push_back(idPopup);
@@ -927,7 +927,7 @@ void CSUIMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay,
     }
 }
 
-void CSUIMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT* tips, vector<int>*idsSrc)
+void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT* tips, vector<int>*idsSrc)
 {
     if(tips) joinPopup(id, idPopup, rTips, pb, delay, locked, *tips, 1, idsSrc);
     else 
@@ -937,16 +937,16 @@ void CSUIMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay,
     }
 }
 
-void CSUIMAN::addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips)
+void CSSECMAN::addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips)
 {
     tips_src_ids.push_back(id);
-    CSUIMAN::joinPopup(id, TIPS_POPUP, rTips, pb, delay, locked, tips, 1, &tips_src_ids);
+    CSSECMAN::joinPopup(id, TIPS_POPUP, rTips, pb, delay, locked, tips, 1, &tips_src_ids);
 }
 
 
 #include <dwmapi.h>
 #pragma comment(lib, "dwmapi.lib")
-void CSUIMAN::enableDarkEdge(int id)
+void CSSECMAN::enableDarkEdge(int id)
 {
     BOOL useDark = TRUE;
 
@@ -965,12 +965,12 @@ void CSUIMAN::enableDarkEdge(int id)
 extern int SMX;
 extern int SMY;
 
-void CSUIMAN::updateSection(int id)
+void CSSECMAN::updateSection(int id)
 {
     InvalidateRect(SECTION[id], 0,1);
 }
 
-void CSUIMAN::_updateApp(int id)
+void CSSECMAN::_updateApp(int id)
 {
     //imageGradients
     //mhgradient
@@ -1032,10 +1032,10 @@ void CSUIMAN::_updateApp(int id)
 
                 RECT r = RECTPARREFSAVED[i];
                 if(i == 0)
-                CSUIMAN::printRect(r, "r ");
+                CSSECMAN::printRect(r, "r ");
                 r.left *= xcf; r.top *= ycf; r.right *= xcf; r.bottom *= ycf;
                 if(i == 0)
-                CSUIMAN::printRect(r, "r ");
+                CSSECMAN::printRect(r, "r ");
                 rv.push_back(r);
 
             }
@@ -1058,12 +1058,12 @@ void CSUIMAN::_updateApp(int id)
     }
 }
 
-void CSUIMAN::autoFitToTitle(int id, int marging)
+void CSSECMAN::autoFitToTitle(int id, int marging)
 {
     autoSizeFromTitle[id] = marging;
 }
 
-void CSUIMAN::setMinMaxInfo(int id, MINMAXINFO mmi)
+void CSSECMAN::setMinMaxInfo(int id, MINMAXINFO mmi)
 {
     minMaxInfo[id] = mmi;
 }
@@ -1078,16 +1078,16 @@ void _manageTimers(CSARGS Args)
         WPARAM wp = WPARAM(Args);
         if(wp == SC_RESTORE)
         {
-            CSUIMAN::setAllTimers();
+            CSSECMAN::setAllTimers();
         }
         else if(wp == SC_MINIMIZE)
         {
-            CSUIMAN::killAllTimers();
+            CSSECMAN::killAllTimers();
         }
     }
 }
 
-void CSUIMAN::sleepWhenMinimizeExcept(int id, vector<int>* idExcept)
+void CSSECMAN::sleepWhenMinimizeExcept(int id, vector<int>* idExcept)
 {
     int n = idExcept->size();
     int m = SECTION.size();
@@ -1109,7 +1109,7 @@ void CSUIMAN::sleepWhenMinimizeExcept(int id, vector<int>* idExcept)
     addAction(id, _manageTimers,0);
 }
 
-void CSUIMAN::sleepWhenMinimize(int id, vector<int>* idSleep)
+void CSSECMAN::sleepWhenMinimize(int id, vector<int>* idSleep)
 {
     int n = idSleep->size();
     for(int i=0; i<n; i++)
@@ -1119,7 +1119,7 @@ void CSUIMAN::sleepWhenMinimize(int id, vector<int>* idSleep)
     addAction(id, _manageTimers,0);
 }
 
-void CSUIMAN::killAllTimers()
+void CSSECMAN::killAllTimers()
 {
     int n = TIMER_PARAMS.size();
     for(int i=1; i<n; i++)
@@ -1131,7 +1131,7 @@ void CSUIMAN::killAllTimers()
     }
 }
 
-void CSUIMAN::setAllTimers()
+void CSSECMAN::setAllTimers()
 {
     int n = TIMER_PARAMS.size();
     for(int i=1; i<n; i++)
@@ -1143,12 +1143,12 @@ void CSUIMAN::setAllTimers()
     }
 }
 
-void CSUIMAN::setLockable(int id, CSLOCKED_MODE lm)
+void CSSECMAN::setLockable(int id, CSLOCKED_MODE lm)
 {
     lockedMode[id] = lm;
 }
 
-void CSUIMAN::updateAfterReceivingResizeMessage(int id)
+void CSSECMAN::updateAfterReceivingResizeMessage(int id)
 {
     updateAfterResizeMsg[id] = 1;
 }

@@ -1211,7 +1211,7 @@ void CSLISTBOXMIN::animate()
 
     if(!animated)
     {
-        groupMsgPos = CSUIMAN::addAction(*parent, catchEvents, 45, dcs0.getTable(), dcs1.getTable(),dcs2.getTable(),dcs3.getTable(),
+        groupMsgPos = CSSECMAN::addAction(*parent, catchEvents, 45, dcs0.getTable(), dcs1.getTable(),dcs2.getTable(),dcs3.getTable(),
                  color0.getTable(), color1.getTable(),color2.getTable(),color3.getTable(),
                  bkgcol0.getTable(), bkgcol1.getTable(),bkgcol2.getTable(),bkgcol3.getTable(),
                  pos.getTable(), posImg.getTable(), posTitle.getTable(),
@@ -1238,13 +1238,13 @@ int CSLISTBOXMIN::getEventsGroupId()
 
 void CSLISTBOXMIN::hide()
 {
-    CSUIMAN::catchEventsGroup(*parent, groupMsgPos, 0);
-    CSUIMAN::updateSection(*parent);
+    CSSECMAN::catchEventsGroup(*parent, groupMsgPos, 0);
+    CSSECMAN::updateSection(*parent);
 }
 void CSLISTBOXMIN::show()
 {
-    CSUIMAN::catchEventsGroup(*parent, groupMsgPos, 1);
-    CSUIMAN::updateSection(*parent);
+    CSSECMAN::catchEventsGroup(*parent, groupMsgPos, 1);
+    CSSECMAN::updateSection(*parent);
 }
 
 RECT CSLISTBOXMIN::getItemRect(int id)

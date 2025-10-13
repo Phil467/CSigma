@@ -68,6 +68,7 @@ void getEditLineParams(HWND hEdit, int* cHeight, int*cWidth, int*xOffset, int*yO
 
 LRESULT CALLBACK richEditSubclassProc(HWND hEdit, UINT msg, WPARAM wParam, LPARAM lParam);
 int csCreateRichEdit(int idpar, RECT r, const wchar_t* defaultText, int style=0, int hMenuId=0);
+void setRichEditColors(int idEdit, COLORREF textColor, COLORREF bkgColor);
 HWND richEditHandle(int ide);
 void csSetRichEditFormat(int id, short format);
 void csSetUpdatingFunction(int id, void(*f)(CSARGS), CSARGS& Args);

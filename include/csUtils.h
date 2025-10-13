@@ -49,7 +49,7 @@
 using namespace  std;
 
 
-namespace CSUIMAN
+namespace CSSECMAN
 {
 
 void _CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* sourceLanguageCode=L"us", const wchar_t* targetLanguageCode=L"fr", bool saveAppStrings=0, bool saveAppGeometry=0, void(*forceEventFunc)(CSARGS)=0, CSARGS* forceEventArgs=0);

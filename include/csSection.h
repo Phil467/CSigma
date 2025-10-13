@@ -9,13 +9,13 @@
 #include <thread>
 #include <functional>
 
-#define CSIGMA_APP_RUN() CSUIMAN::_CSIGMA_APP_RUN_()
+#define CSIGMA_APP_RUN() CSSECMAN::_CSIGMA_APP_RUN_()
 
 #define CSIGMA_MAIN(sourceLang, targetLang, saveAppStrings, saveAppGeometry) \
     static int csigma_main();\
     int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) \
     { \
-        CSUIMAN::_CSIGMA_APP_INIT_(hInstance, sourceLang, targetLang, saveAppStrings, saveAppGeometry); \
+        CSSECMAN::_CSIGMA_APP_INIT_(hInstance, sourceLang, targetLang, saveAppStrings, saveAppGeometry); \
         return csigma_main(); \
     } \
     static int csigma_main()
@@ -24,10 +24,10 @@
 #define CSIGMA_MAIN_START(sourceLang, targetLang, saveAppStrings, saveAppGeometry) \
     int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) \
     { \
-        CSUIMAN::_CSIGMA_APP_INIT_(hInstance, sourceLang, targetLang, saveAppStrings, saveAppGeometry);
+        CSSECMAN::_CSIGMA_APP_INIT_(hInstance, sourceLang, targetLang, saveAppStrings, saveAppGeometry);
 
 #define CSIGMA_MAIN_END \
-        return CSUIMAN::_CSIGMA_APP_RUN_(); \
+        return CSSECMAN::_CSIGMA_APP_RUN_(); \
     }
 
 

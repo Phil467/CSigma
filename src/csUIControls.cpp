@@ -42,7 +42,7 @@ CSSCROLLBAR CSUICONTROLS::addHScrollBar(int* idp, int* idClient, int* idMask, in
     
     hscroll.mouseLeaveHide(autoHideIntensity);
     SetTimer(SECTION[hscroll.getId()],0,17,0);
-    CSUIMAN::addAction(*idc,smoothScrolling,1,hscroll.getIdPtr());
+    CSSECMAN::addAction(*idc,smoothScrolling,1,hscroll.getIdPtr());
     withHScroll[*idc] = hscroll.getId();
     return hscroll;
 }
@@ -63,7 +63,7 @@ CSSCROLLBAR CSUICONTROLS::addVScrollBar(int* idp, int* idClient, int* idMask, in
     }
     vscroll.mouseLeaveHide(autoHideIntensity);
     SetTimer(SECTION[vscroll.getId()],0,18,0);
-    CSUIMAN::addAction(*idc,smoothScrolling,1,vscroll.getIdPtr());
+    CSSECMAN::addAction(*idc,smoothScrolling,1,vscroll.getIdPtr());
     withVScroll[*idc] = vscroll.getId();
     return vscroll;
 }
@@ -92,9 +92,9 @@ void smoothScrolling(CSARGS Args)
 int CSUICONTROLS::iconButton01(int idp, char* path1, char* path2, RECT r)
 {
 
-    int BUTTON = CSUIMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
+    int BUTTON = CSSECMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
     CSBIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE,0}};
-    CSUIMAN::bindGeometry(idp, bd);
+    CSSECMAN::bindGeometry(idp, bd);
     CSUIFX::setImageGradient(BUTTON, path1, path2, {0}, {r.bottom*dimCoef,r.bottom*dimCoef}, 0.1, 4,1);
 
     return BUTTON;
@@ -103,9 +103,9 @@ int CSUICONTROLS::iconButton01(int idp, char* path1, char* path2, RECT r)
 int CSUICONTROLS::iconButton02(int idp, char* path1, char* path2, RECT r)
 {
 
-    int BUTTON = CSUIMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
+    int BUTTON = CSSECMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
     /*CSBIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE,0}};
-    CSUIMAN::bindGeometry(idp, bd);*/
+    CSSECMAN::bindGeometry(idp, bd);*/
     CSUIFX::setImageGradient(BUTTON, path1, path2, {0}, {r.bottom*dimCoef,r.bottom*dimCoef}, 0.1, 4,1);
 
     return BUTTON;
@@ -114,17 +114,17 @@ int CSUICONTROLS::iconButton02(int idp, char* path1, char* path2, RECT r)
 int CSUICONTROLS::darkTextButton01(int idp, wchar_t*title, RECT r, int fontSize)
 {
 
-    int BUTTON = CSUIMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
+    int BUTTON = CSSECMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
     CSBIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
-    CSUIMAN::bindGeometry(idp, bd);
+    CSSECMAN::bindGeometry(idp, bd);
     CSUIFX::setBackgroundColorGradient(BUTTON, {50,50,50}, {20,20,20}, 2, 2);
     CSUIFX::setBackgroundColorClickEffect(BUTTON, {60,60,60});
     CSUIFX::setTitleColorGradient(BUTTON, {220,200,100}, {200,200,200}, 2, 2);
     CSUIFX::setTitleColorClickEffect(BUTTON, {220,220,120});
     CSUIFX::setBorderColorGradient(BUTTON, {100,100,100}, {25,25,25}, 2, 2);
     CSUIFX::setBorderColorClickEffect(BUTTON, {120,120,120});
-    CSUIMAN::setBorderThick(BUTTON, 2);
-    CSUIMAN::setTitle(BUTTON, CSTEXT{.Text=title, .Font=L"Segoe UI", .FontSize=fontSize, .Color={150,150,150},
+    CSSECMAN::setBorderThick(BUTTON, 2);
+    CSSECMAN::setTitle(BUTTON, CSTEXT{.Text=title, .Font=L"Segoe UI", .FontSize=fontSize, .Color={150,150,150},
                             .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1});
 
     return BUTTON;
@@ -133,9 +133,9 @@ int CSUICONTROLS::darkTextButton01(int idp, wchar_t*title, RECT r, int fontSize)
 int CSUICONTROLS::darkImgTextButton01(int idp, wchar_t*title, char* path1, char* path2, RECT r, int fontSize)
 {
 
-    int BUTTON = CSUIMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
+    int BUTTON = CSSECMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
     CSBIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
-    CSUIMAN::bindGeometry(idp, bd);
+    CSSECMAN::bindGeometry(idp, bd);
     CSUIFX::setImageGradient(BUTTON, path1, path2, {0}, {26,26}, 0.1, 2, 2);
     CSUIFX::setBackgroundColorGradient(BUTTON, {5,5,5}, {20,20,20}, 2, 2);
     CSUIFX::setBackgroundColorClickEffect(BUTTON, {10,10,10});
@@ -143,8 +143,8 @@ int CSUICONTROLS::darkImgTextButton01(int idp, wchar_t*title, char* path1, char*
     CSUIFX::setTitleColorClickEffect(BUTTON, {220,220,120});
     CSUIFX::setBorderColorGradient(BUTTON, {10,10,10}, {25,25,25}, 2, 2);
     CSUIFX::setBorderColorClickEffect(BUTTON, {20,20,20});
-    CSUIMAN::setBorderThick(BUTTON, 2);
-    CSUIMAN::setTitle(BUTTON, CSTEXT{.Text=title, .Font=L"Segoe UI", .FontSize=fontSize, .Color={150,150,140},
+    CSSECMAN::setBorderThick(BUTTON, 2);
+    CSSECMAN::setTitle(BUTTON, CSTEXT{.Text=title, .Font=L"Segoe UI", .FontSize=fontSize, .Color={150,150,140},
                             .Marging={32/dimCoef,0}, .Align = CS_TA_CENTER_LEFT, .Show=1});
 
     return BUTTON;
@@ -153,17 +153,17 @@ int CSUICONTROLS::darkImgTextButton01(int idp, wchar_t*title, char* path1, char*
 int CSUICONTROLS::darkTextButton02(int idp, wchar_t*title, RECT r, int fontSize)
 {
 
-    int BUTTON = CSUIMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
+    int BUTTON = CSSECMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
     CSBIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
-    CSUIMAN::bindGeometry(idp, bd);
+    CSSECMAN::bindGeometry(idp, bd);
     CSUIFX::setBackgroundColorGradient(BUTTON, {50,50,50}, {20,20,20}, 2, 2);
     CSUIFX::setBackgroundColorClickEffect(BUTTON, {60,60,60});
     CSUIFX::setTitleColorGradient(BUTTON, {220,220,220}, {200,200,200}, 2, 2);
     CSUIFX::setTitleColorClickEffect(BUTTON, {190,190,190});
     CSUIFX::setBorderColorGradient(BUTTON, {25,25,25}, {25,25,25}, 2, 2);
     CSUIFX::setBorderColorClickEffect(BUTTON, {120,120,120});
-    CSUIMAN::setBorderThick(BUTTON, 1);
-    CSUIMAN::setTitle(BUTTON, CSTEXT{.Text=title, .Font=L"Segoe UI", .FontSize=fontSize, .Color={200,200,200},
+    CSSECMAN::setBorderThick(BUTTON, 1);
+    CSSECMAN::setTitle(BUTTON, CSTEXT{.Text=title, .Font=L"Segoe UI", .FontSize=fontSize, .Color={200,200,200},
                             .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1});
 
     return BUTTON;
@@ -174,12 +174,12 @@ CSSYSCOMMAND_SECTION CSUICONTROLS::addSysCommand(int& id, POINT pos)
     CSSYSCOMMAND_SECTION sc;
     int width = (GetSystemMetrics(SM_CYCAPTION)-2);
     if(dimCoef < 1.5)
-        sc.SYSCOMMAND_SECTION = CSUIMAN::createSection(id, {RECTCL[id].right/dimCoef-3*width-2-6,pos.y,3*width+3,width},  RGB(5,5,5), {0,0,0,0});
+        sc.SYSCOMMAND_SECTION = CSSECMAN::createSection(id, {RECTCL[id].right/dimCoef-3*width-2-6,pos.y,3*width+3,width},  RGB(5,5,5), {0,0,0,0});
     else
-        sc.SYSCOMMAND_SECTION = CSUIMAN::createSection(id, {RECTCL[id].right/dimCoef-3*width-2,pos.y,3*width,width},  RGB(5,5,5), {0,0,0,0});
+        sc.SYSCOMMAND_SECTION = CSSECMAN::createSection(id, {RECTCL[id].right/dimCoef-3*width-2,pos.y,3*width,width},  RGB(5,5,5), {0,0,0,0});
     CSBIND_GEOM_PARAMS bd = {sc.SYSCOMMAND_SECTION, {-1,0,1,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
-    CSUIMAN::bindGeometry(id, bd);
-    CSUIMAN::setBorderColorAndThick(sc.SYSCOMMAND_SECTION, RGB(20,20,20), 1);
+    CSSECMAN::bindGeometry(id, bd);
+    CSSECMAN::setBorderColorAndThick(sc.SYSCOMMAND_SECTION, RGB(20,20,20), 1);
 
     width -= 2;
     if(dimCoef < 1.5)
@@ -195,14 +195,14 @@ CSSYSCOMMAND_SECTION CSUICONTROLS::addSysCommand(int& id, POINT pos)
         sc.SYS_MAX = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_max02.bmp\0", "img/_max01.bmp\0", {1+width,1,width,width});
         sc.SYS_CLOSE = CSUICONTROLS::iconButton01(sc.SYSCOMMAND_SECTION, "img/_close02.bmp\0", "img/_close01.bmp\0", {1+width*2,1,width,width});
     }
-    CSUIMAN::setAsMinButton(sc.SYS_MIN, id);
-    CSUIMAN::setAsMaxButton(sc.SYS_MAX, id);
-    CSUIMAN::setAsCloseButton(sc.SYS_CLOSE, id);
+    CSSECMAN::setAsMinButton(sc.SYS_MIN, id);
+    CSSECMAN::setAsMaxButton(sc.SYS_MAX, id);
+    CSSECMAN::setAsCloseButton(sc.SYS_CLOSE, id);
 
     return sc;
 }
 
-int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, char*iconPath, int fontSize, wchar_t*fontName)
+/*int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, char*iconPath, int fontSize, wchar_t*fontName)
 {
 
     if(size.cx == 0 || size.cy == 0)
@@ -220,19 +220,19 @@ int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, char*iconPath, int
             size.cx += 26;
     }
     
-    int TITLE_SECTION = CSUIMAN::createSection(id, {2,0,size.cx,size.cy},  RGB(5,5,5), {0,0,0,0});
+    int TITLE_SECTION = CSSECMAN::createSection(id, {2,0,size.cx,size.cy},  RGB(5,5,5), {0,0,0,0});
     
-    CSUIMAN::setBorderColorAndThick(TITLE_SECTION, RGB(20,20,20), 1);
+    CSSECMAN::setBorderColorAndThick(TITLE_SECTION, RGB(20,20,20), 1);
     if(iconPath)
         CSUIFX::setImageGradient(TITLE_SECTION, iconPath, iconPath, {2,2}, {26,26}, 0.05, 2,1);
-    CSUIMAN::setTitle(TITLE_SECTION, CSTEXT{.Text=title, .Font=fontName, .FontSize = fontSize, .Italic=0,
+    CSSECMAN::setTitle(TITLE_SECTION, CSTEXT{.Text=title, .Font=fontName, .FontSize = fontSize, .Italic=0,
                                    .Bold=0, .Color={150,150,150},
                                    .Marging={35/dimCoef,0}, .Align = CS_TA_CENTER_LEFT, .Show=1});
     
-    CSUIMAN::inert(TITLE_SECTION,190);
+    CSSECMAN::inert(TITLE_SECTION,190);
     SetWindowTextW(SECTION[id], title);
 
-    CSUIMAN::autoFitToTitle(TITLE_SECTION, 10);
+    CSSECMAN::autoFitToTitle(TITLE_SECTION, 10);
 
     auto f = [](CSARGS Args)
     {
@@ -249,10 +249,10 @@ int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, char*iconPath, int
         }
     };
 
-    CSUIMAN::addAction(TITLE_SECTION, f, 0);
+    CSSECMAN::addAction(TITLE_SECTION, f, 0);
     
     return TITLE_SECTION;
-}
+}*/
 
 extern std::vector<CSAPP_ICON> appIcon;
 extern vector<HDC> hdcontext;
@@ -277,19 +277,19 @@ int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, int fontSize, wcha
             size.cx += appIcon[iconId].rectSmall.left+appIcon[iconId].rectSmall.right;
     }
     
-    int TITLE_SECTION = CSUIMAN::createSection(id, {2,0,size.cx,size.cy},  RGB(5,5,5), {0,0,0,0});
+    int TITLE_SECTION = CSSECMAN::createSection(id, {2,0,size.cx,size.cy},  RGB(5,5,5), {0,0,0,0});
 
-    CSUIMAN::setBorderColorAndThick(TITLE_SECTION, RGB(20,20,20), 1);
-    CSUIMAN::setTitle(TITLE_SECTION, CSTEXT{.Text=title, .Font=fontName, .FontSize = fontSize, .Italic=0,
+    CSSECMAN::setBorderColorAndThick(TITLE_SECTION, RGB(20,20,20), 1);
+    CSSECMAN::setTitle(TITLE_SECTION, CSTEXT{.Text=title, .Font=fontName, .FontSize = fontSize, .Italic=0,
                                    .Bold=0, .Color={150,150,150},
                                    .Marging={(iconId>-1?appIcon[iconId].rectSmall.left+appIcon[iconId].rectSmall.right:0)+5,0}, .Align = CS_TA_CENTER_LEFT, .Show=1});
     ICONID[TITLE_SECTION] = iconId;
     
     
-    CSUIMAN::inert(TITLE_SECTION,190);
+    CSSECMAN::inert(TITLE_SECTION,190);
     SetWindowTextW(SECTION[id], title);
 
-    CSUIMAN::autoFitToTitle(TITLE_SECTION, 10);
+    CSSECMAN::autoFitToTitle(TITLE_SECTION, 10);
 
     auto f = [](CSARGS Args)
     {
@@ -306,7 +306,7 @@ int CSUICONTROLS::addTitle(int& id, wchar_t*title, SIZE size, int fontSize, wcha
         }
     };
 
-    CSUIMAN::addAction(TITLE_SECTION, f, 0);
+    CSSECMAN::addAction(TITLE_SECTION, f, 0);
     
     return TITLE_SECTION;
 }
@@ -317,13 +317,13 @@ extern int csCreateRichEdit(int idpar, RECT marging, const wchar_t* defaultText,
 CS_NUMERIC_INCREMENTER_PARAMS CSUICONTROLS::numericIncrementer(int idp, RECT r, double value, double incr, bool intNum)
 {
     CS_NUMERIC_INCREMENTER_PARAMS nip;
-    nip.idSection = CSUIMAN::createSection(idp, r,  RGB(15,15,15), {0,0,0,0});
+    nip.idSection = CSSECMAN::createSection(idp, r,  RGB(15,15,15), {0,0,0,0});
     //bd = {idp, {-0.5,0,0.5,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
     //bindGeometry(ROOT, bd);
     int l = (r.bottom-4);
     //CSUIFX::setBorderColorGradient(nip.idSection, {100,100,100}, {40,40,40}, 2, 2);
-    CSUIMAN::setBorderThick(nip.idSection, 2);
-    CSUIMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=14, .Italic=1, .Color={100,100,100},
+    CSSECMAN::setBorderThick(nip.idSection, 2);
+    CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=14, .Italic=1, .Color={100,100,100},
                                    .Marging={-45,0}, .Align = CS_TA_CENTER, .Show=1});
 
     nip.idUp = CSUICONTROLS::iconButton02(nip.idSection, "img/increase.bmp\0", "img/increase2.bmp\0", {r.right-l*3-2,2,l,l});
@@ -338,6 +338,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUICONTROLS::numericIncrementer(int idp, RECT r, 
         wsprintf(num, L"%s\0", to_wstring(value).c_str());
     
     nip.idText = csCreateRichEdit(nip.idSection, {4,4,((l+1)*3)*dimCoef,4}, (const wchar_t*)num, 0, 0);
+    setRichEditColors(nip.idText, 0, RGB(120,120,120));
 
     return nip;
 }
@@ -363,21 +364,21 @@ void CS_NUMERIC_INCREMENTER_PARAMS::setMaxBound(const char* num)
 CS_NUMERIC_INCREMENTER_PARAMS CSUICONTROLS::numericIncrementerExt(int idp, RECT r, wchar_t* value, wchar_t* step, short format)
 {
     CS_NUMERIC_INCREMENTER_PARAMS nip = {0};
-    nip.idSection = CSUIMAN::createSection(idp, r,  RGB(25,25,25), {0,0,0,0});
+    nip.idSection = CSSECMAN::createSection(idp, r,  RGB(25,25,25), {0,0,0,0});
     //bd = {idp, {-0.5,0,0.5,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
     //bindGeometry(ROOT, bd);
     int l = (r.bottom-4);
     //CSUIFX::setBorderColorGradient(nip.idSection, {100,100,100}, {40,40,40}, 2, 2);
-    CSUIMAN::setBorderThick(nip.idSection, 2);
-    CSUIMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=14, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
+    CSSECMAN::setBorderThick(nip.idSection, 2);
+    CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=12, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={-((l+1)*3)*dimCoef/2,0}, .Align = CS_TA_CENTER, .Show=1, .ShowEntierText=1});
 
     nip.idUp = CSUICONTROLS::iconButton02(nip.idSection, "img/increase.bmp\0", "img/increase2.bmp\0", {r.right-l*3-2,2,l,l});
     nip.idDown = CSUICONTROLS::iconButton02(nip.idSection, "img/decrease.bmp\0", "img/decrease2.bmp\0", {r.right-l*2-2,2,l,l});
     nip.idValidate = CSUICONTROLS::iconButton02(nip.idSection, "img/go.bmp\0", "img/go2.bmp\0", {r.right-l-2,2,l,l});
 
-    
     nip.idText = csCreateRichEdit(nip.idSection, {4,4,((l+1)*3)*dimCoef,4}, (const wchar_t*)value, 0, 0);
+    setRichEditColors(nip.idText, 0, RGB(120,120,120));
     csSetRichEditFormat(nip.idText, format);
     char*nb = (char*)wcharPtrToCharPtr((const wchar_t*)step).c_str();
     bool sign = CSUTILS::signExtraction(nb); 
@@ -385,8 +386,8 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUICONTROLS::numericIncrementerExt(int idp, RECT 
     //free(nb);
 
     bool*titleAutoRepos = csAlloc<bool>(1,1);
-    CSUIMAN::addAction(nip.idUp, incrementFunction, 2, &nip, titleAutoRepos);
-    CSUIMAN::addAction(nip.idDown, decrementFunction, 2, &nip, titleAutoRepos);
+    CSSECMAN::addAction(nip.idUp, incrementFunction, 2, &nip, titleAutoRepos);
+    CSSECMAN::addAction(nip.idDown, decrementFunction, 2, &nip, titleAutoRepos);
     return nip;
 }
 
@@ -561,15 +562,15 @@ void decrementFunction(CSARGS Args)
 CS_NUMERIC_INCREMENTER_PARAMS CSUICONTROLS::numericIncrementerExt1(int idp, RECT r, wchar_t* value, wchar_t* step, short format, COEFS4 bindCoefs, FLAGS4 bindFlags)
 {
     CS_NUMERIC_INCREMENTER_PARAMS nip = {0};
-    nip.idSection = CSUIMAN::createSection(idp, r,  RGB(25,25,25), {0,0,0,0});
-    CSUIMAN::setBorderColorAndThick(nip.idSection, RGB(40,40,40), 1);
+    nip.idSection = CSSECMAN::createSection(idp, r,  RGB(25,25,25), {0,0,0,0});
+    CSSECMAN::setBorderColorAndThick(nip.idSection, RGB(40,40,40), 1);
     CSBIND_GEOM_PARAMS bd;
     bd = {nip.idSection, bindCoefs, bindFlags};
-    CSUIMAN::bindGeometry(idp, bd);
+    CSSECMAN::bindGeometry(idp, bd);
     int l = (r.bottom-4);
     //CSUIFX::setBorderColorGradient(nip.idSection, {100,100,100}, {40,40,40}, 2, 2);
-    CSUIMAN::setBorderThick(nip.idSection, 2);
-    CSUIMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=14, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
+    CSSECMAN::setBorderThick(nip.idSection, 2);
+    CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=12, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={-5,0}, .Align = CS_TA_CENTER_RIGHT, .Show=1, .ShowEntierText=1});
 
     nip.idUp = CSUICONTROLS::iconButton02(nip.idSection, "img/u1.bmp\0", "img/u1.bmp\0", {2,2,l,l});
@@ -577,6 +578,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUICONTROLS::numericIncrementerExt1(int idp, RECT
 
     
     nip.idText = csCreateRichEdit(nip.idSection, {(2+l*2+2)*dimCoef,4,4,4}, (const wchar_t*)value, 0, 0);
+    setRichEditColors(nip.idText, 0, RGB(120,120,120));
     csSetRichEditFormat(nip.idText, format);
     char*nb = (char*)wcharPtrToCharPtr((const wchar_t*)step).c_str();
     bool sign = CSUTILS::signExtraction(nb); 
@@ -585,8 +587,8 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUICONTROLS::numericIncrementerExt1(int idp, RECT
 
 
     bool*titleAutoRepos = csAlloc<bool>(1,0);
-    CSUIMAN::addAction(nip.idUp, incrementFunction, 2, &nip, titleAutoRepos);
-    CSUIMAN::addAction(nip.idDown, decrementFunction, 2, &nip, titleAutoRepos);
+    CSSECMAN::addAction(nip.idUp, incrementFunction, 2, &nip, titleAutoRepos);
+    CSSECMAN::addAction(nip.idDown, decrementFunction, 2, &nip, titleAutoRepos);
     return nip;
 }
 
@@ -594,14 +596,14 @@ void reposIncBtn(CSARGS Args);
 CS_NUMERIC_INCREMENTER_PARAMS CSUICONTROLS::numericIncrementerExt2(int idp, RECT r, wchar_t* value, wchar_t* step, short format)
 {
     CS_NUMERIC_INCREMENTER_PARAMS nip = {0};
-    nip.idSection = CSUIMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
+    nip.idSection = CSSECMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
     CSBIND_GEOM_PARAMS bd;
     bd = {nip.idSection, {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0}};
-    CSUIMAN::bindGeometry(idp, bd);
+    CSSECMAN::bindGeometry(idp, bd);
     int l = (r.bottom-4);
     //CSUIFX::setBorderColorGradient(nip.idSection, {100,100,100}, {40,40,40}, 2, 2);
-    CSUIMAN::setBorderThick(nip.idSection, 2);
-    CSUIMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=14, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
+    CSSECMAN::setBorderThick(nip.idSection, 2);
+    CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=12, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1, .ShowEntierText=1});
 
     nip.idUp = CSUICONTROLS::iconButton02(nip.idSection, "img/next2.bmp\0", "img/next.bmp\0", {r.right-l-2,2,l,l});
@@ -610,6 +612,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUICONTROLS::numericIncrementerExt2(int idp, RECT
     
     int c = 2*dimCoef;
     nip.idText = csCreateRichEdit(nip.idSection, {(2+l+2)*dimCoef,c,(2+l+2)*dimCoef,c}, (const wchar_t*)value, 0, 0);
+    setRichEditColors(nip.idText, 0, RGB(120,120,120));
     csSetRichEditFormat(nip.idText, format);
     char*nb = (char*)wcharPtrToCharPtr((const wchar_t*)step).c_str();
     bool sign = CSUTILS::signExtraction(nb); 
@@ -618,9 +621,9 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUICONTROLS::numericIncrementerExt2(int idp, RECT
 
 
     bool*titleAutoRepos = csAlloc<bool>(1,0);
-    CSUIMAN::addAction(nip.idUp, incrementFunction, 2, &nip, titleAutoRepos);
-    CSUIMAN::addAction(nip.idDown, decrementFunction, 2, &nip, titleAutoRepos);
-    CSUIMAN::addAction(nip.idSection, reposIncBtn, 1, &nip.idUp);
+    CSSECMAN::addAction(nip.idUp, incrementFunction, 2, &nip, titleAutoRepos);
+    CSSECMAN::addAction(nip.idDown, decrementFunction, 2, &nip, titleAutoRepos);
+    CSSECMAN::addAction(nip.idSection, reposIncBtn, 1, &nip.idUp);
     return nip;
 }
 
@@ -638,8 +641,8 @@ void CSUICONTROLS::createToolTips(COLORREF color)
 {
     if(SECTION.size())
     {
-        TIPS_POPUP = CSUIMAN::createSection(0, {0,0,200/dimCoef,200/dimCoef}, color, {0}, 0, 0, 0);
-        CSUIMAN::enableDarkEdge(TIPS_POPUP);
+        TIPS_POPUP = CSSECMAN::createSection(0, {0,0,200/dimCoef,200/dimCoef}, color, {0}, 0, 0, 0);
+        CSSECMAN::enableDarkEdge(TIPS_POPUP);
         SetTimer(SECTION[TIPS_POPUP], 0, 20, 0);
     }
 }
@@ -824,18 +827,18 @@ void CS_STRING_INCREMENTER_PARAMS::newItem(const wchar_t* title, bool _status)
 CS_STRING_INCREMENTER_PARAMS CSUICONTROLS::stringIncrementer(int idp, RECT r, wchar_t* value, long step, bool loopStyle, COEFS4 bindCoefs, FLAGS4 bindFlags)
 {
     CS_STRING_INCREMENTER_PARAMS sip = {0};
-    sip.idSection = CSUIMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
+    sip.idSection = CSSECMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
     sip.newItem((const wchar_t*)value, 1);
     sip.step = step;
     sip.currentItem = 0;
 
     CSBIND_GEOM_PARAMS bd;
     bd = {sip.idSection, bindCoefs, bindFlags};
-    CSUIMAN::bindGeometry(idp, bd);
+    CSSECMAN::bindGeometry(idp, bd);
     int l = (r.bottom-4);
     
-    CSUIMAN::setBorderThick(sip.idSection, 2);
-    CSUIMAN::setTitle(sip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=14, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
+    CSSECMAN::setBorderThick(sip.idSection, 2);
+    CSSECMAN::setTitle(sip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=12, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1, .ShowEntierText=1});
 
     sip.idUp = CSUICONTROLS::iconButton02(sip.idSection, "img/next2.bmp\0", "img/next.bmp\0", {r.right-l-2,2,l,l});
@@ -849,9 +852,9 @@ CS_STRING_INCREMENTER_PARAMS CSUICONTROLS::stringIncrementer(int idp, RECT r, wc
     sip.loopStyle = loopStyle;
 
     bool*titleAutoRepos = csAlloc<bool>(1,0);
-    CSUIMAN::addAction(sip.idUp, strIncrementFunction, 2, &sip, titleAutoRepos);
-    CSUIMAN::addAction(sip.idDown, strDecrementFunction, 2, &sip, titleAutoRepos);
-    CSUIMAN::addAction(sip.idSection, reposIncBtn, 1, &sip.idUp);
+    CSSECMAN::addAction(sip.idUp, strIncrementFunction, 2, &sip, titleAutoRepos);
+    CSSECMAN::addAction(sip.idDown, strDecrementFunction, 2, &sip, titleAutoRepos);
+    CSSECMAN::addAction(sip.idSection, reposIncBtn, 1, &sip.idUp);
 
     return sip;
 }
