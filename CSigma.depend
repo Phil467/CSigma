@@ -140,7 +140,7 @@
 	"csListBoxMin.h"
 	"readwfile.h"
 
-1760306401 source:d:\projects\csigma\src\csscrollbar.cpp
+1760426733 source:d:\projects\csigma\src\csscrollbar.cpp
 	"csScrollBar.h"
 
 1760306401 source:d:\projects\csigma\src\cssection.cpp
@@ -228,7 +228,7 @@
 	"csScrollbar.h"
 	"csSubClasses.h"
 
-1760418958 source:d:\projects\csigma\src\csuiobjects.cpp
+1760426733 source:d:\projects\csigma\src\csuiobjects.cpp
 	"csUIObjects.h"
 	"readwfile.h"
 	"csArithmetic/csArithUtils.h"

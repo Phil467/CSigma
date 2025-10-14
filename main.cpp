@@ -187,7 +187,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     setTitle(STATIC_SEARCH, CSTEXT{.Text=L"Rechercher...\0", .Font=L"Arial", .FontSize=14, .Italic=1, .Color={100,100,100},
                                    .Marging={-15,0}, .Align = CS_TA_CENTER, .Show=1});
 
-    BUTTON_SEARCH = CSUIOBJECTS::iconButton01(STATIC_SEARCH, "resourcessearch02.bmp\0", "resourcessearch01.bmp\0", {200-14-1,1,14,14});
+    BUTTON_SEARCH = CSUIOBJECTS::iconButton01(STATIC_SEARCH, "resources/search02.bmp\0", "resources/search01.bmp\0", {200-14-1,1,14,14});
 
     int redit = csCreateRichEdit(STATIC_SEARCH, {4,4,35,4}, L"Search...", 0, 0);
 
@@ -222,11 +222,11 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
 
     CSMENU menu(ROOT, {(sRectClient(ROOT).right/dimCoef-cx*6)/2,0,0,cy}, 1);
 
-    menu.newGroup( L"Fichier\0", L"resourcesSettings01.bmp", L"resourcesSettings01.bmp");
-    menu.newGroup( L"Edition\0", L"resourcesSettings01.bmp", L"resourcesSettings01.bmp");
-    menu.newGroup( L"Données\0", L"resourcesSettings01.bmp", L"resourcesSettings01.bmp");
-    menu.newGroup( L"Paramètres\0", L"resourcesSettings01.bmp", L"resourcesSettings01.bmp");
-    int aboutMenuId = menu.newGroup( L"A propos\0", L"resourcesAbout01.bmp", L"resourcesAbout01.bmp");
+    menu.newGroup( L"Fichier\0", L"resources/Settings01.bmp", L"resources/Settings01.bmp");
+    menu.newGroup( L"Edition\0", L"resources/Settings01.bmp", L"resources/Settings01.bmp");
+    menu.newGroup( L"Données\0", L"resources/Settings01.bmp", L"resources/Settings01.bmp");
+    menu.newGroup( L"Paramètres\0", L"resources/Settings01.bmp", L"resources/Settings01.bmp");
+    int aboutMenuId = menu.newGroup( L"A propos\0", L"resources/About01.bmp", L"resources/About01.bmp");
     MENU_ABOUT = menu.getIdButton(aboutMenuId);
 
 
@@ -265,7 +265,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     hscrollAbout.setViewFrameBottomMarging(10);
     vscrollAbout.setViewFrameRightMarging(10);
 
-    int idcv = csGraphics::loadImage(ABOUT_UI_CLIENT, L"resourcescsigma logo.bmp", {1,1}, {0,0});
+    int idcv = csGraphics::loadImage(ABOUT_UI_CLIENT, L"resources/csigma logo.bmp", {1,1}, {0,0});
     SIZE sizecv = csGraphics::getImageSize(ABOUT_UI_CLIENT, idcv);
     csGraphics::showImage(ABOUT_UI_CLIENT, idcv, 1, {0}, sizecv);
 
@@ -455,7 +455,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
 
     GA_CLIENT = MIDDLE_MIDDLE_SECTION;
 
-    int idImg1 = csGraphics::loadImage(GA_CLIENT, L"resourcesCSigma Structure.bmp", {1,1}, {0,0});
+    int idImg1 = csGraphics::loadImage(GA_CLIENT, L"resources/CSigma Structure.bmp", {1,1}, {0,0});
     SIZE size1 = csGraphics::getImageSize(GA_CLIENT, idImg1);
     SIZE newSize1 = {size1.cx-200*4, size1.cy-200*4};
     //csGraphics::setImageSize(GA_CLIENT, idImg1, newSize1);
@@ -464,7 +464,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
 
     POINT logoPos = {100,100};
     SIZE logoSize = {350,300};
-    int idlogo1 = csGraphics::loadImage(GA_CLIENT, L"resourcescsigma logo3.bmp", logoPos, logoSize);
+    int idlogo1 = csGraphics::loadImage(GA_CLIENT, L"resources/csigma logo3.bmp", logoPos, logoSize);
     csGraphics::showImage(GA_CLIENT, idlogo1, 1, {0}, {0});
 
     int fact = std::max(ceil(1.0*size1.cx/smx), ceil(1.0*size1.cy/smy));
@@ -504,7 +504,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     lbm->setDefaultSize({150*dimCoef, 15*dimCoef});
     //lbm->setIconSize(0,{26,26});
 
-    lbm->setIcon(0, L"img\\langIcon2.bmp",L"img\\langIcon.bmp", L"img\\langIcon.bmp", L"img\\langIcon.bmp");
+    lbm->setIcon(0, L"resources\\langIcon2.bmp",L"resources\\langIcon.bmp", L"resources\\langIcon.bmp", L"resources\\langIcon.bmp");
     lbm->setMaxTextWidth(120*dimCoef);
     lbm->setDefaultTitle(L"Index");
 
@@ -570,7 +570,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
     //lbm1->setDefaultTitleColors(RGB(23,23,23), RGB(40,40,40), RGB(100,100,100));
     lbm1->setIconSize(0,{20,20});
 
-    lbm1->setIcon(0, L"img\\img.bmp",L"img\\img2.bmp", L"img\\img2.bmp", L"img\\img2.bmp");
+    lbm1->setIcon(0, L"resources\\img.bmp",L"resources\\img2.bmp", L"resources\\img2.bmp", L"resources\\img2.bmp");
     lbm1->setMaxTextWidth(120*dimCoef);
     lbm1->setDefaultTitle(L"Image");
     lbm1->newItem(0,100,0);
