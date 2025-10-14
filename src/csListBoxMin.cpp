@@ -1188,12 +1188,15 @@ extern vector<vector<CSARGS>> GROUPED_EVENTS_ARGS;
 
 void CSLISTBOXMIN::animate()
 {
-    n = pos.sizePtr();
-    pimgSize = &imgSize;
-    pmarging = &marging;
-    pdfltSz = &dfltSz;
-    poffset = &offset;
-    pgridWidth = &gridWidth;
+    n = csAlloc(1,pos.size());
+    pimgSize = csAlloc(1,imgSize);
+    pmarging = csAlloc(1,marging);
+    pdfltSz = csAlloc(1,dfltSz);
+    poffset = csAlloc(1,offset);
+    pgridWidth = csAlloc(1,gridWidth);
+    bool* pItemAlign = csAlloc(1,itemAlign);
+    int* pcxmax = csAlloc(1, cxmax);
+    int* pcymax = csAlloc(1, cymax);
 
     args.clear();
     args.setArgNumber(45);
@@ -1205,8 +1208,8 @@ void CSLISTBOXMIN::animate()
         lastMouseOverid, lastMouseClickid, n, &colorTracking, cntActivate, phdc,
         vkCtrlCount, vkCtrlCountControl, vkCtrlPoint, vkCtrlGdcPos, pmarging, pdfltSz,
         poffset, pgridWidth, smoothRepos, smoothReposCount,
-        cutPasteViewer, cutPasteStart, cutPasteDone, cutPasteDone0,copyPasteKeyDownState,click_message, &cxmax, &cymax,
-        &itemAlign, extFunc, extFuncArgs);
+        cutPasteViewer, cutPasteStart, cutPasteDone, cutPasteDone0,copyPasteKeyDownState,click_message, pcxmax, pcymax,
+        pItemAlign, extFunc, extFuncArgs);
     
 
     if(!animated)
@@ -1219,8 +1222,8 @@ void CSLISTBOXMIN::animate()
         lastMouseOverid, lastMouseClickid, n, &colorTracking, cntActivate, phdc,
         vkCtrlCount, vkCtrlCountControl, vkCtrlPoint, vkCtrlGdcPos, pmarging, pdfltSz,
         poffset, pgridWidth, smoothRepos, smoothReposCount,
-        cutPasteViewer, cutPasteStart, cutPasteDone, cutPasteDone0,copyPasteKeyDownState,click_message, &cxmax, &cymax,
-        &itemAlign, extFunc, extFuncArgs);
+        cutPasteViewer, cutPasteStart, cutPasteDone, cutPasteDone0,copyPasteKeyDownState,click_message, pcxmax, pcymax,
+        pItemAlign, extFunc, extFuncArgs);
         
         animated = 1;
     }

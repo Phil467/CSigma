@@ -16,6 +16,7 @@
 					<Add directory="include" />
 					<Add directory="include/csArithmetic" />
 					<Add directory="include/csParallelTask" />
+					<Add directory="C:/msys64/mingw64/include/nlohmann" />
 				</Compiler>
 				<ResourceCompiler>
 					<Add option="-D_UNICODE -DUNICODE" />
@@ -43,6 +44,7 @@
 				<Compiler>
 					<Add option="-O2" />
 					<Add directory="include" />
+					<Add directory="C:/msys64/mingw64/include/nlohmann" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -52,6 +54,7 @@
 		<Compiler>
 			<Add option="-Wall" />
 			<Add option="-D_UNICODE -DUNICODE" />
+			<Add directory="C:/msys64/mingw64/include/nlohmann" />
 		</Compiler>
 		<Linker>
 			<Add library="gdi32" />
@@ -79,7 +82,7 @@
 		<Unit filename="include/csSubClasses.h" />
 		<Unit filename="include/csTranslator.h" />
 		<Unit filename="include/csTypes.h" />
-		<Unit filename="include/csUIControls.h" />
+		<Unit filename="include/csUIObjects.h" />
 		<Unit filename="include/csUIFx.h" />
 		<Unit filename="include/csUtils.h" />
 		<Unit filename="include/readwfile.h" />
@@ -96,7 +99,7 @@
 		<Unit filename="src/csStrUtils.cpp" />
 		<Unit filename="src/csSubClasses.cpp" />
 		<Unit filename="src/csTranslator.cpp" />
-		<Unit filename="src/csUIControls.cpp" />
+		<Unit filename="src/csUIObjects.cpp" />
 		<Unit filename="src/csUIFx.cpp" />
 		<Unit filename="src/csUtils.cpp" />
 		<Extensions />

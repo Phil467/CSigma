@@ -1,7 +1,7 @@
 #include "csMenu.h"
 #include "csUtils.h"
 #include "csScrollBar.h"
-#include "csUIControls.h"
+#include "csUIObjects.h"
 
 extern vector<HWND> SECTION;
 extern vector<CSTEXT> TITLE;

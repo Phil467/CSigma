@@ -919,8 +919,8 @@ void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay
         csGraphics::setGraphicAreaColor(TIPS_POPUP,{GetRValue(c),GetGValue(c),GetBValue(c)},{0});
         csGraphics::setGraphicAreaSize(TIPS_POPUP,{rTips.right, rTips.bottom});
         csGraphics::updateGraphicArea(TIPS_POPUP, 1);
-        /*CSSCROLLBAR hscroll1 = CSUICONTROLS::addHScrollBar(&MIDDLE_BOTTOM_SECTION, &MIDDLE_BOTTOM_SECTION, 0, 20);
-        CSSCROLLBAR vscroll1 = CSUICONTROLS::addVScrollBar(&MIDDLE_BOTTOM_SECTION, &MIDDLE_BOTTOM_SECTION, 0, 20);
+        /*CSSCROLLBAR hscroll1 = CSUIOBJECTS::addHScrollBar(&MIDDLE_BOTTOM_SECTION, &MIDDLE_BOTTOM_SECTION, 0, 20);
+        CSSCROLLBAR vscroll1 = CSUIOBJECTS::addVScrollBar(&MIDDLE_BOTTOM_SECTION, &MIDDLE_BOTTOM_SECTION, 0, 20);
 
         hscroll1.setViewFrameBottomMarging(20);
         vscroll1.setViewFrameRightMarging(20);*/
@@ -1148,7 +1148,7 @@ void CSSECMAN::setLockable(int id, CSLOCKED_MODE lm)
     lockedMode[id] = lm;
 }
 
-void CSSECMAN::updateAfterReceivingResizeMessage(int id)
+void CSSECMAN::updateAfterResizing(int id)
 {
     updateAfterResizeMsg[id] = 1;
 }

@@ -1,6 +1,6 @@
 
 #include "csSection.h"
-#include "csUIControls.h"
+#include "csUIObjects.h"
 #include "csMenu.h"
 
 #include "csStrUtils.h"
@@ -36,7 +36,7 @@ int smy = GetSystemMetrics(SM_CYSCREEN);
 
 
     
-CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
+CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
 
 {
 
@@ -50,11 +50,11 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     CSSECMAN::enableDarkEdge(ROOT);
     CSSECMAN::setMinMaxInfo(ROOT, MINMAXINFO{.ptMinTrackSize={400,250}});
 
-    CSUICONTROLS::addTitle(ROOT, L"TEST BIBLIOTHEQUE CSIGMA",{0}, 16, L"Arial Black", ICON_ROOT);
-    CSSYSCOMMAND_SECTION SYS_CMD = CSUICONTROLS::addSysCommand(ROOT, {600});
+    CSUIOBJECTS::addTitle(ROOT, L"TEST BIBLIOTHEQUE CSIGMA",{0}, 16, L"Arial Black", ICON_ROOT);
+    CSSYSCOMMAND_SECTION SYS_CMD = CSUIOBJECTS::addSysCommand(ROOT, {600});
 
     /******************************** ToolTips **************************************** */
-    CSUICONTROLS::createToolTips(RGB(40,40,40));
+    CSUIOBJECTS::createToolTips(RGB(40,40,40));
 
     /*************************************** MIDDLE_SECTION ************************************ */
     CSBIND_GEOM_PARAMS bd;
@@ -115,7 +115,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     bindGeometry(ROOT, bd);
 
     CSSECMAN::setMinMaxInfo(RIGHT_SECTION, MINMAXINFO{.ptMinTrackSize={50}, .ptMaxTrackSize={162}});
-    CSSECMAN::updateAfterReceivingResizeMessage(RIGHT_SECTION);
+    CSSECMAN::updateAfterResizing(RIGHT_SECTION);
 
     /**************************************************************************************************** */
 
@@ -124,12 +124,12 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     bindGeometry(MIDDLE_TOP_SECTION, bd);
     bd = {NR_SECTION, {0,0,0.5,0}, 0,0,BIND_DEST_RIGHT_EDGE,0};
     bindGeometry(ROOT, bd);
-    CSSECMAN::updateAfterReceivingResizeMessage(NR_SECTION);
+    CSSECMAN::updateAfterResizing(NR_SECTION);
 
-    CS_NUMERIC_INCREMENTER_PARAMS nrIds01 = CSUICONTROLS::numericIncrementerExt(NR_SECTION, {2,2,70,15}, L"10", L"1", INPUT_FORMAT_INTERGER);
-    CS_NUMERIC_INCREMENTER_PARAMS nrIds02 = CSUICONTROLS::numericIncrementerExt(NR_SECTION, {2+73,2,70,15}, L"12", L"1", INPUT_FORMAT_INTERGER);
-    CS_NUMERIC_INCREMENTER_PARAMS nrIds03 = CSUICONTROLS::numericIncrementerExt(NR_SECTION, {2+73*2,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
-    CS_NUMERIC_INCREMENTER_PARAMS nrIds04 = CSUICONTROLS::numericIncrementerExt(NR_SECTION, {2+73*3,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
+    CS_NUMERIC_INCREMENTER_PARAMS nrIds01 = CSUIOBJECTS::numericIncrementerExt(NR_SECTION, {2,2,70,15}, L"10", L"1", INPUT_FORMAT_INTERGER);
+    CS_NUMERIC_INCREMENTER_PARAMS nrIds02 = CSUIOBJECTS::numericIncrementerExt(NR_SECTION, {2+73,2,70,15}, L"12", L"1", INPUT_FORMAT_INTERGER);
+    CS_NUMERIC_INCREMENTER_PARAMS nrIds03 = CSUIOBJECTS::numericIncrementerExt(NR_SECTION, {2+73*2,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
+    CS_NUMERIC_INCREMENTER_PARAMS nrIds04 = CSUIOBJECTS::numericIncrementerExt(NR_SECTION, {2+73*3,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
 
     nrIds01.setMinBound("1");
     nrIds02.setMinBound("1");
@@ -143,11 +143,11 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     bindGeometry(BIS_SECTION, bd);
     bd = {BIS_SECTION, {0,0,0.5,0}, 0,0,BIND_DEST_LEFT_EDGE|BIND_DEST_RIGHT_EDGE_ONE,0};
     bindGeometry(ROOT, bd);
-    CSSECMAN::updateAfterReceivingResizeMessage(BIS_SECTION);
-    CS_NUMERIC_INCREMENTER_PARAMS bisIds01 = CSUICONTROLS::numericIncrementerExt(BIS_SECTION, {2,2,70,15}, L"10", L"1", INPUT_FORMAT_INTERGER);
-    CS_NUMERIC_INCREMENTER_PARAMS bisIds02 = CSUICONTROLS::numericIncrementerExt(BIS_SECTION, {2+73,2,70,15}, L"12", L"1", INPUT_FORMAT_INTERGER);
-    CS_NUMERIC_INCREMENTER_PARAMS bisIds03 = CSUICONTROLS::numericIncrementerExt(BIS_SECTION, {2+73*2,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
-    CS_NUMERIC_INCREMENTER_PARAMS bisIds04 = CSUICONTROLS::numericIncrementerExt(BIS_SECTION, {2+73*3,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
+    CSSECMAN::updateAfterResizing(BIS_SECTION);
+    CS_NUMERIC_INCREMENTER_PARAMS bisIds01 = CSUIOBJECTS::numericIncrementerExt(BIS_SECTION, {2,2,70,15}, L"10", L"1", INPUT_FORMAT_INTERGER);
+    CS_NUMERIC_INCREMENTER_PARAMS bisIds02 = CSUIOBJECTS::numericIncrementerExt(BIS_SECTION, {2+73,2,70,15}, L"12", L"1", INPUT_FORMAT_INTERGER);
+    CS_NUMERIC_INCREMENTER_PARAMS bisIds03 = CSUIOBJECTS::numericIncrementerExt(BIS_SECTION, {2+73*2,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
+    CS_NUMERIC_INCREMENTER_PARAMS bisIds04 = CSUIOBJECTS::numericIncrementerExt(BIS_SECTION, {2+73*3,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
 
     bisIds01.setMinBound("1");
     bisIds02.setMinBound("1");
@@ -161,11 +161,11 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     bindGeometry(MIDDLE_TOP_SECTION, bd);
     bd = {CS_SECTION, {-1,0,1,0}, BIND_DEST_RIGHT_EDGE,0,BIND_DEST_LEFT_EDGE,0};
     bindGeometry(ROOT, bd);
-    CSSECMAN::updateAfterReceivingResizeMessage(CS_SECTION);
-    CS_NUMERIC_INCREMENTER_PARAMS csIds01 = CSUICONTROLS::numericIncrementerExt(CS_SECTION, {2,2,70,15}, L"10", L"1", INPUT_FORMAT_INTERGER);
-    CS_NUMERIC_INCREMENTER_PARAMS csIds02 = CSUICONTROLS::numericIncrementerExt(CS_SECTION, {2+73,2,70,15}, L"12", L"1", INPUT_FORMAT_INTERGER);
-    CS_NUMERIC_INCREMENTER_PARAMS csIds03 = CSUICONTROLS::numericIncrementerExt(CS_SECTION, {2+73*2,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
-    CS_NUMERIC_INCREMENTER_PARAMS csIds04 = CSUICONTROLS::numericIncrementerExt(CS_SECTION, {2+73*3,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
+    CSSECMAN::updateAfterResizing(CS_SECTION);
+    CS_NUMERIC_INCREMENTER_PARAMS csIds01 = CSUIOBJECTS::numericIncrementerExt(CS_SECTION, {2,2,70,15}, L"10", L"1", INPUT_FORMAT_INTERGER);
+    CS_NUMERIC_INCREMENTER_PARAMS csIds02 = CSUIOBJECTS::numericIncrementerExt(CS_SECTION, {2+73,2,70,15}, L"12", L"1", INPUT_FORMAT_INTERGER);
+    CS_NUMERIC_INCREMENTER_PARAMS csIds03 = CSUIOBJECTS::numericIncrementerExt(CS_SECTION, {2+73*2,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
+    CS_NUMERIC_INCREMENTER_PARAMS csIds04 = CSUIOBJECTS::numericIncrementerExt(CS_SECTION, {2+73*3,2,70,15}, L"1", L"10", INPUT_FORMAT_INTERGER);
 
     csIds01.setMinBound("1");
     csIds02.setMinBound("1");
@@ -187,13 +187,13 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     setTitle(STATIC_SEARCH, CSTEXT{.Text=L"Rechercher...\0", .Font=L"Arial", .FontSize=14, .Italic=1, .Color={100,100,100},
                                    .Marging={-15,0}, .Align = CS_TA_CENTER, .Show=1});
 
-    BUTTON_SEARCH = CSUICONTROLS::iconButton01(STATIC_SEARCH, "img/search02.bmp\0", "img/search01.bmp\0", {200-14-1,1,14,14});
+    BUTTON_SEARCH = CSUIOBJECTS::iconButton01(STATIC_SEARCH, "img/search02.bmp\0", "img/search01.bmp\0", {200-14-1,1,14,14});
 
     int redit = csCreateRichEdit(STATIC_SEARCH, {4,4,35,4}, L"Search...", 0, 0);
 
     /********************************************************************************** */
 
-    CS_NUMERIC_INCREMENTER_PARAMS fontSizeInc = CSUICONTROLS::numericIncrementerExt1(ROOT, {600-150,0,70,20}, L"16", L"1", INPUT_FORMAT_INTERGER,
+    CS_NUMERIC_INCREMENTER_PARAMS fontSizeInc = CSUIOBJECTS::numericIncrementerExt1(ROOT, {600-150,0,70,20}, L"16", L"1", INPUT_FORMAT_INTERGER,
                                                             {-1,0,1,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0});
     fontSizeInc.setMinBound("8");
     fontSizeInc.setMaxBound("30");
@@ -233,7 +233,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     ABOUT_UI = createSection(0, {100,25,600,500},  RGB(40,40,40), {1,1,1,1,1,1,1,1}, 0, 1, 0);
     CSSECMAN::enableDarkEdge(ABOUT_UI);
     CSSECMAN::setIcon(ABOUT_UI, ICON_ROOT);
-    CSUICONTROLS::addTitle(ABOUT_UI, L"About",{60,CAPTION_AREA_SIZE/dimCoef}, 18, L"Arial black", ICON_ROOT);
+    CSUIOBJECTS::addTitle(ABOUT_UI, L"About",{60,CAPTION_AREA_SIZE/dimCoef}, 18, L"Arial black", ICON_ROOT);
 
     ABOUT_UI_CLIENT = createSection(ABOUT_UI, {10/dimCoef,CAPTION_AREA_SIZE/dimCoef,590-10/dimCoef,500-CAPTION_AREA_SIZE/dimCoef-10-20},  RGB(0,0,0), {0}, 1);
     bd = {ABOUT_UI_CLIENT, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE, BIND_DEST_BOTTOM_EDGE,
@@ -254,14 +254,14 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     bd = {ABOUT_SUB_MENU, {-0.5,0,0.5,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
     bindGeometry(ABOUT_UI, bd);
 
-    ABOUT_P1 = CSUICONTROLS::darkTextButton01(ABOUT_SUB_MENU, L"1\0", {0,0,w,h});
-    ABOUT_P2 = CSUICONTROLS::darkTextButton01(ABOUT_SUB_MENU, L"2\0", {total*1,0,w,h});
-    ABOUT_P3 = CSUICONTROLS::darkTextButton01(ABOUT_SUB_MENU, L"3\0", {total*2,0,w,h});
-    ABOUT_P4 = CSUICONTROLS::darkTextButton01(ABOUT_SUB_MENU, L"4\0", {total*3,0,w,h});
+    ABOUT_P1 = CSUIOBJECTS::darkTextButton01(ABOUT_SUB_MENU, L"1\0", {0,0,w,h});
+    ABOUT_P2 = CSUIOBJECTS::darkTextButton01(ABOUT_SUB_MENU, L"2\0", {total*1,0,w,h});
+    ABOUT_P3 = CSUIOBJECTS::darkTextButton01(ABOUT_SUB_MENU, L"3\0", {total*2,0,w,h});
+    ABOUT_P4 = CSUIOBJECTS::darkTextButton01(ABOUT_SUB_MENU, L"4\0", {total*3,0,w,h});
 
-    CSSYSCOMMAND_SECTION SYS_CMD2 = CSUICONTROLS::addSysCommand(ABOUT_UI, {600});
-    CSSCROLLBAR hscrollAbout = CSUICONTROLS::addHScrollBar(&ABOUT_UI_CLIENT, &ABOUT_UI_CLIENT, 0, 10);
-    CSSCROLLBAR vscrollAbout = CSUICONTROLS::addVScrollBar(&ABOUT_UI_CLIENT, &ABOUT_UI_CLIENT, 0, 10);
+    CSSYSCOMMAND_SECTION SYS_CMD2 = CSUIOBJECTS::addSysCommand(ABOUT_UI, {600});
+    CSSCROLLBAR hscrollAbout = CSUIOBJECTS::addHScrollBar(&ABOUT_UI_CLIENT, &ABOUT_UI_CLIENT, 0, 10);
+    CSSCROLLBAR vscrollAbout = CSUIOBJECTS::addVScrollBar(&ABOUT_UI_CLIENT, &ABOUT_UI_CLIENT, 0, 10);
     hscrollAbout.setViewFrameBottomMarging(10);
     vscrollAbout.setViewFrameRightMarging(10);
 
@@ -295,8 +295,8 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
 
     /********************************************************************************** */
     h = 16, marg = 4, total = h+marg;
-    //BTN_NEW_FILE = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"New File\0", {5,5,65,h});
-    CS_NUMERIC_INCREMENTER_PARAMS internPrec = CSUICONTROLS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5,65,h}, L"1", L"1", INPUT_FORMAT_INTERGER);
+    //BTN_NEW_FILE = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"New File\0", {5,5,65,h});
+    CS_NUMERIC_INCREMENTER_PARAMS internPrec = CSUIOBJECTS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5,65,h}, L"1", L"1", INPUT_FORMAT_INTERGER);
     internPrec.setMinBound("1");
 
     CSDYNAMIC_SIMPLE_TEXT tips;
@@ -312,7 +312,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     tips.pSpace.push_back(5);
     CSSECMAN::addTips(internPrec.idSection, {0,0,250/dimCoef, 200/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips);
 
-    CS_NUMERIC_INCREMENTER_PARAMS externPrec = CSUICONTROLS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*1,65,h}, L"1", L"1", INPUT_FORMAT_INTERGER);
+    CS_NUMERIC_INCREMENTER_PARAMS externPrec = CSUIOBJECTS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*1,65,h}, L"1", L"1", INPUT_FORMAT_INTERGER);
     externPrec.setMinBound("1");
     CSDYNAMIC_SIMPLE_TEXT tips1;
     tips1.marg = {10,10,10,10};
@@ -328,7 +328,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     CSSECMAN::addTips(externPrec.idSection, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips1);
 
 
-    CS_NUMERIC_INCREMENTER_PARAMS Nnb = CSUICONTROLS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*2,65,h}, L"500", L"1", INPUT_FORMAT_INTERGER);
+    CS_NUMERIC_INCREMENTER_PARAMS Nnb = CSUIOBJECTS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*2,65,h}, L"500", L"1", INPUT_FORMAT_INTERGER);
     Nnb.setMinBound("1");
     CSDYNAMIC_SIMPLE_TEXT tips2;
     tips2.marg = {10,10,10,10};
@@ -344,8 +344,8 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     CSSECMAN::addTips(Nnb.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips2);
 
     /********************************************************************************** */
-    //BTN_NEW_OUTPUT = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"New Output\0", {5,5+total*1,65,h});
-    CS_NUMERIC_INCREMENTER_PARAMS minDigit = CSUICONTROLS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*3,65,h}, L"0", L"1", INPUT_FORMAT_INTERGER);
+    //BTN_NEW_OUTPUT = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"New Output\0", {5,5+total*1,65,h});
+    CS_NUMERIC_INCREMENTER_PARAMS minDigit = CSUIOBJECTS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*3,65,h}, L"0", L"1", INPUT_FORMAT_INTERGER);
     minDigit.setMinBound("0");
     minDigit.setMaxBound("9");
     CSDYNAMIC_SIMPLE_TEXT tips3;
@@ -362,9 +362,9 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     CSSECMAN::addTips(minDigit.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
 
     /********************************************************************************** */
-    //BTN_REMOVE_FILE = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Remove File\0", {5,5+total*2,65,h});
+    //BTN_REMOVE_FILE = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Remove File\0", {5,5+total*2,65,h});
 
-    CS_NUMERIC_INCREMENTER_PARAMS maxDigit = CSUICONTROLS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*4,65,h}, L"9", L"1", INPUT_FORMAT_INTERGER);
+    CS_NUMERIC_INCREMENTER_PARAMS maxDigit = CSUIOBJECTS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*4,65,h}, L"9", L"1", INPUT_FORMAT_INTERGER);
     maxDigit.setMinBound("0");
     maxDigit.setMaxBound("9");
 
@@ -372,7 +372,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     /********************************************************************************** */
 
     void getRandomData(CSARGS Args);
-    BNT_RANDOM_NUMBER = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Nombre aléatoire\0", {5,5+total*5,65,h});
+    BNT_RANDOM_NUMBER = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Nombre aléatoire\0", {5,5+total*5,65,h});
     CSSECMAN::addAction(BNT_RANDOM_NUMBER, getRandomData, 4, &Nnb.idSection, &minDigit.idSection, &maxDigit.idSection, &MIDDLE_MIDDLE_SECTION);
 
     CSDYNAMIC_SIMPLE_TEXT tipsMSG;
@@ -390,7 +390,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
 
     /********************************************************************************** */
 
-    BTN_ADD_TO_DATA_LIST = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Ajouter\0", {5,5+total*6,65,h});
+    BTN_ADD_TO_DATA_LIST = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Ajouter\0", {5,5+total*6,65,h});
     CSDYNAMIC_SIMPLE_TEXT tipsMSG1;
     tipsMSG1.marg = {10,10,10,10};
     tipsMSG1.updateGASize = 1;
@@ -403,36 +403,36 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     tipsMSG1.pSpace.push_back(5);
     CSSECMAN::addTips(BTN_ADD_TO_DATA_LIST, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG1);
     /********************************************************************************** */
-    //BTN_REMOVE_SAVE_1 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Save 1\0", {5,5+total*6,65,h});
-    CS_NUMERIC_INCREMENTER_PARAMS activeNum = CSUICONTROLS::numericIncrementerExt2(MIDDLE_LEFT_SECTION, {5,5+total*7,65,h}, L"0", L"1", INPUT_FORMAT_INTERGER);
+    //BTN_REMOVE_SAVE_1 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Save 1\0", {5,5+total*6,65,h});
+    CS_NUMERIC_INCREMENTER_PARAMS activeNum = CSUIOBJECTS::numericIncrementerExt2(MIDDLE_LEFT_SECTION, {5,5+total*7,65,h}, L"0", L"1", INPUT_FORMAT_INTERGER);
     activeNum.setMinBound("0");
     activeNum.setMaxBound("9");
 
-    CS_STRING_INCREMENTER_PARAMS strInc = CSUICONTROLS::stringIncrementer(MIDDLE_LEFT_SECTION, {5,5+total*8,65,h}, L"string 1\0", 1, 1,
+    CS_STRING_INCREMENTER_PARAMS* strInc = CSUIOBJECTS::stringIncrementer(MIDDLE_LEFT_SECTION, {5,5+total*8,65,h}, L"string 1\0", 1, 1,
                                                             {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0});
-    strInc.newItem(L"string 2\0");
-    strInc.newItem(L"string 3\0");
-    strInc.newItem(L"string 4\0");
-    strInc.newItem(L"string 5\0");
-    strInc.newItem(L"string 6\0");
-    strInc.newItem(L"string 7\0");
-    strInc.newItem(L"string 8\0");
-    strInc.newItem(L"string 9\0");
+    strInc->newItem(L"string 2\0");
+    strInc->newItem(L"string 3\0");
+    strInc->newItem(L"string 4\0");
+    strInc->newItem(L"string 5\0");
+    strInc->newItem(L"string 6\0");
+    strInc->newItem(L"string 7\0");
+    strInc->newItem(L"string 8\0");
+    strInc->newItem(L"string 9\0");
 
-    //BTN_REMOVE_UNDO_1 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Undo 1\0", {5,5+total*9,65,h});
+    //BTN_REMOVE_UNDO_1 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Undo 1\0", {5,5+total*9,65,h});
 
-    BTN_1 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Show/Hide logo", {5,5+total*10,65,h});
-    BTN_2 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Play/Stop animation", {5,5+total*11,65,h});
-    BTN_3 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Bouton 3", {5,5+total*12,65,h});
-    BTN_4 = CSUICONTROLS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Bouton 4", {5,5+total*13,65,h});
+    BTN_1 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Show/Hide logo", {5,5+total*10,65,h});
+    BTN_2 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Play/Stop animation", {5,5+total*11,65,h});
+    BTN_3 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Bouton 3", {5,5+total*12,65,h});
+    BTN_4 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Bouton 4", {5,5+total*13,65,h});
     // Boucle principale
 
 
 
     /*********************************************************** */
 
-    CSSCROLLBAR hscroll1 = CSUICONTROLS::addHScrollBar(&MIDDLE_MIDDLE_SECTION, &MIDDLE_MIDDLE_SECTION, 0, 10);
-    CSSCROLLBAR vscroll1 = CSUICONTROLS::addVScrollBar(&MIDDLE_MIDDLE_SECTION, &MIDDLE_MIDDLE_SECTION, 0, 10);
+    CSSCROLLBAR hscroll1 = CSUIOBJECTS::addHScrollBar(&MIDDLE_MIDDLE_SECTION, &MIDDLE_MIDDLE_SECTION, 0, 10);
+    CSSCROLLBAR vscroll1 = CSUIOBJECTS::addVScrollBar(&MIDDLE_MIDDLE_SECTION, &MIDDLE_MIDDLE_SECTION, 0, 10);
 
     hscroll1.setViewFrameBottomMarging(10);
     vscroll1.setViewFrameRightMarging(10);
@@ -486,23 +486,16 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
 
     //RIGHT_SECTION_CHILD = createSection(RIGHT_SECTION, {5,0,1500/dimCoef,1000/dimCoef},  RGB(30,30,30), {0,0,0,0});
 
-    CSSCROLLBAR hscroll2 = CSUICONTROLS::addHScrollBar(&RIGHT_SECTION, &RIGHT_SECTION, 0, 10);
-    CSSCROLLBAR vscroll2 = CSUICONTROLS::addVScrollBar(&RIGHT_SECTION, &RIGHT_SECTION, 0, 10);
+    CSSCROLLBAR hscroll2 = CSUIOBJECTS::addHScrollBar(&RIGHT_SECTION, &RIGHT_SECTION, 0, 10);
+    CSSCROLLBAR vscroll2 = CSUIOBJECTS::addVScrollBar(&RIGHT_SECTION, &RIGHT_SECTION, 0, 10);
 
     hscroll2.setViewFrameBottomMarging(10);
     vscroll2.setViewFrameRightMarging(10);
     csGraphics::setGraphicAreaColor(RIGHT_SECTION, {30,30,30}, {0});
     csGraphics::setMouseWheelPreference(RIGHT_SECTION, CS_MOUSEWHEEL_VSCROLL);
 
-
-    PROGRESS_INFO_SECTION = createSection(BOTTOM_SECTION, {0,0, 300/dimCoef, (sRectClient(BOTTOM_SECTION).bottom/dimCoef)},  RGB(20,20,20), {0,0,1});
-    CSUIFX::setTitleColorGradient(PROGRESS_INFO_SECTION, {180,180,180},{220,220,200},3,3);
-    CSUIFX::setTitleColorClickEffect(PROGRESS_INFO_SECTION, {220,220,120});
-    CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"No Task", .Font=L"calibri", .FontSize = 12, .Italic=1,
-        .Bold=0, .Color={180,180,180},
-        .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1});
-    //CSSECMAN::autoFitToTitle(PROGRESS_INFO_SECTION, 10);
-    CSLANGMAN::translateTitle(PROGRESS_INFO_SECTION, 0);
+    
+    CSUIOBJECTS::CS_ABSTRACT_PROGRESSBAR progressbar(BOTTOM_SECTION, {0,0, 300/dimCoef, (sRectClient(BOTTOM_SECTION).bottom/dimCoef)});
 
     CSLISTBOXMIN* lbm = csNewMinimalListBoxPtr(&RIGHT_SECTION, 100, 220);
     lbm->setDefaultFont(L"calibri",{12,0});
@@ -536,8 +529,20 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     hscroll2.setPositionRatio(0);
     vscroll2.setPositionRatio(0);
 
+
     void appTranslateStrings(CSARGS Args);
-    CSSECMAN::addAction(lbm->getId(), appTranslateStrings, 1, lbm);
+    void startTranslation(CSARGS Args);
+
+    bool*execute = csAlloc<bool>(1,0);
+    bool*status = csAlloc<bool>(1,0);
+    double*maxWorkLevel = csAlloc<double>(1,0);
+    double*workLevel = csAlloc<double>(1,0);
+    CSSECMAN::addAction(lbm->getId(), startTranslation, 1, execute);
+    CSARGS args(4);
+    args.regArg(status, maxWorkLevel, workLevel, lbm);
+    progressbar.regFunction(appTranslateStrings, args, execute, L"Translating", L"Translated", L"Translation failed");
+
+
 
     IMAGE_LIST_SECTION = createSection(MIDDLE_LEFT_SECTION, {5,300, 65, 110},  RGB(22,22,22), {0});
     bd = {IMAGE_LIST_SECTION, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE, 0, BIND_DEST_BOTTOM_EDGE}};
@@ -547,8 +552,8 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
     bd = {IMAGE_LIST_SECTION, {0,0,0,-1}, {0,0, 0,BIND_DEST_BOTTOM_EDGE}};
     bindGeometry(MIDDLE_TOP_SECTION, 1, bd);
 
-    CSSCROLLBAR hscroll3 = CSUICONTROLS::addHScrollBar(&IMAGE_LIST_SECTION, &IMAGE_LIST_SECTION, 0, 10);
-    CSSCROLLBAR vscroll3 = CSUICONTROLS::addVScrollBar(&IMAGE_LIST_SECTION, &IMAGE_LIST_SECTION, 0, 10);
+    CSSCROLLBAR hscroll3 = CSUIOBJECTS::addHScrollBar(&IMAGE_LIST_SECTION, &IMAGE_LIST_SECTION, 0, 10);
+    CSSCROLLBAR vscroll3 = CSUIOBJECTS::addVScrollBar(&IMAGE_LIST_SECTION, &IMAGE_LIST_SECTION, 0, 10);
 
     hscroll3.setViewFrameBottomMarging(10);
     vscroll3.setViewFrameRightMarging(10);
@@ -674,148 +679,52 @@ void setFontSize(CSARGS Args)
     }
 }
 
-COLORREF sectionColor1 = RGB(160,160,220), sectionColor2 = RGB(160,160,230), sectionColor3 = RGB(160,160,220);
-COLORREF dColor1 = RGB(30,40,30), dColor2 = RGB(30,50,30), dColor3 = RGB(160,220,160);
+
 
 void appTranslateStrings(CSARGS Args)
 {
-    CSLISTBOXMIN* lbm = (CSLISTBOXMIN*)Args[0];
-    int id = (int)Args;
-    UINT msg = (UINT)Args;
-    static bool isworking = 0, showStatus = 0;
-    static int lastViewLanguageId = -1, statusIter = 0;
+    CSLISTBOXMIN* lbm = (CSLISTBOXMIN*)Args[3];
+    int i = *lbm->getActiveItem();
+    static int lastViewLanguageId = -1;
 
-    if(msg == WM_LBUTTONDBLCLK)
+    COLORREF sectionColor1 = RGB(160,160,220), sectionColor2 = RGB(160,160,230), sectionColor3 = RGB(160,160,220);
+    COLORREF dColor1 = RGB(30,40,30), dColor2 = RGB(30,50,30), dColor3 = RGB(160,220,160);
+    
+    CSLANGMAN::setViewLanguage(i);
+    CSLANGMAN::translateAppStrings();
+
+    *(bool*)Args[0] = CSLANGMAN::getTranslationProcessStatus();
+    
+    if(CSLANGMAN::getTranslationProcessStatus())
     {
-        if(statusIter > 0)
-            statusIter = 900; //terminer le processus precedent
 
-        if(!isworking)
+        int viewLanguageId = CSLANGMAN::getLanguageCodeId(CSLANGMAN::getViewLanguageCode());
+        COLORREF color , highlightColor, selectionColor;
+
+        if(viewLanguageId != lastViewLanguageId)
         {
-            isworking = 1;
-
-            thread t(
-                [](CSLISTBOXMIN* lbm)
-                {
-                    int i = *lbm->getActiveItem();
-                    CSLANGMAN::setViewLanguage(i);
-                    CSLANGMAN::translateAppStrings();
-                    isworking = 0;
-
-                    if(CSLANGMAN::getTranslationProcessStatus())
-                    {
-                        int viewLanguageId = CSLANGMAN::getLanguageCodeId(CSLANGMAN::getViewLanguageCode());
-                        COLORREF color , highlightColor, selectionColor;
-
-                        if(viewLanguageId != lastViewLanguageId)
-                        {
-                            if(lastViewLanguageId > -1)
-                            {
-                                lbm->setItemBackground(lastViewLanguageId, dColor1, dColor2, dColor3);
-                            }
-                            lbm->setItemBackground(viewLanguageId, sectionColor1, sectionColor2, sectionColor3);
-                            lastViewLanguageId = viewLanguageId;
-                            InvalidateRect(sHandle(lbm->getId()), 0,1);
-                        }
-                    }
-
-
-                }, lbm
-            );
-            t.detach();
-
-            thread t2(
-                []()
-                {
-                    const wchar_t* title = CSSECMAN::getTitleText(PROGRESS_INFO_SECTION);
-                    long iter = 0;
-
-                    while (1)
-                    {
-                        if(iter == 50)
-                        {
-                            CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation in progress ."}, 1);
-                            CSSECMAN::updateSection(PROGRESS_INFO_SECTION);
-                        }
-                        else if(iter == 100)
-                        {
-                            CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation in progress . ."}, 1);
-                            CSSECMAN::updateSection(PROGRESS_INFO_SECTION);
-                        }
-                        else if(iter == 150)
-                        {
-                            CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation in progress . . ."}, 1);
-                            CSSECMAN::updateSection(PROGRESS_INFO_SECTION);
-                        }
-                        else if(iter > 150)
-                        {
-                            iter = 0;
-                        }
-                        iter++;
-
-                        if(!isworking)
-                        {
-                            showStatus = 1;
-                            break;
-                        }
-                        std::this_thread::sleep_for(std::chrono::microseconds(1000));
-                    }
-
-                }
-            );
-            t2.detach();
-
-            thread t3(
-                []()
-                {
-                    //const wchar_t* title = CSSECMAN::getTitleText(PROGRESS_INFO_SECTION);
-                    //CSRGBA titleColor = CSSECMAN::getTitleColor(PROGRESS_INFO_SECTION);
-                    CSRGBA titleColor = {220,220,220};
-
-                    while (1)
-                    {
-
-                        if(showStatus)
-                        {
-                            statusIter++;
-                            if(CSLANGMAN::getTranslationProcessStatus())
-                            {
-                                CSSECMAN::setTitleColor(PROGRESS_INFO_SECTION, {70,200,70});
-                                CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation succeeded !"}, 1);
-                                CSSECMAN::updateSection(PROGRESS_INFO_SECTION);
-                            }
-                            else
-                            {
-                                CSSECMAN::setTitleColor(PROGRESS_INFO_SECTION, {200,70,70});
-                                CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"Translation failed !"}, 1);
-                                CSSECMAN::updateSection(PROGRESS_INFO_SECTION);
-                            }
-
-
-                            if(statusIter > 900)
-                            {
-                                CSSECMAN::setTitleColor(PROGRESS_INFO_SECTION, titleColor);
-                                CSSECMAN::setTitle(PROGRESS_INFO_SECTION, CSTEXT{.Text=L"No task."}, 1);
-                                CSSECMAN::updateSection(PROGRESS_INFO_SECTION);
-                                statusIter = 0;
-                                showStatus = 0;
-                                break;
-                            }
-                        }
-                        std::this_thread::sleep_for(std::chrono::microseconds(1000));
-                    }
-
-                }
-            );
-            t3.detach();
+            if(lastViewLanguageId > -1)
+            {
+                lbm->setItemBackground(lastViewLanguageId, dColor1, dColor2, dColor3);
+            }
+            lbm->setItemBackground(viewLanguageId, sectionColor1, sectionColor2, sectionColor3);
+            lastViewLanguageId = viewLanguageId;
+            InvalidateRect(sHandle(lbm->getId()), 0,1);
         }
-        else
-        {
-            cout<<"Please wait until active translation ends up !\n";
-        }
-
     }
 }
+
+void startTranslation(CSARGS Args)
+{
+    if(UINT(Args) == WM_LBUTTONDBLCLK)
+    {
+        *(bool*)Args[0] = 1;
+    }
+}
+
+
+COLORREF sectionColor1 = RGB(160,160,220), sectionColor2 = RGB(160,160,230), sectionColor3 = RGB(160,160,220);
+COLORREF dColor1 = RGB(30,40,30), dColor2 = RGB(30,50,30), dColor3 = RGB(160,220,160);
 
 void checkInstalledLanguages(CSLISTBOXMIN*& lbm)
 {

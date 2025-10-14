@@ -117,7 +117,7 @@ RECT getTaskbarRect();
 TASKBAR_INFO getTaskbarInfo();
 
 void setLockable(int id, CSLOCKED_MODE lm);
-void updateAfterReceivingResizeMessage(int id);
+void updateAfterResizing(int id);
 void joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips, bool withTips, vector<int>*idsSrc=0);
 void joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT* tips, vector<int>*idsSrc=0);
 void addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips);
