@@ -28,7 +28,7 @@ No static (`.lib`) or dynamic (`.dll`) library is available yet — compilation 
 ### 🔹 Requirements
 - **OS:** Windows 8 or later  
 - **Compiler:** MinGW or Clang (C++17 minimum)  
-- **IDE:** Code::Blocks (recommended)  
+- **IDE:** Code::Blocks (recommended for fast compilation); Cursor (efficient code editing)
 - **Dependencies:** None (uses only Win32 and the C++ Standard Library)
 
 ### 🔹 Build with Code::Blocks
@@ -185,7 +185,7 @@ Aucune bibliothèque statique (`.lib`) ou dynamique (`.dll`) n’est encore disp
 ### 🔹 Prérequis
 - **Système :** Windows 8 ou supérieur  
 - **Compilateur :** MinGW ou Clang (C++17 minimum)  
-- **IDE :** Code::Blocks (recommandé)  
+- **IDE :** Code::Blocks (recommandé pour compilation rapide); Cursor (édition efficace du code) 
 - **Dépendances :** Aucune (Win32 + bibliothèque standard C++)
 
 ### 🔹 Compilation avec Code::Blocks
