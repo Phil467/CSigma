@@ -18,7 +18,7 @@ CSigma adopte un modèle événementiel basé sur la **distribution directe des 
 Chaque élément de l’interface enregistre une ou plusieurs **actions** en réponse aux messages du système (clics, saisies, survols, etc.).
 
 ```cpp
-CSUIMAN::addAction(ControlID, HandlerFunction, ArgsCount, ...);
+CSSECMAN::addAction(ControlID, HandlerFunction, ArgsCount, ...);
 ```
 
 Exemple de gestionnaire :
