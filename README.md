@@ -54,17 +54,35 @@ g++ -std=c++17 -Iinclude src/*.cpp main.cpp -o CSigmaApp.exe -ldwmapi -lgdi32 -l
 ```cpp
 #include "csSection.h"
 #include "csUIOBjects.h"
-using namespace CSSECMAN;
-using namespace CSUIOBJECTS;
 
 CSIGMA_MAIN_START(L"en-us", L"en-us", 0, 0)
 
-int ROOT = createSection(-1, {100, 100, 600, 400}, RGB(30,30,30));
-addTitle(ROOT, L"CSigma Window");
-addSysCommand(ROOT, {600});
+float sizeCoef = 1.5;
+CSSECMAN::setSizeCoef(sizeCoef);
+
+int ROOT = CSSECMAN::createSection( -1,
+                                    {100,25,600,500},
+                                    RGB(30,30,30),
+                                    {1,1,1,1,1,1,1,1}   );
+
+int ROOT_ICON  = CSSECMAN::setIcon( ROOT, 
+                                    L"icon.ico", 
+                                    L"icon.ico", 
+                                    {2,2,21,21} );
+
+CSUIOBJECTS::addTitle(  ROOT, 
+                        L"MY APPLICATION",
+                        {0}, 
+                        18, L"Arial Black", 
+                        ROOT_ICON   );
+
+CSSYSCOMMAND_SECTION SYS_CMD = CSUIOBJECTS::addSysCommand(ROOT, {600});
+CSSECMAN::setMinMaxInfo(ROOT, MINMAXINFO{.ptMinTrackSize={400,250}});
+CSSECMAN::enableDarkEdge(ROOT);
 
 CSIGMA_MAIN_END
 ```
+![output](Examples/mainExample.png)
 
 ---
 
@@ -193,17 +211,35 @@ g++ -std=c++17 -Iinclude src/*.cpp main.cpp -o CSigmaApp.exe -ldwmapi -lgdi32 -l
 ```cpp
 #include "csSection.h"
 #include "csUIOBjects.h"
-using namespace CSSECMAN;
-using namespace CSUIOBJECTS;
 
 CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
 
-int ROOT = createSection(-1, {100, 100, 600, 400}, RGB(30,30,30));
-addTitle(ROOT, L"Fenêtre CSigma");
-addSysCommand(ROOT, {600});
+float sizeCoef = 1.5;
+CSSECMAN::setSizeCoef(sizeCoef);
+
+int ROOT = CSSECMAN::createSection( -1,
+                                    {100,25,600,500},
+                                    RGB(30,30,30),
+                                    {1,1,1,1,1,1,1,1}   );
+
+int ROOT_ICON  = CSSECMAN::setIcon( ROOT, 
+                                    L"icon.ico", 
+                                    L"icon.ico", 
+                                    {2,2,21,21} );
+
+CSUIOBJECTS::addTitle(  ROOT, 
+                        L"MY APPLICATION",
+                        {0}, 
+                        18, L"Arial Black", 
+                        ROOT_ICON   );
+
+CSSYSCOMMAND_SECTION SYS_CMD = CSUIOBJECTS::addSysCommand(ROOT, {600});
+CSSECMAN::setMinMaxInfo(ROOT, MINMAXINFO{.ptMinTrackSize={400,250}});
+CSSECMAN::enableDarkEdge(ROOT);
 
 CSIGMA_MAIN_END
 ```
+![output](Examples/mainExample.png)
 
 ---
 
