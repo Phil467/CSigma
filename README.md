@@ -177,7 +177,7 @@ Aucune bibliothèque statique (`.lib`) ou dynamique (`.dll`) n’est encore disp
    ```
 2. Ouvrez le fichier de projet :
    ```
-   project/CSigma.cbp
+   CSigma.cbp
    ```
 3. Compilez et exécutez le projet.
 
