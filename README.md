@@ -53,7 +53,7 @@ g++ -std=c++17 -Iinclude src/*.cpp main.cpp -o CSigmaApp.exe -ldwmapi -lgdi32 -l
 
 ```cpp
 #include "csSection.h"
-#include "csUIOBjects.h"
+#include "csUIObjects.h"
 
 CSIGMA_MAIN_START(L"en-us", L"en-us", 0, 0)
 
@@ -210,7 +210,7 @@ g++ -std=c++17 -Iinclude src/*.cpp main.cpp -o CSigmaApp.exe -ldwmapi -lgdi32 -l
 
 ```cpp
 #include "csSection.h"
-#include "csUIOBjects.h"
+#include "csUIObjects.h"
 
 CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 0, 0)
 
