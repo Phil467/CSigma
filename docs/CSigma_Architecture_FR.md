@@ -5,7 +5,7 @@
 **CSigma** est un framework C++ actuellement en développement actif, conçu pour offrir un environnement **léger, performant et entièrement natif** destiné à la création d’interfaces graphiques modernes.  
 Il repose sur deux piliers techniques essentiels :
 
-1. Un **système d’évènements groupé**, inspiré de Win32, offrant un contrôle optimal à l’exécution.  
+1. Un **système d’évènements groupé**, inspiré de Win32, offrant un contrôle optimal à la conception et  à l’exécution.  
 2. Un **moteur de traduction intelligente**, assisté par IA, capable de changer instantanément la langue de l’interface avec un contrôle précis de la qualité de traduction.
 
 ---
