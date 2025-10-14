@@ -26,7 +26,7 @@ No static (`.lib`) or dynamic (`.dll`) library is available yet — compilation 
 ## 🛠️ Installation & Compilation
 
 ### 🔹 Requirements
-- **OS:** Windows 10 or later  
+- **OS:** Windows 8 or later  
 - **Compiler:** MinGW or Clang (C++17 minimum)  
 - **IDE:** Code::Blocks (recommended)  
 - **Dependencies:** None (uses only Win32 and the C++ Standard Library)
@@ -130,7 +130,7 @@ To be defined (prototype stage)
 ---
 
 ### 🔧 Maintainer
-**Phil Az**  
+**Phil Az (Philippe Levang Azeufack)**  
 Developer and founder of the CSigma project  
 [GitHub: Phil467](https://github.com/Phil467)
 
@@ -165,7 +165,7 @@ Aucune bibliothèque statique (`.lib`) ou dynamique (`.dll`) n’est encore disp
 ## 🛠️ Installation & Compilation
 
 ### 🔹 Prérequis
-- **Système :** Windows 10 ou supérieur  
+- **Système :** Windows 8 ou supérieur  
 - **Compilateur :** MinGW ou Clang (C++17 minimum)  
 - **IDE :** Code::Blocks (recommandé)  
 - **Dépendances :** Aucune (Win32 + bibliothèque standard C++)
@@ -270,6 +270,6 @@ Les développeurs peuvent dès à présent explorer la structure du code et prop
 
 ### 🔧 Mainteneur
 
-**Phil Az**  
+**Phil Az (Philippe Levang Azeufack)**  
 Développeur et fondateur du projet CSigma  
 [GitHub : Phil467](https://github.com/Phil467)
