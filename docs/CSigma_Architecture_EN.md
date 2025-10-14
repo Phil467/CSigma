@@ -18,7 +18,7 @@ CSigma uses an event-driven model based on **direct message dispatching**, follo
 Each user interface element registers one or more **actions** that respond to system messages such as clicks, key presses, or focus changes.
 
 ```cpp
-CSUIMAN::addAction(ControlID, HandlerFunction, ArgsCount, ...);
+CSSECMAN::addAction(ControlID, HandlerFunction, ArgsCount, ...);
 ```
 
 Example handler:
