@@ -126,6 +126,8 @@ vector<bool> autoSizeComplete;
 extern bool END_CREATE;
 vector<int> ICONID;
 
+vector<bool> layeredStyle;
+
 extern bool __translateTitles();
 extern bool __translateTips();
 
@@ -296,6 +298,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
     dynSimpleText.push_back({newVector<CSTEXT>(),newVector<int>(),0});
 
     ICONID.push_back(-1);
+    layeredStyle.push_back(0);
 
     updateTitleSectionBool.push_back(0);
     zoomParams.push_back({0.2, 15, 0.2, 15, 1, 1, 100, {GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)}});

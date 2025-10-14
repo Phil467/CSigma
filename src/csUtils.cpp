@@ -586,11 +586,12 @@ void CSSECMAN::setTitleColor(int id, CSRGBA color)
     }
 }
 
+extern vector<bool> layeredStyle;
 void CSSECMAN::inert(int id, BYTE alphaLevel)
 {
+    layeredStyle[id] = 1;
     SetWindowLongW(sHandle(id), GWL_EXSTYLE, GetWindowLongW(sHandle(id), GWL_EXSTYLE)|WS_EX_LAYERED|WS_EX_TRANSPARENT);
     SetLayeredWindowAttributes(sHandle(id), 0, alphaLevel, LWA_ALPHA);
-
     /*RECT r = sRectClient(id);
     SetWindowPos(SECTION[id],0, 0,0,r.right+2, r.bottom, SWP_NOMOVE|SWP_NOZORDER|SWP_DRAWFRAME);
     SetWindowPos(SECTION[id],0, 0,0,r.right, r.bottom, SWP_NOMOVE|SWP_NOZORDER);*/
@@ -598,12 +599,20 @@ void CSSECMAN::inert(int id, BYTE alphaLevel)
 
 void CSSECMAN::setTransparent(int id)
 {
+    layeredStyle[id] = 1;
     SetWindowLongW(sHandle(id), GWL_EXSTYLE, GetWindowLongW(sHandle(id), GWL_EXSTYLE)|WS_EX_LAYERED);
 }
 
 void CSSECMAN::setTransparency(int id, char level)
 {
-    SetLayeredWindowAttributes(sHandle(id), 0, level, LWA_ALPHA);
+    if(layeredStyle[id])
+        SetLayeredWindowAttributes(sHandle(id), 0, level, LWA_ALPHA);
+    else
+    {
+        setTransparent(id);
+        SetLayeredWindowAttributes(sHandle(id), 0, level, LWA_ALPHA);
+    }
+
     InvalidateRect(sHandle(id), 0, 1);
 }
 

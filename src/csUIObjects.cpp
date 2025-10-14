@@ -259,7 +259,7 @@ extern vector<HDC> hdcontext;
 extern vector<HDC> hdStackContext;
 extern vector<int> ICONID;
 
-int CSUIOBJECTS::addTitle(int& id, wchar_t*title, SIZE size, int fontSize, wchar_t*fontName, int iconId)
+int CSUIOBJECTS::addTitle(int& id, wchar_t*title, SIZE size, int fontSize, wchar_t*fontName, int iconId, int alphaLevel)
 {
 
     if(size.cx == 0 || size.cy == 0)
@@ -286,7 +286,7 @@ int CSUIOBJECTS::addTitle(int& id, wchar_t*title, SIZE size, int fontSize, wchar
     ICONID[TITLE_SECTION] = iconId;
     
     
-    CSSECMAN::inert(TITLE_SECTION,190);
+    CSSECMAN::inert(TITLE_SECTION,255-alphaLevel);
     SetWindowTextW(SECTION[id], title);
 
     CSSECMAN::autoFitToTitle(TITLE_SECTION, 10);
