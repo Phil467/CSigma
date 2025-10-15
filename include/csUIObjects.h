@@ -42,6 +42,7 @@ class CS_ABSTRACT_PROGRESSBAR
 
     CS_ABSTRACT_PROGRESSBAR(int idp, RECT rect);
     int regFunction(void(*func)(CSARGS), CSARGS args, bool* execute, wstring workMessage, wstring successMessage, wstring errorMessage);
+    int regFunctionEx(int idSource, UINT msgSource, void(*func)(CSARGS), CSARGS args, wstring workMessage, wstring successMessage, wstring errorMessage);
     void setProgressbarAnimFunctions(void(*_workAnimFunc)(int, int*, double*, double*, wstring), void(*_resultAnimFunc)(int, int*, int*, bool*, wstring, wstring));
 
     private:

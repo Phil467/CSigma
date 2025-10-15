@@ -867,6 +867,7 @@ CS_STRING_INCREMENTER_PARAMS* CSUIOBJECTS::stringIncrementer(int idp, RECT r, wc
 /************************************************************************************************************************** */
 
 void progressBarAction(CSARGS Args);
+void __executeFunc(CSARGS Args);
 void __workAnimFunc(int id, int* iter, double* maxLevel, double* level, wstring workMessage);
 void __resultAnimFunc(int id, int* iter, int* resultAnimMaxTime, bool* status, wstring successMessage, wstring errorMessage);
 
@@ -897,6 +898,14 @@ CSUIOBJECTS::CS_ABSTRACT_PROGRESSBAR::CS_ABSTRACT_PROGRESSBAR(int idp, RECT rect
 
 int CSUIOBJECTS::CS_ABSTRACT_PROGRESSBAR::regFunction(void(*func)(CSARGS), CSARGS args, bool* execute, wstring workMessage, wstring successMessage, wstring errorMessage)
 {
+    apArgs->push_back({func, args, execute, workMessage, successMessage, errorMessage});
+    return apArgs->size()-1;
+}
+int CSUIOBJECTS::CS_ABSTRACT_PROGRESSBAR::regFunctionEx(int idSource, UINT msgSource, void(*func)(CSARGS), CSARGS args, wstring workMessage, wstring successMessage, wstring errorMessage)
+{
+    bool* execute = csAlloc<bool>(1,0);
+    UINT* msg = csAlloc<UINT>(1, msgSource);
+    CSSECMAN::addAction(idSource, __executeFunc, 2, execute, msg);
     apArgs->push_back({func, args, execute, workMessage, successMessage, errorMessage});
     return apArgs->size()-1;
 }
@@ -1005,6 +1014,16 @@ void progressBarAction(CSARGS Args)
         }
 
     }
+    }
+}
+
+void __executeFunc(CSARGS Args)
+{
+    bool* execute = (bool*)Args[0];
+    UINT msg = *(UINT*)Args[1];
+    if((UINT)Args == msg)
+    {
+        *execute = 1;
     }
 }
 

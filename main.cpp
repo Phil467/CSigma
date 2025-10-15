@@ -533,14 +533,18 @@ CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", 1, 1)
     void appTranslateStrings(CSARGS Args);
     void startTranslation(CSARGS Args);
 
-    bool*execute = csAlloc<bool>(1,0);
+    /*bool*execute = csAlloc<bool>(1,0);
     bool*status = csAlloc<bool>(1,0);
     double*maxWorkLevel = csAlloc<double>(1,0);
     double*workLevel = csAlloc<double>(1,0);
     CSSECMAN::addAction(lbm->getId(), startTranslation, 1, execute);
     CSARGS args(4);
     args.regArg(status, maxWorkLevel, workLevel, lbm);
-    progressbar.regFunction(appTranslateStrings, args, execute, L"Translating", L"Translated", L"Translation failed");
+    progressbar.regFunction(appTranslateStrings, args, execute, L"Translating", L"Translated", L"Translation failed");*/
+
+    CSARGS args(4);
+    args.regArg(csAlloc<bool>(1,0), csAlloc<double>(1,0.0), csAlloc<double>(1,0.0), lbm);
+    progressbar.regFunctionEx(lbm->getId(), WM_LBUTTONDBLCLK, appTranslateStrings, args, L"Translating", L"Translated", L"Translation failed");
 
 
 
