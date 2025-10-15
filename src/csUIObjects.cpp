@@ -1031,17 +1031,17 @@ void __workAnimFunc(int id, int* iter, double* maxLevel, double* level, wstring 
 {
     if(*iter == 50)
     {
-        CSSECMAN::setTitle(id, CSTEXT{.Text= (wchar_t*)(workMessage + L".").c_str()}, 1);
+        CSSECMAN::setTitle(id, CSTEXT{.Text= (wchar_t*)(workMessage + L" .").c_str()}, 1);
         CSSECMAN::updateSection(id);
     }
     else if(*iter == 100)
     {
-        CSSECMAN::setTitle(id, CSTEXT{.Text=(wchar_t*)(workMessage + L"..").c_str()}, 1);
+        CSSECMAN::setTitle(id, CSTEXT{.Text=(wchar_t*)(workMessage + L" . .").c_str()}, 1);
         CSSECMAN::updateSection(id);
     }
     else if(*iter == 150)
     {
-        CSSECMAN::setTitle(id, CSTEXT{.Text=(wchar_t*)(workMessage + L"...").c_str()}, 1);
+        CSSECMAN::setTitle(id, CSTEXT{.Text=(wchar_t*)(workMessage + L" . . .").c_str()}, 1);
         CSSECMAN::updateSection(id);
     }
     else if(*iter > 150)
