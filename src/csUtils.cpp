@@ -109,11 +109,11 @@ extern vector<bool> setTitleInit;
 
 bool END_CREATE = 0;
 
-void CSSECMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _originalLanguage, const wchar_t* _viewLanguage, bool saveAppStrings, bool saveAppGeometry, void(*forceEventFunc)(CSARGS), CSARGS *forceEventArgs)
+void CSSECMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _sourceLanguage, const wchar_t* _targetLanguage, bool saveAppStrings, bool saveAppGeometry, void(*forceEventFunc)(CSARGS), CSARGS *forceEventArgs)
 {
     _hInstance = hInstance;
-    sourceLanguageCode = (wchar_t*)_originalLanguage;
-    targetLanguageCode = (wchar_t*)_viewLanguage;
+    sourceLanguageCode = (wchar_t*)_sourceLanguage;
+    targetLanguageCode = (wchar_t*)_targetLanguage;
 
     wstring s = appTitleFilePath;
     size_t pos1 = s.find_last_of(L"/");

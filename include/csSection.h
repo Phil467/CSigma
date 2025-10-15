@@ -21,12 +21,12 @@
     static int csigma_main()
 
 
-#define CSIGMA_MAIN_START(sourceLang, targetLang, saveAppStrings, saveAppGeometry) \
+#define CSIGMA_MAIN_BEGIN(sourceLang, targetLang, saveAppStrings, saveAppGeometry) \
     int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE, LPSTR, int nCmdShow) \
     { \
         CSSECMAN::_CSIGMA_APP_INIT_(hInstance, sourceLang, targetLang, saveAppStrings, saveAppGeometry);
 
-#define CSIGMA_MAIN_END \
+#define CSIGMA_MAIN_END() \
         return CSSECMAN::_CSIGMA_APP_RUN_(); \
     }
 

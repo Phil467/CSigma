@@ -19,7 +19,7 @@ This file shows how to create a simple window with the CSigma library.
 
 using namespace std;
 
-CSIGMA_MAIN_START(L"en", L"en", 0, 0)
+CSIGMA_MAIN_BEGIN(L"en", L"en", 0, 0)
 
 float sizeCoef = 1.5;
 CSSECMAN::setSizeCoef(sizeCoef);
@@ -44,4 +44,4 @@ CSSYSCOMMAND_SECTION SYS_CMD = CSUIOBJECTS::addSysCommand(ROOT, {600});
 CSSECMAN::setMinMaxInfo(ROOT, MINMAXINFO{.ptMinTrackSize={400,250}});
 CSSECMAN::enableDarkEdge(ROOT);
 
-CSIGMA_MAIN_END
+CSIGMA_MAIN_END()

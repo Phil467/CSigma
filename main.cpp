@@ -36,7 +36,7 @@ int smy = GetSystemMetrics(SM_CYSCREEN);
 
 
     
-CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
+CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", 1, 1)
 
 {
 
@@ -585,7 +585,7 @@ CSIGMA_MAIN_START(L"fr-fr", L"fr-fr", 1, 1)
 
 }
 
-CSIGMA_MAIN_END
+CSIGMA_MAIN_END()
 
 
 HWND btnTracked;
@@ -698,17 +698,17 @@ void appTranslateStrings(CSARGS Args)
     if(CSLANGMAN::getTranslationProcessStatus())
     {
 
-        int viewLanguageId = CSLANGMAN::getLanguageCodeId(CSLANGMAN::getViewLanguageCode());
+        int targetLanguageId = CSLANGMAN::getLanguageCodeId(CSLANGMAN::getViewLanguageCode());
         COLORREF color , highlightColor, selectionColor;
 
-        if(viewLanguageId != lastViewLanguageId)
+        if(targetLanguageId != lastViewLanguageId)
         {
             if(lastViewLanguageId > -1)
             {
                 lbm->setItemBackground(lastViewLanguageId, dColor1, dColor2, dColor3);
             }
-            lbm->setItemBackground(viewLanguageId, sectionColor1, sectionColor2, sectionColor3);
-            lastViewLanguageId = viewLanguageId;
+            lbm->setItemBackground(targetLanguageId, sectionColor1, sectionColor2, sectionColor3);
+            lastViewLanguageId = targetLanguageId;
             InvalidateRect(sHandle(lbm->getId()), 0,1);
         }
     }
