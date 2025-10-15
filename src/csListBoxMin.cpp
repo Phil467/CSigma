@@ -119,10 +119,10 @@ void CSLISTBOXMIN::init(int* idp, int _gridStyle, int _gridWidth)
     marging = {1,1};
     offset = {5,5};
     imgSize = {15,15};
-    imgdc1 = createGraphicContextResizedFromFileW(L"resources\\combo_12.bmp", {15,15});
-    imgdc2 = createGraphicContextResizedFromFileW(L"resources\\combo_12.bmp", {15,15});
-    imgdc3 = createGraphicContextResizedFromFileW(L"resources\\combo_1.bmp", {15,15});
-    imgdc4 = createGraphicContextResizedFromFileW(L"resources\\combo_1.bmp", {15,15});
+    imgdc1 = createGraphicContextResizedFromFileW(L"resources\\img\\combo_12.bmp", {15,15});
+    imgdc2 = createGraphicContextResizedFromFileW(L"resources\\img\\combo_12.bmp", {15,15});
+    imgdc3 = createGraphicContextResizedFromFileW(L"resources\\img\\combo_1.bmp", {15,15});
+    imgdc4 = createGraphicContextResizedFromFileW(L"resources\\img\\combo_1.bmp", {15,15});
     icons.insertEnd({imgdc1.dc, imgdc2.dc, imgdc3.dc, imgdc4.dc});
     gridStyle = _gridStyle;
     textOrientation = CS_RDBTN_TEXT_H;

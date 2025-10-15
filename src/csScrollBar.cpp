@@ -335,19 +335,19 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
         hdBmpExt[*id] = CreateCompatibleBitmap(hdcontext[_idp], GetSystemMetrics(SM_CXSCREEN), thick);
         SelectBitmap(hdcontextExt[*id], hdBmpExt[*id]);
 
-        CSGRAPHIC_CONTEXT gc01 = csGraphics::createGraphicContextResizedFromFileW(L"resources/back.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc01 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/back.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc01.hbmp);
         (*cloths)[0].push_back(gc01.dc);
-        CSGRAPHIC_CONTEXT gc02 = csGraphics::createGraphicContextResizedFromFileW(L"resources/back2.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc02 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/back2.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc02.hbmp);
         (*cloths)[0].push_back(gc02.dc);
         (*cloths)[0].push_back(gc02.dc);
         (*cloths)[0].push_back(gc01.dc);
 
-        CSGRAPHIC_CONTEXT gc11 = csGraphics::createGraphicContextResizedFromFileW(L"resources/next.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc11 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/next.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc11.hbmp);
         (*cloths)[4].push_back(gc11.dc);
-        CSGRAPHIC_CONTEXT gc12 = csGraphics::createGraphicContextResizedFromFileW(L"resources/next2.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc12 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/next2.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc12.hbmp);
         (*cloths)[4].push_back(gc12.dc);
         (*cloths)[4].push_back(gc12.dc);
@@ -370,19 +370,19 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
         hdBmpExt[*id] = CreateCompatibleBitmap(hdcontext[_idp], thick, GetSystemMetrics(SM_CYSCREEN));
         SelectBitmap(hdcontextExt[*id], hdBmpExt[*id]);
         
-        CSGRAPHIC_CONTEXT gc01 = csGraphics::createGraphicContextResizedFromFileW(L"resources/up.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc01 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/up.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc01.hbmp);
         (*cloths)[0].push_back(gc01.dc);
-        CSGRAPHIC_CONTEXT gc02 = csGraphics::createGraphicContextResizedFromFileW(L"resources/up2.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc02 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/up2.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc02.hbmp);
         (*cloths)[0].push_back(gc02.dc);
         (*cloths)[0].push_back(gc02.dc);
         (*cloths)[0].push_back(gc01.dc);
 
-        CSGRAPHIC_CONTEXT gc11 = csGraphics::createGraphicContextResizedFromFileW(L"resources/down.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc11 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/down.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc11.hbmp);
         (*cloths)[4].push_back(gc11.dc);
-        CSGRAPHIC_CONTEXT gc12 = csGraphics::createGraphicContextResizedFromFileW(L"resources/down2.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc12 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/down2.bmp", {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc12.hbmp);
         (*cloths)[4].push_back(gc12.dc);
         (*cloths)[4].push_back(gc12.dc);

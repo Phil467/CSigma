@@ -8,7 +8,7 @@ std::mutex _mutex;
 
 float xdimFact = 1.0;
 float ydimFact = 1.0;
-extern wchar_t* appSizesFilePath;
+extern wchar_t* appGeometryFilePath;
 extern vector<RECT> RF;
 bool saveAppSizes;
 
@@ -189,7 +189,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
 
         __getAppSizes();
 
-        if(saveAppSizes && CSFILESMAN::fileExists(appSizesFilePath))
+        if(saveAppSizes && CSFILESMAN::fileExists(appGeometryFilePath))
         {
             MoveWindow(SECTION[0], RF[0].left, RF[0].top, RF[0].right, RF[0].bottom, 1);
         }

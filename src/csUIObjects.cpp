@@ -185,15 +185,15 @@ CSSYSCOMMAND_SECTION CSUIOBJECTS::addSysCommand(int& id, POINT pos)
     if(dimCoef < 1.5)
     {
         width+=3;
-        sc.SYS_MIN = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/min20.bmp\0", "resources/min20.bmp\0", {-1,-1,width,width});
-        sc.SYS_MAX = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/max20.bmp\0", "resources/max20.bmp\0", {-1+width,-1,width,width});
-        sc.SYS_CLOSE = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/close20.bmp\0", "resources/close20.bmp\0", {-1+width*2,-1,width,width});
+        sc.SYS_MIN = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/min20.bmp\0", "resources/img/min20.bmp\0", {-1,-1,width,width});
+        sc.SYS_MAX = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/max20.bmp\0", "resources/img/max20.bmp\0", {-1+width,-1,width,width});
+        sc.SYS_CLOSE = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/close20.bmp\0", "resources/img/close20.bmp\0", {-1+width*2,-1,width,width});
     }
     else
     {
-        sc.SYS_MIN = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/_min02.bmp\0", "resources/_min01.bmp\0", {1,1,width,width});
-        sc.SYS_MAX = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/_max02.bmp\0", "resources/_max01.bmp\0", {1+width,1,width,width});
-        sc.SYS_CLOSE = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/_close02.bmp\0", "resources/_close01.bmp\0", {1+width*2,1,width,width});
+        sc.SYS_MIN = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/_min02.bmp\0", "resources/img/_min01.bmp\0", {1,1,width,width});
+        sc.SYS_MAX = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/_max02.bmp\0", "resources/img/_max01.bmp\0", {1+width,1,width,width});
+        sc.SYS_CLOSE = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/_close02.bmp\0", "resources/img/_close01.bmp\0", {1+width*2,1,width,width});
     }
     CSSECMAN::setAsMinButton(sc.SYS_MIN, id);
     CSSECMAN::setAsMaxButton(sc.SYS_MAX, id);
@@ -326,9 +326,9 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementer(int idp, RECT r, d
     CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=14, .Italic=1, .Color={100,100,100},
                                    .Marging={-45,0}, .Align = CS_TA_CENTER, .Show=1});
 
-    nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/increase.bmp\0", "resources/increase2.bmp\0", {r.right-l*3-2,2,l,l});
-    nip.idDown = CSUIOBJECTS::iconButton02(nip.idSection, "resources/decrease.bmp\0", "resources/decrease2.bmp\0", {r.right-l*2-2,2,l,l});
-    nip.idValidate = CSUIOBJECTS::iconButton02(nip.idSection, "resources/go.bmp\0", "resources/go2.bmp\0", {r.right-l-2,2,l,l});
+    nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/increase.bmp\0", "resources/img/increase2.bmp\0", {r.right-l*3-2,2,l,l});
+    nip.idDown = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/decrease.bmp\0", "resources/img/decrease2.bmp\0", {r.right-l*2-2,2,l,l});
+    nip.idValidate = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/go.bmp\0", "resources/img/go2.bmp\0", {r.right-l-2,2,l,l});
 
 
     wchar_t num[5000];
@@ -373,9 +373,9 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt(int idp, RECT r
     CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=12, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={-((l+1)*3)*dimCoef/2,0}, .Align = CS_TA_CENTER, .Show=1, .ShowEntierText=1});
 
-    nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/increase.bmp\0", "resources/increase2.bmp\0", {r.right-l*3-2,2,l,l});
-    nip.idDown = CSUIOBJECTS::iconButton02(nip.idSection, "resources/decrease.bmp\0", "resources/decrease2.bmp\0", {r.right-l*2-2,2,l,l});
-    nip.idValidate = CSUIOBJECTS::iconButton02(nip.idSection, "resources/go.bmp\0", "resources/go2.bmp\0", {r.right-l-2,2,l,l});
+    nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/increase.bmp\0", "resources/img/increase2.bmp\0", {r.right-l*3-2,2,l,l});
+    nip.idDown = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/decrease.bmp\0", "resources/img/decrease2.bmp\0", {r.right-l*2-2,2,l,l});
+    nip.idValidate = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/go.bmp\0", "resources/img/go2.bmp\0", {r.right-l-2,2,l,l});
 
     nip.idText = csCreateRichEdit(nip.idSection, {4,4,((l+1)*3)*dimCoef,4}, (const wchar_t*)value, 0, 0);
     setRichEditColors(nip.idText, 0, RGB(120,120,120));
@@ -573,8 +573,8 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt1(int idp, RECT 
     CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=12, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={-5,0}, .Align = CS_TA_CENTER_RIGHT, .Show=1, .ShowEntierText=1});
 
-    nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/u1.bmp\0", "resources/u1.bmp\0", {2,2,l,l});
-    nip.idDown = CSUIOBJECTS::iconButton02(nip.idSection, "resources/d1.bmp\0", "resources/d1.bmp\0", {2+l,2,l,l});
+    nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/u1.bmp\0", "resources/img/u1.bmp\0", {2,2,l,l});
+    nip.idDown = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/d1.bmp\0", "resources/img/d1.bmp\0", {2+l,2,l,l});
 
     
     nip.idText = csCreateRichEdit(nip.idSection, {(2+l*2+2)*dimCoef,4,4,4}, (const wchar_t*)value, 0, 0);
@@ -606,8 +606,8 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt2(int idp, RECT 
     CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=12, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1, .ShowEntierText=1});
 
-    nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/next2.bmp\0", "resources/next.bmp\0", {r.right-l-2,2,l,l});
-    nip.idDown = CSUIOBJECTS::iconButton02(nip.idSection, "resources/back2.bmp\0", "resources/back.bmp\0", {2,2,l,l});
+    nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/next2.bmp\0", "resources/img/next.bmp\0", {r.right-l-2,2,l,l});
+    nip.idDown = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/back2.bmp\0", "resources/img/back.bmp\0", {2,2,l,l});
 
     
     int c = 2*dimCoef;
@@ -843,8 +843,8 @@ CS_STRING_INCREMENTER_PARAMS* CSUIOBJECTS::stringIncrementer(int idp, RECT r, wc
     CSSECMAN::setTitle(sip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=12, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1, .ShowEntierText=1});
 
-    sip.idUp = CSUIOBJECTS::iconButton02(sip.idSection, "resources/next2.bmp\0", "resources/next.bmp\0", {r.right-l-2,2,l,l});
-    sip.idDown = CSUIOBJECTS::iconButton02(sip.idSection, "resources/back2.bmp\0", "resources/back.bmp\0", {2,2,l,l});
+    sip.idUp = CSUIOBJECTS::iconButton02(sip.idSection, "resources/img/next2.bmp\0", "resources/img/next.bmp\0", {r.right-l-2,2,l,l});
+    sip.idDown = CSUIOBJECTS::iconButton02(sip.idSection, "resources/img/back2.bmp\0", "resources/img/back.bmp\0", {2,2,l,l});
 
     
     int c = 2*dimCoef;

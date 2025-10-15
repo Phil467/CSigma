@@ -166,7 +166,7 @@ void initLbm(CSLISTBOXMIN*& lbm, int nbItem, wchar_t*defltTitle)
     lbm->setDefaultBackgroundColors(RGB(120,120,120), RGB(140,140,140), RGB(120,120,120), RGB(100,100,100));
     lbm->setIconSize(0,{30,30});
 
-    lbm->setIcon(0, L"resources\\menulogo.bmp",L"resources\\menulogo2.bmp", L"resources\\menulogo2.bmp", L"resources\\menulogo2.bmp");
+    lbm->setIcon(0, L"resources\\img\\menulogo.bmp",L"resources\\img\\menulogo2.bmp", L"resources\\img\\menulogo2.bmp", L"resources\\img\\menulogo2.bmp");
     lbm->setMaxTextWidth(120*dimCoef);
     lbm->setDefaultTitle(defltTitle);
     lbm->newItem(0,nbItem,0);

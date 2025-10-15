@@ -10,16 +10,16 @@ extern vector<CSTEXT> TITLE;
 extern  vector<RECT> RF;
 extern vector<TIPS_POPUP_PARAMS> TipsPopupParams;
 
-wchar_t* appSizesFilePath = L"appSizes.txt\0";
+wchar_t* appGeometryFilePath = L"resources/geometry/appGeometry.txt\0";
 extern bool saveAppSizes;
 
-wchar_t* appTitleParamsFilePath = L"lang/titles/prm.txt\0";
-wchar_t* appTitleFilePath = L"lang/titles/ar.txt\0";
+wchar_t* appTitleParamsFilePath = L"resources/lang/titles/prm.txt\0";
+wchar_t* appTitleFilePath = L"resources/lang/titles/ar.txt\0";
 vector<CSTEXT> TITLEFILE;
 vector<bool> setTitleInit;
 bool saveAppTitles;
 
-wchar_t* appTipsFilePath = L"lang/tips/ar.txt\0";
+wchar_t* appTipsFilePath = L"resources/lang/tips/ar.txt\0";
 vector<vector<vector<wchar_t*>>> TIPSFILE;
 bool saveAppTips;
 
@@ -33,7 +33,7 @@ extern int LANGUAGES_COUNT;
 extern wchar_t* sourceLanguageCode;
 extern wchar_t* targetLanguageCode;
 
-wchar_t* unsupportedLangPath = L"lang/ul.txt";
+wchar_t* unsupportedLangPath = L"resources/lang/ul.txt";
 wstring unsupportedLangCodes = L"";
 
 bool TRANSLATION_PROCESS_STATUS = 1;
@@ -107,7 +107,7 @@ void CSFILESMAN::__saveAppSizes()
     if(!saveAppSizes)
         return;
 
-    FILE* f = _wfopen(appSizesFilePath,L"w+");
+    FILE* f = _wfopen(appGeometryFilePath,L"w+");
     //FILE* f = fopen(wcharPtrToCharPtr(filePath).c_str(),"w+");
 
     int n = SECTION.size();
@@ -125,10 +125,10 @@ void CSFILESMAN::__saveAppSizes()
 
 void CSFILESMAN::__getAppSizes()
 {
-    if(!(fileExists(appSizesFilePath) && saveAppSizes))
+    if(!(fileExists(appGeometryFilePath) && saveAppSizes))
         return;
 
-    FILE* f = _wfopen(appSizesFilePath,L"r");
+    FILE* f = _wfopen(appGeometryFilePath,L"r");
     wchar_t str[1001];
 
     fgetws(str, 1000, f);
@@ -494,8 +494,8 @@ void CSFILESMAN::setSaveAppSizes(bool b)
 bool __translateTitles() 
 {
     // === PARAMÈTRES À MODIFIER ===
-    std::string INPUT_FILE = "lang\\titles\\" + utf16_to_utf8(sourceLanguageCode) + ".txt";
-    std::string OUTPUT_FILE = wcharPtrToCharPtr(appTitleFilePath); //"D:\\projects\\CSigma\\lang\\titles\\hi.txt";
+    std::string INPUT_FILE = "resources\\lang\\titles\\" + utf16_to_utf8(sourceLanguageCode) + ".txt";
+    std::string OUTPUT_FILE = wcharPtrToCharPtr(appTitleFilePath); //"D:\\projects\\CSigma\\resources\\lang\\titles\\hi.txt";
 
     if(!CSFILESMAN::fileExists(utf8_to_utf16(INPUT_FILE).c_str()))
         return 0;
@@ -701,7 +701,7 @@ void CSLANGMAN::translateTitle(int id, bool b)
 bool __translateTips() 
 {
     
-    std::string INPUT_FILE = string("lang\\tips\\") + utf16_to_utf8(sourceLanguageCode) + ".txt";
+    std::string INPUT_FILE = string("resources\\lang\\tips\\") + utf16_to_utf8(sourceLanguageCode) + ".txt";
     std::string OUTPUT_FILE = utf16_to_utf8(appTipsFilePath); 
     //cout<<OUTPUT_FILE<<" +++++++++++++++++++++++++++ deja +++++++++++++++\n";
 
