@@ -121,6 +121,7 @@ void onButtonClick(CSARGS Args) {
 | fluid resizing | ✅ Done |
 | Automatic layout saving | ✅ Done |
 | Canvas | ✅ Functional, partial|
+| Arithmetic Module (n-digit calculation) | ✅ Done |
 | Real-time event dispatching | ✅ Done |
 | AI-powered translation engine | ✅ Functional |
 | Static/Dynamic library build | 🚧 In progress |
@@ -282,6 +283,7 @@ void onButtonClick(CSARGS Args) {
 | Redimensionnement fluide | ✅ Terminée |
 | Sauvegarde automatique de la géométrie | ✅ Terminée |
 | Caneva | ✅ Fonctionnel, partiel|
+| Module Aritmétique (calcul à n chiffres) | ✅ Terminée |
 | Distribution des évènements en temps réel | ✅ Terminée |
 | Moteur de traduction assistée par IA | ✅ Fonctionnel |
 | Compilation en bibliothèque (statique/dynamique) | 🚧 En cours |
