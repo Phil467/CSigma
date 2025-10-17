@@ -1,12 +1,12 @@
 <div align="center">
     <img src="resources/img/csigma%20logo4w200x200b.png" alt="Logo">
 </div>
----
 
+<div align="center">
 # 🧩 CSigma Framework
 
-*A lightweight, native C++ framework for modern graphical interfaces*
-
+*Framework C++ natif pour les applications de bureau modernes et omnilingues.*
+</div>
 ---
 
 ## ⚙️ Overview
@@ -164,11 +164,11 @@ Developer and founder of the CSigma project
 
 ---
 ---
-
+<div align="center">
 # 🧩 Framework CSigma
 
-*Un framework C++ natif et léger pour les interfaces graphiques modernes*
-
+*Framework C++ natif pour les applications de bureau modernes et omnilingues.*
+</div>
 ---
 
 ## ⚙️ Vue d’ensemble
