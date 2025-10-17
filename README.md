@@ -2,7 +2,7 @@
     <img src="resources/img/csigma%20logo4w200x200b.png" alt="Logo">
 </div>
 
-<div align="center" style="font-size: 30px">
+<div align="center" style="font-size: 30px;">
 🧩 CSigma Framework
 </div>
 
@@ -166,7 +166,7 @@ Developer and founder of the CSigma project
 
 ---
 ---
-<div align="center" style="font-size: 30px">
+<div align="center" style="font-size: 30px;">
 🧩 Framework CSigma
 </div>
 
