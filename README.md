@@ -166,6 +166,10 @@ Developer and founder of the CSigma project
 
 ---
 ---
+<div align="center">
+    <img src="resources/img/csigma%20logo4w200x200b.png" alt="Logo">
+</div>
+
 <h1 align="center">
 🧩 Framework CSigma
 </h1>
