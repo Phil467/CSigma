@@ -1,4 +1,6 @@
+<div align="center">
 ![logo](resources/img/csigma%20logo4w200x200b.png)
+</div>
 ---
 
 # 🧩 CSigma Framework

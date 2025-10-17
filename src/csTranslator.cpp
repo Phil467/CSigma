@@ -9,7 +9,7 @@
 using namespace CSSTRUTILS;
 
 // Nombre total de langues et codes
-int LANGUAGES_COUNT = 220;
+int LANGUAGES_COUNT = 221;
 
 const char* languages[] = {
     "abkhazian", "acehnese", "acholi", "afar", "afrikaans", "aghem", "akan", "albanian", "alemannic_german", "amharic",
@@ -18,7 +18,7 @@ const char* languages[] = {
     "bosnian", "breton", "bulgarian", "burmese", "cantonese", "catalan", "cebuano", "chamorro", "chechen", "chichewa",
     "chinese_simplified", "chinese_traditional", "choctaw", "chuvash", "corsican", "cree", "crimean_tatar", "croatian", "czech", "danish",
     "dari", "dhivehi", "dinka", "dogri", "dutch", "dzongkha", "eastern_mari", "english","english_usa","english_uk", "erzya", "esperanto",
-    "estonian", "ewe", "faroese", "fijian", "filipino", "finnish", "french", "frisian", "fula", "ga",
+    "estonian", "ewe", "faroese", "fijian", "filipino", "finnish", "french", "french FR", "frisian", "fula", "ga",
     "galician", "ganda", "georgian", "german", "gilbertese", "greek", "guarani", "gujarati", "haitian_creole", "hausa",
     "hawaiian", "hebrew", "hiligaynon", "hindi", "hmong", "hungarian", "icelandic", "igbo", "ilocano", "indonesian",
     "inuktitut", "irish", "italian", "japanese", "javanese", "jingpho", "kalaallisut", "kannada", "kanuri", "kashmiri",
@@ -44,7 +44,7 @@ const char* langCodes[] = {
     "bs", "br", "bg", "my", "yue", "ca", "ceb", "ch", "ce", "ny",
     "zh-cn", "zh-tw", "cho", "cv", "co", "cr", "crh", "hr", "cs", "da",
     "prs", "dv", "din", "doi", "nl", "dz", "mhr", "en","en-us","en-gb", "myv", "eo",
-    "et", "ee", "fo", "fj", "tl", "fi", "fr", "fy", "ff", "gaa",
+    "et", "ee", "fo", "fj", "tl", "fi", "fr", "fr-fr", "fy", "ff", "gaa",
     "gl", "lg", "ka", "de", "gil", "el", "gn", "gu", "ht", "ha",
     "haw", "he", "hil", "hi", "hmn", "hu", "is", "ig", "ilo", "id",
     "iu", "ga", "it", "ja", "jv", "kac", "kl", "kn", "kr", "ks",
@@ -69,7 +69,7 @@ const wchar_t* langCodesW[] = {
     L"bs", L"br", L"bg", L"my", L"yue", L"ca", L"ceb", L"ch", L"ce", L"ny",
     L"zh-cn", L"zh-tw", L"cho", L"cv", L"co", L"cr", L"crh", L"hr", L"cs", L"da",
     L"prs", L"dv", L"din", L"doi", L"nl", L"dz", L"mhr", L"en", L"en-us", L"en-gb", L"myv", L"eo",
-    L"et", L"ee", L"fo", L"fj", L"tl", L"fi", L"fr", L"fy", L"ff", L"gaa",
+    L"et", L"ee", L"fo", L"fj", L"tl", L"fi", L"fr", L"fr-fr", L"fy", L"ff", L"gaa",
     L"gl", L"lg", L"ka", L"de", L"gil", L"el", L"gn", L"gu", L"ht", L"ha",
     L"haw", L"he", L"hil", L"hi", L"hmn", L"hu", L"is", L"ig", L"ilo", L"id",
     L"iu", L"ga", L"it", L"ja", L"jv", L"kac", L"kl", L"kn", L"kr", L"ks",
@@ -95,7 +95,7 @@ const wchar_t* languagesW[] = {
     L"bosnian", L"breton", L"bulgarian", L"burmese", L"cantonese", L"catalan", L"cebuano", L"chamorro", L"chechen", L"chichewa",
     L"chinese_simplified", L"chinese_traditional", L"choctaw", L"chuvash", L"corsican", L"cree", L"crimean_tatar", L"croatian", L"czech", L"danish",
     L"dari", L"dhivehi", L"dinka", L"dogri", L"dutch", L"dzongkha", L"eastern_mari", L"english", L"english_usa", L"english_uk", L"erzya", L"esperanto",
-    L"estonian", L"ewe", L"faroese", L"fijian", L"filipino", L"finnish", L"french", L"frisian", L"fula", L"ga",
+    L"estonian", L"ewe", L"faroese", L"fijian", L"filipino", L"finnish", L"french", L"french FR", L"frisian", L"fula", L"ga",
     L"galician", L"ganda", L"georgian", L"german", L"gilbertese", L"greek", L"guarani", L"gujarati", L"haitian_creole", L"hausa",
     L"hawaiian", L"hebrew", L"hiligaynon", L"hindi", L"hmong", L"hungarian", L"icelandic", L"igbo", L"ilocano", L"indonesian",
     L"inuktitut", L"irish", L"italian", L"japanese", L"javanese", L"jingpho", L"kalaallisut", L"kannada", L"kanuri", L"kashmiri",

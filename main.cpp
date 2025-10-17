@@ -258,7 +258,7 @@ CSSCROLLBAR vscrollAbout = CSUIOBJECTS::addVScrollBar(&ABOUT_UI_CLIENT, &ABOUT_U
 hscrollAbout.setViewFrameBottomMarging(10);
 vscrollAbout.setViewFrameRightMarging(10);
 
-int idcv = csGraphics::loadImage(ABOUT_UI_CLIENT, L"resources/img/csigma logo4w200x200b.bmp", {1,1}, {0,0});
+int idcv = csGraphics::loadImage(ABOUT_UI_CLIENT, L"resources/img/csigma logo4w.bmp", {1,1}, {0,0});
 SIZE sizecv = csGraphics::getImageSize(ABOUT_UI_CLIENT, idcv);
 csGraphics::showImage(ABOUT_UI_CLIENT, idcv, 1, {0}, sizecv);
 
@@ -266,11 +266,13 @@ csGraphics::setGraphicAreaPosition(ABOUT_UI_CLIENT,{0,0});
 csGraphics::setGraphicAreaColor(ABOUT_UI_CLIENT,{50,50,50},{0});
 csGraphics::setGraphicAreaSize(ABOUT_UI_CLIENT,sizecv);
 csGraphics::updateGraphicArea(ABOUT_UI_CLIENT, 1);
-csGraphics::setHzoom(ABOUT_UI_CLIENT, 0.1);
-csGraphics::setVzoom(ABOUT_UI_CLIENT, 0.1);
+csGraphics::setHzoom(ABOUT_UI_CLIENT, 0.5);
+csGraphics::setVzoom(ABOUT_UI_CLIENT, 0.5);
 hscrollAbout.setPositionRatio(0.5);
 void showAboutUi(CSARGS Args);
 CSSECMAN::addAction(MENU_ABOUT, showAboutUi, 1, &ABOUT_UI);
+
+hscrollAbout.update();
 
 /*CSLOCKED_MODE lm;
 lm.Lockable = 1;
@@ -503,7 +505,7 @@ for(int i=0; i<langCount; i++)
     languageListBox->newItem((wchar_t*)(wstring(languages[i])+L" ("+ wstring(langCodes[i])+L")").c_str(),1,0);
 }
 
-languageListBox->setActiveItem(0);
+languageListBox->setActiveItem(CSLANGMAN::getLanguageCodeId(CSLANGMAN::getTargetLanguageCode()));
 languageListBox->create();
 
 void checkInstalledLanguages(CSLISTBOXMIN*& languageListBox);
@@ -672,7 +674,7 @@ void appTranslateStrings(CSARGS Args)
 {
     CSLISTBOXMIN* lbm = (CSLISTBOXMIN*)Args[3];
     int i = *lbm->getActiveItem();
-    static int lastViewLanguageId = -1;
+    static int lastTargetLanguageId = -1;
 
     COLORREF sectionColor1 = RGB(160,160,220), sectionColor2 = RGB(160,160,230), sectionColor3 = RGB(160,160,220);
     COLORREF dColor1 = RGB(30,40,30), dColor2 = RGB(30,50,30), dColor3 = RGB(160,220,160);
@@ -685,17 +687,17 @@ void appTranslateStrings(CSARGS Args)
     if(CSLANGMAN::getTranslationProcessStatus())
     {
 
-        int targetLanguageId = CSLANGMAN::getLanguageCodeId(CSLANGMAN::getViewLanguageCode());
+        int targetLanguageId = CSLANGMAN::getLanguageCodeId(CSLANGMAN::getTargetLanguageCode());
         COLORREF color , highlightColor, selectionColor;
 
-        if(targetLanguageId != lastViewLanguageId)
+        if(targetLanguageId != lastTargetLanguageId)
         {
-            if(lastViewLanguageId > -1)
+            if(lastTargetLanguageId > -1)
             {
-                lbm->setItemBackground(lastViewLanguageId, dColor1, dColor2, dColor3);
+                lbm->setItemBackground(lastTargetLanguageId, dColor1, dColor2, dColor3);
             }
             lbm->setItemBackground(targetLanguageId, sectionColor1, sectionColor2, sectionColor3);
-            lastViewLanguageId = targetLanguageId;
+            lastTargetLanguageId = targetLanguageId;
             InvalidateRect(sHandle(lbm->getId()), 0,1);
         }
     }

@@ -111,7 +111,7 @@ int CSMENU::newGroup(const wchar_t* title, const wchar_t* iconPath1, const wchar
         CSSECMAN::removeAction((*idSection)[idSection->size()-1], ID_ACTION);
     }
 
-    CSSECMAN::joinPopup(BUTTON, idPopup[0], {0,0,160,255}, (POS_BOOL){.bLBottom=1}, 1, 1,0, idSection);
+    CSSECMAN::joinPopup(BUTTON, idPopup[0], {0,0,160,133}, (POS_BOOL){.bLBottom=1}, 1, 1,0, idSection);
     idSection->push_back(BUTTON);
     int id = idSection->size()-1;
 
@@ -163,10 +163,11 @@ void initLbm(CSLISTBOXMIN*& lbm, int nbItem, wchar_t*defltTitle)
     lbm->setItemAlign(CS_ALIGN_VERTICAL);
     lbm->setMarging({8,8});
     lbm->setOffset({0,1});
-    lbm->setDefaultSize({150*dimCoef, 25*dimCoef});
-    lbm->setDefaultTitleColors(RGB(0,0,0), RGB(0,0,0), RGB(0,0,0), RGB(100,100,100));
-    lbm->setDefaultBackgroundColors(RGB(120,120,120), RGB(140,140,140), RGB(120,120,120), RGB(100,100,100));
-    lbm->setIconSize(0,{30,30});
+    lbm->setDefaultSize({150*dimCoef, 15*dimCoef});
+    lbm->setDefaultTitleColors(RGB(100,100,100), RGB(100,100,100), RGB(100,100,100), RGB(100,100,100));
+    //lbm->setDefaultBackgroundColors(RGB(120,120,120), RGB(140,140,140), RGB(120,120,120), RGB(100,100,100));
+    lbm->setDefaultBackgroundColors(RGB(35,35,35), RGB(40,40,40), RGB(34,34,34), RGB(0,0,0));
+    lbm->setIconSize(0,{15*dimCoef-6,15*dimCoef-6});
 
     lbm->setIcon(0, L"resources\\img\\menulogo.bmp",L"resources\\img\\menulogo2.bmp", L"resources\\img\\menulogo2.bmp", L"resources\\img\\menulogo2.bmp");
     lbm->setMaxTextWidth(120*dimCoef);

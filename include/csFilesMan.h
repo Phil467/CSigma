@@ -41,7 +41,7 @@ vector<int> getLanguagesCodesIds(vector<wstring> _langCodes);
 wstring openUnsupportedLanguages();
 wstring& getUnsupportedLanguages();
 int getLanguageCodeId(const wchar_t* langCode);
-const wchar_t* getViewLanguageCode();
+const wchar_t* getTargetLanguageCode();
 bool getTranslationProcessStatus();
 };
 

@@ -904,7 +904,7 @@ int CSLANGMAN::getLanguageCodeId(const wchar_t* langCode)
     return -1;
 }
 
-const wchar_t* CSLANGMAN::getViewLanguageCode()
+const wchar_t* CSLANGMAN::getTargetLanguageCode()
 {
     return (const wchar_t*)targetLanguageCode;
 }
