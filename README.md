@@ -64,8 +64,8 @@ g++ -std=c++17 -Iinclude src/*.cpp main.cpp -o CSigmaApp.exe -ldwmapi -lgdi32 -l
 
 CSIGMA_MAIN_BEGIN(L"en", L"en", 0, 0)
 
-float sizeCoef = 1.5;
-CSSECMAN::setGeometryCoef(sizeCoef);
+float geomCoef = 1.5;
+CSSECMAN::setGeometryCoef(geomCoef);
 
 int ROOT = CSSECMAN::createSection( -1,
                                     {100,25,600,500},
@@ -232,8 +232,8 @@ g++ -std=c++17 -Iinclude src/*.cpp main.cpp -o CSigmaApp.exe -ldwmapi -lgdi32 -l
 
 CSIGMA_MAIN_BEGIN(L"en", L"en", 0, 0)
 
-float sizeCoef = 1.5;
-CSSECMAN::setGeometryCoef(sizeCoef);
+float geomCoef = 1.5;
+CSSECMAN::setGeometryCoef(geomCoef);
 
 int ROOT = CSSECMAN::createSection( -1,
                                     {100,25,600,500},

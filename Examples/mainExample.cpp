@@ -21,8 +21,8 @@ using namespace std;
 
 CSIGMA_MAIN_BEGIN(L"en", L"en", 0, 0)
 
-float sizeCoef = 1.5;
-CSSECMAN::setGeometryCoef(sizeCoef);
+float geomCoef = 1.5;
+CSSECMAN::setGeometryCoef(geomCoef);
 
 int ROOT = CSSECMAN::createSection( -1,
                                     {100,25,600,500},
