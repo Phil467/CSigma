@@ -16,7 +16,7 @@ void lastMenuItemRepos(CSARGS Args);
 void resizeMenu(CSARGS Args);
 void showHideLbm(CSARGS Args);
 
-extern float dimCoef;
+extern float geomCoef;
 
 void initLbm(CSLISTBOXMIN*& lbm, int nbItem, wchar_t*defltTitle);
 void hideMenuContainer(CSPARAARGS pArgs);
@@ -38,7 +38,7 @@ void CSMENU::init(int _idp, RECT r, bool _autoResize)
     idSection = new vector<int>;
 
     textPar = CSTEXT{.Font=L"Segoe UI", .FontSize=12, .Color={150,150,150},
-                                .Marging={32/dimCoef,-5}, .Align = CS_TA_CENTER_LEFT, .Show=1};
+                                .Marging={32/geomCoef,-5}, .Align = CS_TA_CENTER_LEFT, .Show=1};
     
 
     id = CSSECMAN::createSection(idp, r,  RGB(15,15,15), {0,0,0,0});
@@ -57,7 +57,7 @@ void CSMENU::init(int _idp, RECT r, bool _autoResize)
 
     //CSSECMAN::newMouseHook(i);
     csGraphics::setGraphicAreaColor(i, {30,30,30}, {0});
-    csGraphics::setGraphicAreaSize(i, {200*dimCoef,300*dimCoef});
+    csGraphics::setGraphicAreaSize(i, {200*geomCoef,300*geomCoef});
     csGraphics::updateGraphicArea(i, 1);
     sectionMouseHook[i].push_back(0);
 }
@@ -163,14 +163,14 @@ void initLbm(CSLISTBOXMIN*& lbm, int nbItem, wchar_t*defltTitle)
     lbm->setItemAlign(CS_ALIGN_VERTICAL);
     lbm->setMarging({8,8});
     lbm->setOffset({0,1});
-    lbm->setDefaultSize({150*dimCoef, 15*dimCoef});
+    lbm->setDefaultSize({150*geomCoef, 15*geomCoef});
     lbm->setDefaultTitleColors(RGB(100,100,100), RGB(100,100,100), RGB(100,100,100), RGB(100,100,100));
     //lbm->setDefaultBackgroundColors(RGB(120,120,120), RGB(140,140,140), RGB(120,120,120), RGB(100,100,100));
     lbm->setDefaultBackgroundColors(RGB(35,35,35), RGB(40,40,40), RGB(34,34,34), RGB(0,0,0));
-    lbm->setIconSize(0,{15*dimCoef-6,15*dimCoef-6});
+    lbm->setIconSize(0,{15*geomCoef-6,15*geomCoef-6});
 
     lbm->setIcon(0, L"resources\\img\\menulogo.bmp",L"resources\\img\\menulogo2.bmp", L"resources\\img\\menulogo2.bmp", L"resources\\img\\menulogo2.bmp");
-    lbm->setMaxTextWidth(120*dimCoef);
+    lbm->setMaxTextWidth(120*geomCoef);
     lbm->setDefaultTitle(defltTitle);
     lbm->newItem(0,nbItem,0);
 

@@ -24,7 +24,7 @@ extern vector<CSARGS*> richEditUpdatingFunctionArgs;
 
 int TIPS_POPUP;
 
-extern float dimCoef;
+extern float geomCoef;
 void smoothScrolling(CSARGS Args);
 
 CSSCROLLBAR CSUIOBJECTS::addHScrollBar(int* idp, int* idClient, int* idMask, int thick, int autoHideIntensity)
@@ -98,7 +98,7 @@ int CSUIOBJECTS::iconButton01(int idp, char* path1, char* path2, RECT r)
     int BUTTON = CSSECMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
     CSBIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE,0}};
     CSSECMAN::bindGeometry(idp, bd);
-    CSUIFX::setImageGradient(BUTTON, path1, path2, {0}, {r.bottom*dimCoef,r.bottom*dimCoef}, 0.1, 4,1);
+    CSUIFX::setImageGradient(BUTTON, path1, path2, {0}, {r.bottom*geomCoef,r.bottom*geomCoef}, 0.1, 4,1);
 
     return BUTTON;
 }
@@ -109,7 +109,7 @@ int CSUIOBJECTS::iconButton02(int idp, char* path1, char* path2, RECT r)
     int BUTTON = CSSECMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
     /*CSBIND_GEOM_PARAMS bd = {BUTTON, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE,0}};
     CSSECMAN::bindGeometry(idp, bd);*/
-    CSUIFX::setImageGradient(BUTTON, path1, path2, {0}, {r.bottom*dimCoef,r.bottom*dimCoef}, 0.1, 4,1);
+    CSUIFX::setImageGradient(BUTTON, path1, path2, {0}, {r.bottom*geomCoef,r.bottom*geomCoef}, 0.1, 4,1);
 
     return BUTTON;
 }
@@ -148,7 +148,7 @@ int CSUIOBJECTS::darkImgTextButton01(int idp, wchar_t*title, char* path1, char* 
     CSUIFX::setBorderColorClickEffect(BUTTON, {20,20,20});
     CSSECMAN::setBorderThick(BUTTON, 2);
     CSSECMAN::setTitle(BUTTON, CSTEXT{.Text=title, .Font=L"Segoe UI", .FontSize=fontSize, .Color={150,150,140},
-                            .Marging={32/dimCoef,0}, .Align = CS_TA_CENTER_LEFT, .Show=1});
+                            .Marging={32/geomCoef,0}, .Align = CS_TA_CENTER_LEFT, .Show=1});
 
     return BUTTON;
 }
@@ -176,16 +176,16 @@ CSSYSCOMMAND_SECTION CSUIOBJECTS::addSysCommand(int& id, POINT pos)
 {
     CSSYSCOMMAND_SECTION sc;
     int width = (GetSystemMetrics(SM_CYCAPTION)-2);
-    if(dimCoef < 1.5)
-        sc.SYSCOMMAND_SECTION = CSSECMAN::createSection(id, {RECTCL[id].right/dimCoef-3*width-2-6,pos.y,3*width+3,width},  RGB(5,5,5), {0,0,0,0});
+    if(geomCoef < 1.5)
+        sc.SYSCOMMAND_SECTION = CSSECMAN::createSection(id, {RECTCL[id].right/geomCoef-3*width-2-6,pos.y,3*width+3,width},  RGB(5,5,5), {0,0,0,0});
     else
-        sc.SYSCOMMAND_SECTION = CSSECMAN::createSection(id, {RECTCL[id].right/dimCoef-3*width-2,pos.y,3*width,width},  RGB(5,5,5), {0,0,0,0});
+        sc.SYSCOMMAND_SECTION = CSSECMAN::createSection(id, {RECTCL[id].right/geomCoef-3*width-2,pos.y,3*width,width},  RGB(5,5,5), {0,0,0,0});
     CSBIND_GEOM_PARAMS bd = {sc.SYSCOMMAND_SECTION, {-1,0,1,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
     CSSECMAN::bindGeometry(id, bd);
     CSSECMAN::setBorderColorAndThick(sc.SYSCOMMAND_SECTION, RGB(20,20,20), 1);
 
     width -= 2;
-    if(dimCoef < 1.5)
+    if(geomCoef < 1.5)
     {
         width+=3;
         sc.SYS_MIN = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/min20.bmp\0", "resources/img/min20.bmp\0", {-1,-1,width,width});
@@ -230,7 +230,7 @@ CSSYSCOMMAND_SECTION CSUIOBJECTS::addSysCommand(int& id, POINT pos)
         CSUIFX::setImageGradient(TITLE_SECTION, iconPath, iconPath, {2,2}, {26,26}, 0.05, 2,1);
     CSSECMAN::setTitle(TITLE_SECTION, CSTEXT{.Text=title, .Font=fontName, .FontSize = fontSize, .Italic=0,
                                    .Bold=0, .Color={150,150,150},
-                                   .Marging={35/dimCoef,0}, .Align = CS_TA_CENTER_LEFT, .Show=1});
+                                   .Marging={35/geomCoef,0}, .Align = CS_TA_CENTER_LEFT, .Show=1});
     
     CSSECMAN::inert(TITLE_SECTION,190);
     SetWindowTextW(SECTION[id], title);
@@ -247,7 +247,7 @@ CSSYSCOMMAND_SECTION CSUIOBJECTS::addSysCommand(int& id, POINT pos)
                 InvalidateRect(HWND(Args),0,1);
                 updateTitleSectionBool[id] = 1;
                 RECT r = TITLE[id].TextRect;
-                SetWindowPos(SECTION[id], 0, 0,0,r.right, 20*dimCoef, SWP_NOMOVE|SWP_NOZORDER);
+                SetWindowPos(SECTION[id], 0, 0,0,r.right, 20*geomCoef, SWP_NOMOVE|SWP_NOZORDER);
             }
         }
     };
@@ -304,7 +304,7 @@ int CSUIOBJECTS::addTitle(int& id, wchar_t*title, SIZE size, int fontSize, wchar
                 InvalidateRect(HWND(Args),0,1);
                 updateTitleSectionBool[id] = 1;
                 RECT r = TITLE[id].TextRect;
-                SetWindowPos(SECTION[id], 0, 0,0,r.right, 20*dimCoef, SWP_NOMOVE|SWP_NOZORDER);
+                SetWindowPos(SECTION[id], 0, 0,0,r.right, 20*geomCoef, SWP_NOMOVE|SWP_NOZORDER);
             }
         }
     };
@@ -340,7 +340,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementer(int idp, RECT r, d
     else
         wsprintf(num, L"%s\0", to_wstring(value).c_str());
     
-    nip.idText = csCreateRichEdit(nip.idSection, {4,4,((l+1)*3)*dimCoef,4}, (const wchar_t*)num, 0, 0);
+    nip.idText = csCreateRichEdit(nip.idSection, {4,4,((l+1)*3)*geomCoef,4}, (const wchar_t*)num, 0, 0);
     setRichEditColors(nip.idText, 0, RGB(120,120,120));
 
     return nip;
@@ -374,13 +374,13 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt(int idp, RECT r
     //CSUIFX::setBorderColorGradient(nip.idSection, {100,100,100}, {40,40,40}, 2, 2);
     CSSECMAN::setBorderThick(nip.idSection, 2);
     CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=10, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
-                                   .Marging={-((l+1)*3)*dimCoef/2,0}, .Align = CS_TA_CENTER, .Show=1, .ShowEntierText=1});
+                                   .Marging={-((l+1)*3)*geomCoef/2,0}, .Align = CS_TA_CENTER, .Show=1, .ShowEntierText=1});
 
     nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/increase.bmp\0", "resources/img/increase2.bmp\0", {r.right-l*3-2,2,l,l});
     nip.idDown = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/decrease.bmp\0", "resources/img/decrease2.bmp\0", {r.right-l*2-2,2,l,l});
     nip.idValidate = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/go.bmp\0", "resources/img/go2.bmp\0", {r.right-l-2,2,l,l});
 
-    nip.idText = csCreateRichEdit(nip.idSection, {4,4,((l+1)*3)*dimCoef,4}, (const wchar_t*)value, 0, 0);
+    nip.idText = csCreateRichEdit(nip.idSection, {4,4,((l+1)*3)*geomCoef,4}, (const wchar_t*)value, 0, 0);
     setRichEditColors(nip.idText, 0, RGB(120,120,120));
     csSetRichEditFormat(nip.idText, format);
     char*nb = (char*)utf16_to_utf8((const wchar_t*)step).c_str();
@@ -463,7 +463,7 @@ void incrementFunction(CSARGS Args)
             if(rt.right-rt.left - TITLE[nip.idSection].Marging.left > RECTCL[nip.idSection].right)
             {
                 TITLE[nip.idSection].Align = CS_TA_CENTER_RIGHT;
-                TITLE[nip.idSection].Marging.left = ceil((richEditMarging[nip.idText].left-richEditMarging[nip.idText].right)/dimCoef);
+                TITLE[nip.idSection].Marging.left = ceil((richEditMarging[nip.idText].left-richEditMarging[nip.idText].right)/geomCoef);
             }
             else
             {
@@ -548,7 +548,7 @@ void decrementFunction(CSARGS Args)
             {
                 TITLE[nip.idSection].Align = CS_TA_CENTER_RIGHT;
                 //TITLE[nip.idSection].Marging.left = -richEditMarging[nip.idText].right;
-                TITLE[nip.idSection].Marging.left = ceil((richEditMarging[nip.idText].left-richEditMarging[nip.idText].right)/dimCoef);
+                TITLE[nip.idSection].Marging.left = ceil((richEditMarging[nip.idText].left-richEditMarging[nip.idText].right)/geomCoef);
             }
             else
             {
@@ -581,7 +581,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt1(int idp, RECT 
     nip.idDown = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/d1.bmp\0", "resources/img/d1.bmp\0", {2+l,2,l,l});
 
     
-    nip.idText = csCreateRichEdit(nip.idSection, {(2+l*2+2)*dimCoef,4,4,4}, (const wchar_t*)value, 0, 0);
+    nip.idText = csCreateRichEdit(nip.idSection, {(2+l*2+2)*geomCoef,4,4,4}, (const wchar_t*)value, 0, 0);
     setRichEditColors(nip.idText, 0, RGB(120,120,120));
     csSetRichEditFormat(nip.idText, format);
     char*nb = (char*)utf16_to_utf8((const wchar_t*)step).c_str();
@@ -614,8 +614,8 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt2(int idp, RECT 
     nip.idDown = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/back2.bmp\0", "resources/img/back.bmp\0", {2,2,l,l});
 
     
-    int c = 2*dimCoef;
-    nip.idText = csCreateRichEdit(nip.idSection, {(2+l+2)*dimCoef,c,(2+l+2)*dimCoef,c}, (const wchar_t*)value, 0, 0);
+    int c = 2*geomCoef;
+    nip.idText = csCreateRichEdit(nip.idSection, {(2+l+2)*geomCoef,c,(2+l+2)*geomCoef,c}, (const wchar_t*)value, 0, 0);
     setRichEditColors(nip.idText, 0, RGB(120,120,120));
     csSetRichEditFormat(nip.idText, format);
     char*nb = (char*)utf16_to_utf8((const wchar_t*)step).c_str();
@@ -636,7 +636,7 @@ void reposIncBtn(CSARGS Args)
     if(UINT(Args) == WM_SIZE)
     {
         RECT r = RECTCL[int(Args)];
-        int c = 2*dimCoef;
+        int c = 2*geomCoef;
         MoveWindow(SECTION[*(int*)Args[0]], r.right-r.bottom+c, c, r.bottom-c, r.bottom-c, 1);
     }
 }
@@ -645,7 +645,7 @@ void CSUIOBJECTS::createToolTips(COLORREF color)
 {
     if(SECTION.size())
     {
-        TIPS_POPUP = CSSECMAN::createSection(0, {0,0,200/dimCoef,200/dimCoef}, color, {0}, 0, 0, 0);
+        TIPS_POPUP = CSSECMAN::createSection(0, {0,0,200/geomCoef,200/geomCoef}, color, {0}, 0, 0, 0);
         CSSECMAN::enableDarkEdge(TIPS_POPUP);
         SetTimer(SECTION[TIPS_POPUP], 0, 20, 0);
     }
@@ -851,8 +851,8 @@ CS_STRING_INCREMENTER_PARAMS* CSUIOBJECTS::stringIncrementer(int idp, RECT r, wc
     sip.idDown = CSUIOBJECTS::iconButton02(sip.idSection, "resources/img/back2.bmp\0", "resources/img/back.bmp\0", {2,2,l,l});
 
     
-    int c = 2*dimCoef;
-    sip.idText = csCreateRichEdit(sip.idSection, {(2+l+2)*dimCoef,c,(2+l+2)*dimCoef,c}, (const wchar_t*)value, 0, 0);
+    int c = 2*geomCoef;
+    sip.idText = csCreateRichEdit(sip.idSection, {(2+l+2)*geomCoef,c,(2+l+2)*geomCoef,c}, (const wchar_t*)value, 0, 0);
     csSetRichEditFormat(sip.idText, INPUT_FORMAT_POSITIVE_INTERGER);
 
     sip.loopStyle = loopStyle;

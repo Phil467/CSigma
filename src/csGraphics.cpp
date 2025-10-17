@@ -725,7 +725,7 @@ void csGraphics::setDynamicSimpleText(int id, CSDYNAMIC_SIMPLE_TEXT dst)
     //dynSimpleText[id].view = 1;
 }
 
-extern float dimCoef;
+extern float geomCoef;
 void viewDynamicSimpleText(int id, vector<CSTEXT> paragraph, vector<int> pSpace, RECT marg, bool updateGASize)
 {
     int n = paragraph.size();
@@ -753,7 +753,7 @@ void viewDynamicSimpleText(int id, vector<CSTEXT> paragraph, vector<int> pSpace,
         h0[i] = CSUTILS::unilineTextToPolylineText(paragraph[i].Text, hf[i], sz.cx, lines[i]);
         h0[i] += 1;
 
-        sz.cy += h0[i]*lines[i].size() + pSpace[i]*dimCoef;
+        sz.cy += h0[i]*lines[i].size() + pSpace[i]*geomCoef;
     }
 
     CSGRAPHIC_CONTEXT dc = csGraphics::createGraphicContext(sz);
@@ -784,7 +784,7 @@ void viewDynamicSimpleText(int id, vector<CSTEXT> paragraph, vector<int> pSpace,
             free(lines[i][j]);
             d += h0[i];
         }
-        d += pSpace[i]*dimCoef;
+        d += pSpace[i]*geomCoef;
         lines[i].clear();
         DeleteFont(hf[i]);
 

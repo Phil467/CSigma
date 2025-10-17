@@ -81,7 +81,7 @@ void inert(int id, BYTE alphaLevel=255);
 void setTransparent(int id);
 void setTransparency(int id, char level);
 void printRect(RECT r, char* title="rect");
-void setSizeCoef(float factor);
+void setGeometryCoef(float factor);
 
 void bindGeometry(int id, int n, ...);
 void bindGeometry_(int id, CSBIND_GEOM_PARAMS*& Args, int& n);

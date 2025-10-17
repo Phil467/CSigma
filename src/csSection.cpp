@@ -142,7 +142,7 @@ TASKBAR_INFO taskbarInfo;
 WNDCLASS wc0 = { 0 };
 RECT LAST_WORKAREA;
 
-float dimCoef = 1.0;
+float geomCoef = 1.0;
 int CAPTION_AREA_SIZE = GetSystemMetrics(SM_CYCAPTION);
 
 UINT LAST_TASKBAR_POS = 0;
@@ -164,7 +164,7 @@ int SMX, SMY;
 int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE edgeResize, bool show, bool isRoot, bool attach)
 {
     int i = SECTION.size();
-    RECT geom = r(_geom.left*dimCoef, _geom.top*dimCoef, _geom.right*dimCoef, _geom.bottom*dimCoef, i);
+    RECT geom = r(_geom.left*geomCoef, _geom.top*geomCoef, _geom.right*geomCoef, _geom.bottom*geomCoef, i);
     
     if(i == 1)
     {
@@ -993,29 +993,29 @@ cout<<"gesture\n";
             MINMAXINFO MMI = minMaxInfo[id];
             //std::cout<<HWND(lp);
             if(MMI.ptMaxTrackSize.x > 0)
-                mmi->ptMaxTrackSize.x = MMI.ptMaxTrackSize.x*dimCoef;
+                mmi->ptMaxTrackSize.x = MMI.ptMaxTrackSize.x*geomCoef;
             else if(MMI.ptMaxTrackSize.x < 0 )
             {
                 mmi->ptMaxTrackSize.x = RECTCL[PARID[id]].right
                                     -(RECTWND[PARID[id]].right - RECTWND[id].right)
-                                    + MMI.ptMaxTrackSize.x*dimCoef;
+                                    + MMI.ptMaxTrackSize.x*geomCoef;
             }
             if(MMI.ptMaxTrackSize.y > 0)
-                mmi->ptMaxTrackSize.y = MMI.ptMaxTrackSize.y*dimCoef;
+                mmi->ptMaxTrackSize.y = MMI.ptMaxTrackSize.y*geomCoef;
             else if(MMI.ptMaxTrackSize.y < 0 )
             {
                 mmi->ptMaxTrackSize.y = RECTCL[PARID[id]].bottom
                                     -(RECTWND[PARID[id]].bottom - RECTWND[id].bottom)
-                                    + MMI.ptMaxTrackSize.y*dimCoef;
+                                    + MMI.ptMaxTrackSize.y*geomCoef;
             }
 
-            mmi->ptMinTrackSize.x = MMI.ptMinTrackSize.x*dimCoef;
-            mmi->ptMinTrackSize.y = MMI.ptMinTrackSize.y*dimCoef;
+            mmi->ptMinTrackSize.x = MMI.ptMinTrackSize.x*geomCoef;
+            mmi->ptMinTrackSize.y = MMI.ptMinTrackSize.y*geomCoef;
 
             if(MMI.ptMaxSize.x > 0)
-                mmi->ptMaxSize.x = MMI.ptMaxSize.x*dimCoef;
+                mmi->ptMaxSize.x = MMI.ptMaxSize.x*geomCoef;
             if(MMI.ptMaxSize.y > 0)
-                mmi->ptMaxSize.y = MMI.ptMaxSize.y*dimCoef;
+                mmi->ptMaxSize.y = MMI.ptMaxSize.y*geomCoef;
 
         }
 

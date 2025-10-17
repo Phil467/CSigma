@@ -39,7 +39,7 @@ extern vector<bool> halftoneMode;
 
 extern vector<HCURSOR> cursor;
 extern POINT LBD_POINT;
-extern float dimCoef;
+extern float geomCoef;
 extern HINSTANCE _hInstance;
 int IDCAPTURE;
 
@@ -193,12 +193,12 @@ void CSSCROLLBAR::setBackgroundColor(COLORREF color)
 void CSSCROLLBAR::setViewFrameRightMarging(int marging)
 {
     if(*idc)
-        viewedAreaRightMarging[*idc] = marging*dimCoef;
+        viewedAreaRightMarging[*idc] = marging*geomCoef;
 }
 void CSSCROLLBAR::setViewFrameBottomMarging(int marging)
 {
     if(*idc)
-        viewedAreaBottomMarging[*idc] = marging*dimCoef;
+        viewedAreaBottomMarging[*idc] = marging*geomCoef;
 }
 
 void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
@@ -208,9 +208,9 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
     idc = csAlloc<int>(1,0);
     idMask = csAlloc<int>(1,0);
     if(orientation == CS_SBAR_HORIZONTAL)
-        width = csAlloc<int>(1,geometry.bottom*dimCoef);
+        width = csAlloc<int>(1,geometry.bottom*geomCoef);
     else
-        width = csAlloc<int>(1,geometry.right*dimCoef);
+        width = csAlloc<int>(1,geometry.right*geomCoef);
     orient = csAlloc<bool>(1,orientation);
     scType = csAlloc<int>(1,_sctype);
     tLength = csAlloc<int>(1,0);
@@ -241,8 +241,8 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
         rcs->push_back({*hmarg,*vmarg,*width-*hmarg,*width-*vmarg});
         rcs->push_back({(*rcs)[0].right,*vmarg,(*rcs)[0].right,*width-*vmarg});
         rcs->push_back({(*rcs)[1].right,*vmarg,(*rcs)[1].right+szzoom->cx+(szzoom->cy)/2,*width-*vmarg});
-        rcs->push_back({(*rcs)[2].right,*vmarg,geometry.right*dimCoef-*width-*hmarg,*width-*vmarg});
-        rcs->push_back({(*rcs)[3].right,*vmarg,geometry.right*dimCoef-*hmarg,*width-*vmarg});
+        rcs->push_back({(*rcs)[2].right,*vmarg,geometry.right*geomCoef-*width-*hmarg,*width-*vmarg});
+        rcs->push_back({(*rcs)[3].right,*vmarg,geometry.right*geomCoef-*hmarg,*width-*vmarg});
 
     }
     (*colors).push_back(newVector<CSRGBA>());
@@ -320,9 +320,9 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
     if(orientation == CS_SBAR_HORIZONTAL)
     {
         int edge = *hEdge;
-        int thick = geometry.bottom*dimCoef;
+        int thick = geometry.bottom*geomCoef;
         int t2 = thick;
-        *id = CSSECMAN::createSection(_idp, {edge/dimCoef, (cy - edge - thick)/dimCoef, (cx - 2*edge - thick)/dimCoef, thick/dimCoef},  RGB(200,200,200), {0,0,0,0});
+        *id = CSSECMAN::createSection(_idp, {edge/geomCoef, (cy - edge - thick)/geomCoef, (cx - 2*edge - thick)/geomCoef, thick/geomCoef},  RGB(200,200,200), {0,0,0,0});
             
         cursor[*id] = LoadCursor(0,IDC_SIZEWE);
         
@@ -356,9 +356,9 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
     else
     {
         int edge = *vEdge;
-        int thick = geometry.right*dimCoef;
+        int thick = geometry.right*geomCoef;
         int t2 = thick;
-        *id = CSSECMAN::createSection(_idp, {(cx - edge - thick)/dimCoef, edge/dimCoef, thick/dimCoef, (cy - 2*edge - thick)/dimCoef},  RGB(200,200,200), {0,0,0,0});
+        *id = CSSECMAN::createSection(_idp, {(cx - edge - thick)/geomCoef, edge/geomCoef, thick/geomCoef, (cy - 2*edge - thick)/geomCoef},  RGB(200,200,200), {0,0,0,0});
 
         hdStackContext[*id] = CreateCompatibleDC(hdcontext[_idp]);
         hStackBmp[*id] = CreateCompatibleBitmap(hdcontext[_idp], thick, GetSystemMetrics(SM_CYSCREEN));

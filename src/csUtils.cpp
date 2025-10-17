@@ -79,7 +79,7 @@ extern vector<vector<bool>> HIDEGROUPMSG;
 HINSTANCE hReditLib;
 
 extern int CURSOR_NCHITTEST_POS;
-extern float dimCoef;
+extern float geomCoef;
 
 extern wchar_t* sourceLanguageCode;
 extern wchar_t* targetLanguageCode;
@@ -482,9 +482,9 @@ void CSSECMAN::bindGeometry(int id, int n, ...)
     free(tab);
 }
 
-void CSSECMAN::setSizeCoef(float factor)
+void CSSECMAN::setGeometryCoef(float factor)
 {
-    dimCoef = factor;
+    geomCoef = factor;
 }
 
 void CSSECMAN::setBorderThick(int id, int thick)
@@ -658,46 +658,46 @@ void CSSECMAN::_drawTitle(int id, HDC dc)
         if(textAlign == CS_TA_TOP_CENTER)
         {
             Title.TextRect.left = (rc.right-lps->cx)/2;
-            Title.TextRect.top = Title.Marging.top*dimCoef*ydimFact;
+            Title.TextRect.top = Title.Marging.top*geomCoef*ydimFact;
         }
         if(textAlign == CS_TA_CENTER)
         {
             if(Title.Orientation == -900)
             {
-                Title.TextRect.left = (rc.right+lps->cy)/2 + Title.Marging.left*dimCoef*xdimFact;
-                Title.TextRect.top = (rc.bottom-lps->cx)/2 + Title.Marging.top*dimCoef*ydimFact;
+                Title.TextRect.left = (rc.right+lps->cy)/2 + Title.Marging.left*geomCoef*xdimFact;
+                Title.TextRect.top = (rc.bottom-lps->cx)/2 + Title.Marging.top*geomCoef*ydimFact;
             }
             else if(Title.Orientation == 900)
             {
-                Title.TextRect.left = (rc.right-lps->cy)/2 + Title.Marging.left*dimCoef*xdimFact;
-                Title.TextRect.top = (rc.bottom+lps->cx)/2 + Title.Marging.top*dimCoef*ydimFact;
+                Title.TextRect.left = (rc.right-lps->cy)/2 + Title.Marging.left*geomCoef*xdimFact;
+                Title.TextRect.top = (rc.bottom+lps->cx)/2 + Title.Marging.top*geomCoef*ydimFact;
             }
             else
             {
                 //cout<<Title.Marging.left<<" id ="<<id<<"\n";
-                Title.TextRect.left = (rc.right-lps->cx)/2 + Title.Marging.left*dimCoef*xdimFact;
-                Title.TextRect.top = (rc.bottom-lps->cy)/2 + Title.Marging.top*dimCoef*ydimFact;
+                Title.TextRect.left = (rc.right-lps->cx)/2 + Title.Marging.left*geomCoef*xdimFact;
+                Title.TextRect.top = (rc.bottom-lps->cy)/2 + Title.Marging.top*geomCoef*ydimFact;
             }
         }
         else if(textAlign == CS_TA_TOP_LEFT)
         {
-            Title.TextRect.left = Title.Marging.left*dimCoef*xdimFact;
-            Title.TextRect.top = Title.Marging.top*dimCoef*ydimFact;
+            Title.TextRect.left = Title.Marging.left*geomCoef*xdimFact;
+            Title.TextRect.top = Title.Marging.top*geomCoef*ydimFact;
         }
         else if(textAlign == CS_TA_CENTER_LEFT)
         {
-            Title.TextRect.left = Title.Marging.left*dimCoef*xdimFact;
-            Title.TextRect.top = (rc.bottom-lps->cy)/2 + Title.Marging.top*dimCoef*ydimFact;
+            Title.TextRect.left = Title.Marging.left*geomCoef*xdimFact;
+            Title.TextRect.top = (rc.bottom-lps->cy)/2 + Title.Marging.top*geomCoef*ydimFact;
         }
         else if(textAlign == CS_TA_TOP_RIGHT)
         {
-            Title.TextRect.left = (rc.right-lps->cx) + Title.Marging.left*dimCoef*xdimFact;
-            Title.TextRect.top = Title.Marging.top*dimCoef*ydimFact;
+            Title.TextRect.left = (rc.right-lps->cx) + Title.Marging.left*geomCoef*xdimFact;
+            Title.TextRect.top = Title.Marging.top*geomCoef*ydimFact;
         }
         else if(textAlign == CS_TA_CENTER_RIGHT)
         {
-            Title.TextRect.left = (rc.right-lps->cx) + Title.Marging.left*dimCoef*xdimFact;
-            Title.TextRect.top = (rc.bottom-lps->cy)/2 + Title.Marging.top*dimCoef*ydimFact;
+            Title.TextRect.left = (rc.right-lps->cx) + Title.Marging.left*geomCoef*xdimFact;
+            Title.TextRect.top = (rc.bottom-lps->cy)/2 + Title.Marging.top*geomCoef*ydimFact;
         }
 
         TextOutW(dc,Title.TextRect.left,Title.TextRect.top,title,
@@ -887,7 +887,7 @@ void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay
     TIPS_POPUP_PARAMS tpp;
     tpp.Ids.push_back(idPopup);
     tpp.Ids_src = idsSrc;
-    tpp.Geometry.push_back({0,0,rTips.right*dimCoef, rTips.bottom*dimCoef});
+    tpp.Geometry.push_back({0,0,rTips.right*geomCoef, rTips.bottom*geomCoef});
     tpp.Bpos.push_back(pb);
     if(withTips)
     {
@@ -1214,15 +1214,15 @@ int  CSUTILS::getAdjustedFontSizeX(int xbaseFontSize)
     }*/
    //cout<<ceil(xbaseFontSize*GetSystemMetrics(SM_CXSCREEN)/1366.0)<< " "<< adaptedSize<<"\n";
     //return ceil(xbaseFontSize*GetSystemMetrics(SM_CXSCREEN)/1366.0);
-    //return ceil(xbaseFontSize*xdimFact*dimCoef*0.7);
-    return ceil(xbaseFontSize*xdimFact*dimCoef);
+    //return ceil(xbaseFontSize*xdimFact*geomCoef*0.7);
+    return ceil(xbaseFontSize*xdimFact*geomCoef);
     //return adaptedSize;
 }
 int  CSUTILS::getAdjustedFontSizeY(int ySize)
 {
-    //return ceil(dimCoef*ySize*GetSystemMetrics(SM_CYSCREEN)/768.0);
-    //return ceil(ySize*ydimFact*dimCoef*0.7);
-    return ceil(ySize*ydimFact*dimCoef);
+    //return ceil(geomCoef*ySize*GetSystemMetrics(SM_CYSCREEN)/768.0);
+    //return ceil(ySize*ydimFact*geomCoef*0.7);
+    return ceil(ySize*ydimFact*geomCoef);
     //return ySize;
 }
 

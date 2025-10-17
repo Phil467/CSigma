@@ -38,8 +38,8 @@ int smy = GetSystemMetrics(SM_CYSCREEN);
 
 CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", CS_SAVE_APP_STRINGS, CS_SAVE_APP_GEOMETRY) //--------------------------------------------------------------------------------------------------------------------------------
 
-float dimCoef = 1.5;
-setSizeCoef(dimCoef);
+float geomCoef = 1.5;
+setGeometryCoef(geomCoef);
 
 // /***************************** Root ********************************** */
 
@@ -56,7 +56,7 @@ CSUIOBJECTS::createToolTips(RGB(40,40,40));
 
 /*************************************** MIDDLE_SECTION ************************************ */
 CSBIND_GEOM_PARAMS bd;
-MIDDLE_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/dimCoef+6,smx/dimCoef,smy/dimCoef},  RGB(40,40,40), {0,0,0,0});
+MIDDLE_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/geomCoef+6,smx/geomCoef,smy/geomCoef},  RGB(40,40,40), {0,0,0,0});
 
 /*************************************** MIDDLE_LEFT_SECTION ************************************ */
 
@@ -206,14 +206,14 @@ tips0.pSpace.push_back(5);
 tips0.paragraph.push_back(CSTEXT{.Text=L"Modifie la taille de la police.\0", .Font=L"calibri", .FontSize = 12, .Italic=1,
                                 .Bold=FW_THIN, .Color={150,150,150}});
 tips0.pSpace.push_back(5);
-CSSECMAN::addTips(fontSizeInc.idSection, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bRBottom=1}, 3, 0, tips0);
+CSSECMAN::addTips(fontSizeInc.idSection, {0,0,200/geomCoef, 150/geomCoef}, (POS_BOOL){.bRBottom=1}, 3, 0, tips0);
 
 
 /********************************************************************************** */
-int cy = CAPTION_AREA_SIZE/dimCoef-2;
+int cy = CAPTION_AREA_SIZE/geomCoef-2;
 int cx = 70;
 
-CSMENU menu(ROOT, {(sRectClient(ROOT).right/dimCoef-cx*6)/2,0,0,cy}, 1);
+CSMENU menu(ROOT, {(sRectClient(ROOT).right/geomCoef-cx*6)/2,0,0,cy}, 1);
 
 menu.newGroup( L"Fichier\0", L"resources/img/Settings01.bmp", L"resources/img/Settings01.bmp");
 menu.newGroup( L"Edition\0", L"resources/img/Settings01.bmp", L"resources/img/Settings01.bmp");
@@ -226,14 +226,14 @@ MENU_ABOUT = menu.getIdButton(aboutMenuId);
 ABOUT_UI = createSection(0, {100,25,600,500},  RGB(40,40,40), {1,1,1,1,1,1,1,1}, 0, 1, 0);
 CSSECMAN::enableDarkEdge(ABOUT_UI);
 CSSECMAN::setIcon(ABOUT_UI, ICON_ROOT);
-CSUIOBJECTS::addTitle(ABOUT_UI, L"About",{60,CAPTION_AREA_SIZE/dimCoef}, 18, L"Arial black", ICON_ROOT);
+CSUIOBJECTS::addTitle(ABOUT_UI, L"About",{60,CAPTION_AREA_SIZE/geomCoef}, 18, L"Arial black", ICON_ROOT);
 
-ABOUT_UI_CLIENT = createSection(ABOUT_UI, {10/dimCoef,CAPTION_AREA_SIZE/dimCoef,590-10/dimCoef,500-CAPTION_AREA_SIZE/dimCoef-10-20},  RGB(0,0,0), {0}, 1);
+ABOUT_UI_CLIENT = createSection(ABOUT_UI, {10/geomCoef,CAPTION_AREA_SIZE/geomCoef,590-10/geomCoef,500-CAPTION_AREA_SIZE/geomCoef-10-20},  RGB(0,0,0), {0}, 1);
 bd = {ABOUT_UI_CLIENT, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE, BIND_DEST_BOTTOM_EDGE,
                                     BIND_DEST_RIGHT_EDGE, BIND_DEST_BOTTOM_EDGE}};
 bindGeometry(ABOUT_UI, bd);
 
-ABOUT_UI_BOTTOM = createSection(ABOUT_UI, {1,(CAPTION_AREA_SIZE+sRectClient(ABOUT_UI_CLIENT).bottom)/dimCoef,590,20},  RGB(40,40,40), {0}, 1);
+ABOUT_UI_BOTTOM = createSection(ABOUT_UI, {1,(CAPTION_AREA_SIZE+sRectClient(ABOUT_UI_CLIENT).bottom)/geomCoef,590,20},  RGB(40,40,40), {0}, 1);
 bd = {ABOUT_UI_BOTTOM, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE, BIND_DEST_TOP_EDGE,
                                     BIND_DEST_RIGHT_EDGE, BIND_DEST_TOP_EDGE}};
 bindGeometry(ABOUT_UI, bd);
@@ -242,8 +242,8 @@ CSSECMAN::setTitle(ABOUT_UI_BOTTOM, CSTEXT{.Text=L"Logo CSigma", .Font=L"calibri
                                 .Bold=0, .Color={180,180,180},
                                 .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1});
 
-int h = (CAPTION_AREA_SIZE-2)/dimCoef, w=30, marg = 1, total = w+marg;
-ABOUT_SUB_MENU = createSection(ABOUT_UI, {(sRectClient(ABOUT_UI).right/dimCoef-total*4)/2,0,total*4,h},  RGB(20,20,20), {0});
+int h = (CAPTION_AREA_SIZE-2)/geomCoef, w=30, marg = 1, total = w+marg;
+ABOUT_SUB_MENU = createSection(ABOUT_UI, {(sRectClient(ABOUT_UI).right/geomCoef-total*4)/2,0,total*4,h},  RGB(20,20,20), {0});
 bd = {ABOUT_SUB_MENU, {-0.5,0,0.5,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
 bindGeometry(ABOUT_UI, bd);
 
@@ -305,7 +305,7 @@ wchar_t* txt = L"Représente la précision des opérations. Plus elle est grande
 tips.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 12, .Italic=1,
                                 .Bold=FW_THIN, .Color={150,150,150}});
 tips.pSpace.push_back(5);
-CSSECMAN::addTips(internPrec.idSection, {0,0,250/dimCoef, 200/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips);
+CSSECMAN::addTips(internPrec.idSection, {0,0,250/geomCoef, 200/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips);
 
 CS_NUMERIC_INCREMENTER_PARAMS externPrec = CSUIOBJECTS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*1,65,h}, L"1", L"1", INPUT_FORMAT_INTERGER);
 externPrec.setMinBound("1");
@@ -320,7 +320,7 @@ tips1.pSpace.push_back(5);
 tips1.paragraph.push_back(CSTEXT{.Text=L"Représente la précision d'affichqge des numbres.\0", .Font=L"calibri", .FontSize = 12, .Italic=1,
                                 .Bold=FW_THIN, .Color={150,150,150}});
 tips1.pSpace.push_back(5);
-CSSECMAN::addTips(externPrec.idSection, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips1);
+CSSECMAN::addTips(externPrec.idSection, {0,0,200/geomCoef, 150/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips1);
 
 
 CS_NUMERIC_INCREMENTER_PARAMS Nnb = CSUIOBJECTS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*2,65,h}, L"500", L"1", INPUT_FORMAT_INTERGER);
@@ -336,7 +336,7 @@ txt = L"Représente le numbre de chiffres du nombre aléatoire à générer.\0";
 tips2.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 12, .Italic=1,
                                 .Bold=FW_THIN, .Color={150,150,150}});
 tips2.pSpace.push_back(5);
-CSSECMAN::addTips(Nnb.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips2);
+CSSECMAN::addTips(Nnb.idSection, {0,0,200/geomCoef, 170/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips2);
 
 /********************************************************************************** */
 
@@ -354,7 +354,7 @@ txt = L"Represent l'une ou l'autre des deux bornes des chiffres constituant le n
 tips3.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 12, .Italic=1,
                                 .Bold=FW_THIN, .Color={150,150,150}});
 tips3.pSpace.push_back(5);
-CSSECMAN::addTips(minDigit.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
+CSSECMAN::addTips(minDigit.idSection, {0,0,200/geomCoef, 170/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
 
 /********************************************************************************** */
 
@@ -362,7 +362,7 @@ CS_NUMERIC_INCREMENTER_PARAMS maxDigit = CSUIOBJECTS::numericIncrementerExt1(MID
 maxDigit.setMinBound("0");
 maxDigit.setMaxBound("9");
 
-CSSECMAN::addTips(maxDigit.idSection, {0,0,200/dimCoef, 170/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
+CSSECMAN::addTips(maxDigit.idSection, {0,0,200/geomCoef, 170/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
 /********************************************************************************** */
 
 void getRandomData(CSARGS Args);
@@ -380,7 +380,7 @@ txt = L"Génère un entier aléatoire.\0";
 tipsMSG.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 12, .Italic=1,
                                 .Bold=FW_THIN, .Color={150,150,150}});
 tipsMSG.pSpace.push_back(5);
-CSSECMAN::addTips(BNT_RANDOM_NUMBER, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG);
+CSSECMAN::addTips(BNT_RANDOM_NUMBER, {0,0,200/geomCoef, 150/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG);
 
 /********************************************************************************** */
 
@@ -395,7 +395,7 @@ tipsMSG1.pSpace.push_back(5);
 tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Ajouter une donnée à la liste.\0", .Font=L"calibri", .FontSize = 12, .Italic=1,
                                 .Bold=FW_THIN, .Color={150,150,150}});
 tipsMSG1.pSpace.push_back(5);
-CSSECMAN::addTips(BTN_ADD_TO_DATA_LIST, {0,0,200/dimCoef, 150/dimCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG1);
+CSSECMAN::addTips(BTN_ADD_TO_DATA_LIST, {0,0,200/geomCoef, 150/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG1);
 
 /********************************************************************************** */
 
@@ -483,17 +483,17 @@ csGraphics::setGraphicAreaColor(RIGHT_SECTION, {30,30,30}, {0});
 csGraphics::setMouseWheelPreference(RIGHT_SECTION, CS_MOUSEWHEEL_VSCROLL);
 
 //*******************************  Translation Section **************************** */
-CSUIOBJECTS::CS_ABSTRACT_PROGRESSBAR progressbar(BOTTOM_SECTION, {0,0, 300/dimCoef, (sRectClient(BOTTOM_SECTION).bottom/dimCoef)});
+CSUIOBJECTS::CS_ABSTRACT_PROGRESSBAR progressbar(BOTTOM_SECTION, {0,0, 300/geomCoef, (sRectClient(BOTTOM_SECTION).bottom/geomCoef)});
 
 CSLISTBOXMIN* languageListBox = csNewMinimalListBoxPtr(&RIGHT_SECTION, 100, 220);
 languageListBox->setDefaultFont(L"calibri",{12,0});
 languageListBox->setItemAlign(CS_ALIGN_VERTICAL);
 languageListBox->setOffset({0,0});
-languageListBox->setDefaultSize({150*dimCoef, 15*dimCoef});
+languageListBox->setDefaultSize({150*geomCoef, 15*geomCoef});
 //languageListBox->setIconSize(0,{26,26});
 
 languageListBox->setIcon(0, L"resources\\img\\langIcon2.bmp",L"resources\\img\\langIcon.bmp", L"resources\\img\\langIcon.bmp", L"resources\\img\\langIcon.bmp");
-languageListBox->setMaxTextWidth(120*dimCoef);
+languageListBox->setMaxTextWidth(120*geomCoef);
 languageListBox->setDefaultTitle(L"Index");
 
 int langCount = 0;
@@ -556,13 +556,13 @@ lbm1->setDefaultFont(L"calibri",{12,0});
 lbm1->setItemAlign(CS_ALIGN_VERTICAL);
 lbm1->setOffset({0,0});
 lbm1->setMarging({2,0});
-lbm1->setDefaultSize({75*dimCoef, 25*dimCoef});
+lbm1->setDefaultSize({75*geomCoef, 25*geomCoef});
 //lbm1->setAllTitleColors(RGB(200,200,200), RGB(200,200,200), RGB(0,0,0));
 //lbm1->setDefaultTitleColors(RGB(23,23,23), RGB(40,40,40), RGB(100,100,100));
 lbm1->setIconSize(0,{20,20});
 
 lbm1->setIcon(0, L"resources\\img\\img.bmp",L"resources\\img\\img2.bmp", L"resources\\img\\img2.bmp", L"resources\\img\\img2.bmp");
-lbm1->setMaxTextWidth(120*dimCoef);
+lbm1->setMaxTextWidth(120*geomCoef);
 lbm1->setDefaultTitle(L"Image");
 lbm1->newItem(0,100,0);
 //lbm->newFilePath(L"Bitmap 24-bits\0*.bmp\0");
