@@ -44,7 +44,7 @@ setSizeCoef(dimCoef);
 // /***************************** Root ********************************** */
 
 ROOT = createSection(-1, {100,25,600,500},  RGB(30,30,30), {1,1,1,1,1,1,1,1});
-int ICON_ROOT  = setIcon(ROOT, L"icon.ico", L"icon.ico", {2,2,21,21});
+int ICON_ROOT  = setIcon(ROOT, L"resources/img/icon20.ico", L"resources/img/icon96.ico", {2,2,21,21});
 CSSECMAN::enableDarkEdge(ROOT);
 CSSECMAN::setMinMaxInfo(ROOT, MINMAXINFO{.ptMinTrackSize={400,250}});
 
@@ -258,7 +258,7 @@ CSSCROLLBAR vscrollAbout = CSUIOBJECTS::addVScrollBar(&ABOUT_UI_CLIENT, &ABOUT_U
 hscrollAbout.setViewFrameBottomMarging(10);
 vscrollAbout.setViewFrameRightMarging(10);
 
-int idcv = csGraphics::loadImage(ABOUT_UI_CLIENT, L"resources/img/csigma logo.bmp", {1,1}, {0,0});
+int idcv = csGraphics::loadImage(ABOUT_UI_CLIENT, L"resources/img/csigma logo4w200x200b.bmp", {1,1}, {0,0});
 SIZE sizecv = csGraphics::getImageSize(ABOUT_UI_CLIENT, idcv);
 csGraphics::showImage(ABOUT_UI_CLIENT, idcv, 1, {0}, sizecv);
 
@@ -451,8 +451,8 @@ csGraphics::setImagePos(GA_CLIENT, idImg1, {100, 100});
 csGraphics::showImage(GA_CLIENT, idImg1, 1, {0}, {0});
 
 POINT logoPos = {100,100};
-SIZE logoSize = {350,300};
-int idlogo1 = csGraphics::loadImage(GA_CLIENT, L"resources/img/csigma logo3.bmp", logoPos, logoSize);
+SIZE logoSize = {200,200};
+int idlogo1 = csGraphics::loadImage(GA_CLIENT, L"resources/img/csigma logo4w200x200b.bmp", logoPos, logoSize);
 csGraphics::showImage(GA_CLIENT, idlogo1, 1, {0}, {0});
 
 int fact = std::max(ceil(1.0*size1.cx/smx), ceil(1.0*size1.cy/smy));

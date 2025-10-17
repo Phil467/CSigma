@@ -1,3 +1,6 @@
+![logo](resources/img/csigma%20logo4w200x200b.png.png)
+---
+
 # 🧩 CSigma Framework
 
 *A lightweight, native C++ framework for modern graphical interfaces*
