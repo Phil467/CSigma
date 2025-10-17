@@ -118,6 +118,9 @@ void onButtonClick(CSARGS Args) {
 | Feature | Status |
 |----------|---------|
 | UI Components | ✅ some basic |
+| fluid resizing | ✅ Done |
+| Automatic layout saving | ✅ Done |
+| Canvas | ✅ Functional, partial|
 | Real-time event dispatching | ✅ Done |
 | AI-powered translation engine | ✅ Functional |
 | Static/Dynamic library build | 🚧 In progress |
@@ -149,7 +152,7 @@ To be defined (prototype stage)
 ---
 
 ### 🔧 Maintainer
-**Phil Az (Philippe Levang Azeufack)**  
+**Phil467**  
 Developer and founder of the CSigma project  
 [GitHub: Phil467](https://github.com/Phil467)
 
@@ -276,6 +279,9 @@ void onButtonClick(CSARGS Args) {
 | Fonctionnalité | Statut |
 |----------------|--------|
 | Composantes UI | ✅ de base |
+| Redimensionnement fluide | ✅ Terminée |
+| Sauvegarde automatique de la géométrie | ✅ Terminée |
+| Caneva | ✅ Fonctionnel, partiel|
 | Distribution des évènements en temps réel | ✅ Terminée |
 | Moteur de traduction assistée par IA | ✅ Fonctionnel |
 | Compilation en bibliothèque (statique/dynamique) | 🚧 En cours |
@@ -308,6 +314,6 @@ Les développeurs peuvent dès à présent explorer la structure du code et prop
 
 ### 🔧 Mainteneur
 
-**Phil Az (Philippe Levang Azeufack)**  
+**Phil467**  
 Développeur et fondateur du projet CSigma  
 [GitHub : Phil467](https://github.com/Phil467)

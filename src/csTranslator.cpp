@@ -6,6 +6,8 @@
 
 #pragma comment(lib, "wininet.lib")
 
+using namespace CSSTRUTILS;
+
 // Nombre total de langues et codes
 int LANGUAGES_COUNT = 220;
 
@@ -117,28 +119,6 @@ wchar_t* sourceLanguageCode = L"en-us";
 wchar_t* targetLanguageCode = L"fr";
 
 extern int MAX_TRANSLATION_TEXT_LENGTH_REQUESTED;
-
-
-std::wstring utf8_to_utf16(const std::string& utf8) 
-{
-    if (utf8.empty()) return std::wstring();
-    
-    int size_needed = MultiByteToWideChar(CP_UTF8, 0, &utf8[0], (int)utf8.size(), NULL, 0);
-    std::wstring result(size_needed, 0);
-    MultiByteToWideChar(CP_UTF8, 0, &utf8[0], (int)utf8.size(), &result[0], size_needed);
-    return result;
-}
-
-// Convertir UTF-16 vers UTF-8
-std::string utf16_to_utf8(const std::wstring& utf16) 
-{
-    if (utf16.empty()) return std::string();
-    
-    int size_needed = WideCharToMultiByte(CP_UTF8, 0, &utf16[0], (int)utf16.size(), NULL, 0, NULL, NULL);
-    std::string result(size_needed, 0);
-    WideCharToMultiByte(CP_UTF8, 0, &utf16[0], (int)utf16.size(), &result[0], size_needed, NULL, NULL);
-    return result;
-}
 
 // Encoder une chaîne pour URL
 std::string CSTRANSLATOR::urlEncode(const std::string& value) 

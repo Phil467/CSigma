@@ -12,7 +12,7 @@ bool fileExists(const char* filename);
 void __saveAppSizes();
 void __getAppSizes();
 void __setAppSizes();
-void setSaveAppSizes(bool b);
+void setSaveAppGeometry(bool b);
 
 void __saveAppTitles();
 void __getAppTitles();

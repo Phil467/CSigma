@@ -147,7 +147,6 @@ void parentResize(CSARGS Args)
                 }, Args
             );
             t.detach();
-            cout<<"done------------------------------------------------- !\n";
         }
     }
 }

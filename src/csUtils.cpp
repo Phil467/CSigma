@@ -87,6 +87,8 @@ extern wchar_t* targetLanguageCode;
 extern wchar_t* appTitleFilePath;
 extern wchar_t* appTipsFilePath;
 
+int MAX_TRANSLATION_TEXT_LENGTH_REQUESTED;
+
 LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 HHOOK setHook();
 
@@ -115,6 +117,8 @@ void CSSECMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _sourceLang
     sourceLanguageCode = (wchar_t*)_sourceLanguage;
     targetLanguageCode = (wchar_t*)_targetLanguage;
 
+    MAX_TRANSLATION_TEXT_LENGTH_REQUESTED = 499;
+
     wstring s = appTitleFilePath;
     size_t pos1 = s.find_last_of(L"/");
     size_t pos2 = s.find_last_of(L".");
@@ -128,7 +132,7 @@ void CSSECMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _sourceLang
     appTipsFilePath = CSSTRUTILS::makeWString((wchar_t*)(s.substr(0,pos1+1) + targetLanguageCode + s.substr(pos2, s.size()-pos2)).c_str());
 
     CSFILESMAN::setSaveAppTitles(saveAppStrings);
-    CSFILESMAN::setSaveAppSizes(saveAppGeometry);
+    CSFILESMAN::setSaveAppGeometry(saveAppGeometry);
     CSFILESMAN::setSaveAppTips(saveAppStrings);
 
     xdimFact = 1.0*GetSystemMetrics(SM_CXSCREEN)/(1920);

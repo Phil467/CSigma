@@ -1,6 +1,9 @@
 #include "csUIObjects.h"
 #include "readwfile.h"
 #include "csArithmetic/csArithUtils.h"
+#include "csStrUtils.h"
+
+using namespace CSSTRUTILS;
 
 extern vector<HWND> SECTION;
 extern vector<CSTEXT> TITLE;
@@ -323,7 +326,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementer(int idp, RECT r, d
     int l = (r.bottom-4);
     //CSUIFX::setBorderColorGradient(nip.idSection, {100,100,100}, {40,40,40}, 2, 2);
     CSSECMAN::setBorderThick(nip.idSection, 2);
-    CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=14, .Italic=1, .Color={100,100,100},
+    CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=10, .Italic=1, .Color={100,100,100},
                                    .Marging={-45,0}, .Align = CS_TA_CENTER, .Show=1});
 
     nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/increase.bmp\0", "resources/img/increase2.bmp\0", {r.right-l*3-2,2,l,l});
@@ -370,7 +373,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt(int idp, RECT r
     int l = (r.bottom-4);
     //CSUIFX::setBorderColorGradient(nip.idSection, {100,100,100}, {40,40,40}, 2, 2);
     CSSECMAN::setBorderThick(nip.idSection, 2);
-    CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=12, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
+    CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=10, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={-((l+1)*3)*dimCoef/2,0}, .Align = CS_TA_CENTER, .Show=1, .ShowEntierText=1});
 
     nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/increase.bmp\0", "resources/img/increase2.bmp\0", {r.right-l*3-2,2,l,l});
@@ -380,7 +383,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt(int idp, RECT r
     nip.idText = csCreateRichEdit(nip.idSection, {4,4,((l+1)*3)*dimCoef,4}, (const wchar_t*)value, 0, 0);
     setRichEditColors(nip.idText, 0, RGB(120,120,120));
     csSetRichEditFormat(nip.idText, format);
-    char*nb = (char*)wcharPtrToCharPtr((const wchar_t*)step).c_str();
+    char*nb = (char*)utf16_to_utf8((const wchar_t*)step).c_str();
     bool sign = CSUTILS::signExtraction(nb); 
     nip.step.set(nb,0,sign);
     //free(nb);
@@ -400,7 +403,7 @@ void incrementFunction(CSARGS Args)
     if(msg == WM_LBUTTONDOWN||msg == WM_LBUTTONDBLCLK)
     {
         CS_NUMERIC_INCREMENTER_PARAMS nip = *(CS_NUMERIC_INCREMENTER_PARAMS*)Args[0];
-        const char*nb = wcharPtrToCharPtr((const wchar_t*)TITLE[nip.idSection].Text).c_str();
+        const char*nb = utf16_to_utf8((const wchar_t*)TITLE[nip.idSection].Text).c_str();
 
         CSARITHMETIC::csRNUMBER res(0,nb);
         if(nip.useMaxBound)
@@ -460,7 +463,7 @@ void incrementFunction(CSARGS Args)
             if(rt.right-rt.left - TITLE[nip.idSection].Marging.left > RECTCL[nip.idSection].right)
             {
                 TITLE[nip.idSection].Align = CS_TA_CENTER_RIGHT;
-                TITLE[nip.idSection].Marging.left = -richEditMarging[nip.idText].right;
+                TITLE[nip.idSection].Marging.left = ceil((richEditMarging[nip.idText].left-richEditMarging[nip.idText].right)/dimCoef);
             }
             else
             {
@@ -482,7 +485,7 @@ void decrementFunction(CSARGS Args)
     if(msg == WM_LBUTTONDOWN||msg == WM_LBUTTONDBLCLK)
     {
         CS_NUMERIC_INCREMENTER_PARAMS nip = *(CS_NUMERIC_INCREMENTER_PARAMS*)Args[0];
-        const char*nb = wcharPtrToCharPtr((const wchar_t*)TITLE[nip.idSection].Text).c_str();
+        const char*nb = utf16_to_utf8((const wchar_t*)TITLE[nip.idSection].Text).c_str();
         CSARITHMETIC::csRNUMBER res(0, nb);
 
         if(nip.useMinBound)
@@ -544,7 +547,8 @@ void decrementFunction(CSARGS Args)
             if(rt.right-rt.left - TITLE[nip.idSection].Marging.left > RECTCL[nip.idSection].right)
             {
                 TITLE[nip.idSection].Align = CS_TA_CENTER_RIGHT;
-                TITLE[nip.idSection].Marging.left = -richEditMarging[nip.idText].right;
+                //TITLE[nip.idSection].Marging.left = -richEditMarging[nip.idText].right;
+                TITLE[nip.idSection].Marging.left = ceil((richEditMarging[nip.idText].left-richEditMarging[nip.idText].right)/dimCoef);
             }
             else
             {
@@ -570,7 +574,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt1(int idp, RECT 
     int l = (r.bottom-4);
     //CSUIFX::setBorderColorGradient(nip.idSection, {100,100,100}, {40,40,40}, 2, 2);
     CSSECMAN::setBorderThick(nip.idSection, 2);
-    CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=12, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
+    CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=10, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={-5,0}, .Align = CS_TA_CENTER_RIGHT, .Show=1, .ShowEntierText=1});
 
     nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/u1.bmp\0", "resources/img/u1.bmp\0", {2,2,l,l});
@@ -580,7 +584,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt1(int idp, RECT 
     nip.idText = csCreateRichEdit(nip.idSection, {(2+l*2+2)*dimCoef,4,4,4}, (const wchar_t*)value, 0, 0);
     setRichEditColors(nip.idText, 0, RGB(120,120,120));
     csSetRichEditFormat(nip.idText, format);
-    char*nb = (char*)wcharPtrToCharPtr((const wchar_t*)step).c_str();
+    char*nb = (char*)utf16_to_utf8((const wchar_t*)step).c_str();
     bool sign = CSUTILS::signExtraction(nb); 
     nip.step.set(nb,0,sign);
     //free(nb);
@@ -603,7 +607,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt2(int idp, RECT 
     int l = (r.bottom-4);
     //CSUIFX::setBorderColorGradient(nip.idSection, {100,100,100}, {40,40,40}, 2, 2);
     CSSECMAN::setBorderThick(nip.idSection, 2);
-    CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=12, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
+    CSSECMAN::setTitle(nip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=10, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1, .ShowEntierText=1});
 
     nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/next2.bmp\0", "resources/img/next.bmp\0", {r.right-l-2,2,l,l});
@@ -614,7 +618,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt2(int idp, RECT 
     nip.idText = csCreateRichEdit(nip.idSection, {(2+l+2)*dimCoef,c,(2+l+2)*dimCoef,c}, (const wchar_t*)value, 0, 0);
     setRichEditColors(nip.idText, 0, RGB(120,120,120));
     csSetRichEditFormat(nip.idText, format);
-    char*nb = (char*)wcharPtrToCharPtr((const wchar_t*)step).c_str();
+    char*nb = (char*)utf16_to_utf8((const wchar_t*)step).c_str();
     bool sign = CSUTILS::signExtraction(nb); 
     nip.step.set(nb,0,sign);
     //free(nb);
@@ -840,7 +844,7 @@ CS_STRING_INCREMENTER_PARAMS* CSUIOBJECTS::stringIncrementer(int idp, RECT r, wc
     int l = (r.bottom-4);
     
     CSSECMAN::setBorderThick(sip.idSection, 2);
-    CSSECMAN::setTitle(sip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=12, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
+    CSSECMAN::setTitle(sip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=10, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1, .ShowEntierText=1});
 
     sip.idUp = CSUIOBJECTS::iconButton02(sip.idSection, "resources/img/next2.bmp\0", "resources/img/next.bmp\0", {r.right-l-2,2,l,l});

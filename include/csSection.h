@@ -9,6 +9,11 @@
 #include <thread>
 #include <functional>
 
+#define CS_NO_SAVE_APP_STRINGS 0
+#define CS_SAVE_APP_STRINGS 1
+#define CS_NO_SAVE_APP_GEOMETRY 0
+#define CS_SAVE_APP_GEOMETRY 1
+
 #define CSIGMA_APP_RUN() CSSECMAN::_CSIGMA_APP_RUN_()
 
 #define CSIGMA_MAIN(sourceLang, targetLang, saveAppStrings, saveAppGeometry) \

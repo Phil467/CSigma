@@ -14,6 +14,8 @@
 #include <math.h>
 #include <csArithmetic/csARITHMETIC.h>
 
+#define WM_TRANSLATED (WM_USER + 2)
+
 #define AUTO_TRANSF_LENGTH   1
 #define AUTO_TRANSF_RECT   2
 

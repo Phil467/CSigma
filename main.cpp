@@ -35,11 +35,12 @@ int smy = GetSystemMetrics(SM_CYSCREEN);
 
 
 
-    
-CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", 1, 1) //--------------------------------------------------------------------------------------------------------------------------------
+
+CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", CS_SAVE_APP_STRINGS, CS_SAVE_APP_GEOMETRY) //--------------------------------------------------------------------------------------------------------------------------------
 
 float dimCoef = 1.5;
 setSizeCoef(dimCoef);
+
 // /***************************** Root ********************************** */
 
 ROOT = createSection(-1, {100,25,600,500},  RGB(30,30,30), {1,1,1,1,1,1,1,1});
@@ -616,9 +617,9 @@ void getRandomData(CSARGS Args)
             int idMinSection = *(int*)Args[1];
             int idMaxSection = *(int*)Args[2];
 
-            int n = strtod(wcharPtrToCharPtr(sTitle(idnDigits).Text).c_str(), 0);
-            char mn = strtod(wcharPtrToCharPtr(sTitle(idMinSection).Text).c_str(), 0);
-            char mx = strtod(wcharPtrToCharPtr(sTitle(idMaxSection).Text).c_str(), 0);
+            int n = strtod(utf16_to_utf8(sTitle(idnDigits).Text).c_str(), 0);
+            char mn = strtod(utf16_to_utf8(sTitle(idMinSection).Text).c_str(), 0);
+            char mx = strtod(utf16_to_utf8(sTitle(idMaxSection).Text).c_str(), 0);
 
 
 
@@ -658,7 +659,7 @@ void setFontSize(CSARGS Args)
         int idGaphicArea = *(int*)Args[0];
         int idFontSizeSection = *(int*)Args[1];
 
-        int fsize = strtod(wcharPtrToCharPtr(sTitle(idFontSizeSection).Text).c_str(), 0);
+        int fsize = strtod(utf16_to_utf8(sTitle(idFontSizeSection).Text).c_str(), 0);
         sDynSimpleText(idGaphicArea).paragraph[0].FontSize = {fsize};
 
         csGraphics::updateGraphicArea(idGaphicArea,0);

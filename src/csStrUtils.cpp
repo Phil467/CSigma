@@ -85,3 +85,26 @@ wchar_t* CSSTRUTILS::makeWString(const char* _str)
     wcscpy_s(str, len, charPtrtoWcharPtr(_str).c_str());
     return str;
 }
+
+
+
+std::wstring CSSTRUTILS::utf8_to_utf16(const std::string& utf8) 
+{
+    if (utf8.empty()) return std::wstring();
+    
+    int size_needed = MultiByteToWideChar(CP_UTF8, 0, &utf8[0], (int)utf8.size(), NULL, 0);
+    std::wstring result(size_needed, 0);
+    MultiByteToWideChar(CP_UTF8, 0, &utf8[0], (int)utf8.size(), &result[0], size_needed);
+    return result;
+}
+
+// Convertir UTF-16 vers UTF-8
+std::string CSSTRUTILS::utf16_to_utf8(const std::wstring& utf16) 
+{
+    if (utf16.empty()) return std::string();
+    
+    int size_needed = WideCharToMultiByte(CP_UTF8, 0, &utf16[0], (int)utf16.size(), NULL, 0, NULL, NULL);
+    std::string result(size_needed, 0);
+    WideCharToMultiByte(CP_UTF8, 0, &utf16[0], (int)utf16.size(), &result[0], size_needed, NULL, NULL);
+    return result;
+}

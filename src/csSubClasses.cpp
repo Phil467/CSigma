@@ -1,5 +1,10 @@
 #include "csSubClasses.h"
 #include "csGraphics.h"
+#include "csStrUtils.h"
+
+using namespace  CSSTRUTILS;
+
+
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "uxtheme.lib")
 
@@ -266,7 +271,7 @@ LRESULT CALLBACK richEditSubclassProc(HWND hEdit, UINT msg, WPARAM wParam, LPARA
                 if(richEditTextFormat[id] == INPUT_FORMAT_INTERGER || richEditTextFormat[id] == INPUT_FORMAT_POSITIVE_INTERGER
                    ||richEditTextFormat[id] == INPUT_FORMAT_NEGATIVE_INTERGER)
                 {
-                    /*char*chr = (char*)wcharPtrToCharPtr((const wchar_t*)str).c_str();
+                    /*char*chr = (char*)utf16_to_utf8((const wchar_t*)str).c_str();
                     long long num = strtoll(chr,&chr + strlen(chr),0);*/
                     int n = wcslen(str);
                     if(str[0] != '-' && str[0] != '+' && str[0] != '1' && str[0] != '2' && str[0] != '3' && 
@@ -289,7 +294,7 @@ LRESULT CALLBACK richEditSubclassProc(HWND hEdit, UINT msg, WPARAM wParam, LPARA
 
                     if(b && richEditNumericBounds[id].minBound)
                     {
-                        CSARITHMETIC::csRNUMBER rn(0, wcharPtrToCharPtr(str).c_str());
+                        CSARITHMETIC::csRNUMBER rn(0, utf16_to_utf8(str).c_str());
                         CSARITHMETIC::csRNUMBER rnMin(0, richEditNumericBounds[id].minBound);
 
                         if(rn < rnMin)
@@ -301,7 +306,7 @@ LRESULT CALLBACK richEditSubclassProc(HWND hEdit, UINT msg, WPARAM wParam, LPARA
 
                     if(b && richEditNumericBounds[id].maxBound)
                     {
-                        CSARITHMETIC::csRNUMBER rn(0, wcharPtrToCharPtr(str).c_str());
+                        CSARITHMETIC::csRNUMBER rn(0, utf16_to_utf8(str).c_str());
                         CSARITHMETIC::csRNUMBER rnMax(0, richEditNumericBounds[id].maxBound);
 
                         if(rn > rnMax)
@@ -350,7 +355,7 @@ LRESULT CALLBACK richEditSubclassProc(HWND hEdit, UINT msg, WPARAM wParam, LPARA
 
                     if(b && richEditNumericBounds[id].minBound)
                     {
-                        CSARITHMETIC::csRNUMBER rn(0, wcharPtrToCharPtr(str).c_str());
+                        CSARITHMETIC::csRNUMBER rn(0, utf16_to_utf8(str).c_str());
                         CSARITHMETIC::csRNUMBER rnMin(0, richEditNumericBounds[id].minBound);
 
                         if(rn < rnMin)
@@ -362,7 +367,7 @@ LRESULT CALLBACK richEditSubclassProc(HWND hEdit, UINT msg, WPARAM wParam, LPARA
 
                     if(b && richEditNumericBounds[id].maxBound)
                     {
-                        CSARITHMETIC::csRNUMBER rn(0, wcharPtrToCharPtr(str).c_str());
+                        CSARITHMETIC::csRNUMBER rn(0, utf16_to_utf8(str).c_str());
                         CSARITHMETIC::csRNUMBER rnMax(0, richEditNumericBounds[id].maxBound);
 
                         if(rn > rnMax)

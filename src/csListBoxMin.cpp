@@ -279,7 +279,7 @@ void CSLISTBOXMIN::setTitles(wchar_t* ids[], wchar_t* _title[], int n)
     for(int i=0; i<n; i++)
     {
         
-        int j = (int)strtod(wcharPtrToCharPtr(ids[i]).c_str(),0);
+        int j = (int)strtod(utf16_to_utf8(ids[i]).c_str(),0);
         titleReal[j] = (wchar_t*)_title[i];
 
         free(title[j]);

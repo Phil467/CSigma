@@ -22,6 +22,9 @@ vector<wstring> splitWords(const wchar_t* text, const wchar_t* delims=L" ") ;
 vector<long> wordsToLong(vector<wstring> words);
 wchar_t* makeWString(const wchar_t* _str);
 wchar_t* makeWString(const char* _str);
+
+std::wstring utf8_to_utf16(const std::string& utf8) ;
+std::string utf16_to_utf8(const std::wstring& utf16) ;
 }
 
 #endif // CSSTRUTILS_H

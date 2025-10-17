@@ -3,6 +3,8 @@
 #include "csScrollBar.h"
 #include "csUIObjects.h"
 
+using namespace CSSTRUTILS;
+
 extern vector<HWND> SECTION;
 extern vector<CSTEXT> TITLE;
 extern vector<RECT> RECTWND;
@@ -88,7 +90,7 @@ int CSMENU::newGroup(const wchar_t* title, const wchar_t* iconPath1, const wchar
 {
     int BUTTON = CSSECMAN::createSection(id, {0,0,0,RECTCL[id].bottom-1},  RGB(30,30,30), {0,0,0,0});
     //SetTimer(SECTION[BUTTON], 0, 90, 0);
-    CSUIFX::setImageGradient(BUTTON, (char*)wcharPtrToCharPtr(iconPath1).c_str(), (char*)wcharPtrToCharPtr(iconPath2).c_str(), {4,4}, {20,20}, 0.1, 2, 2);
+    CSUIFX::setImageGradient(BUTTON, (char*)utf16_to_utf8(iconPath1).c_str(), (char*)utf16_to_utf8(iconPath2).c_str(), {4,4}, {20,20}, 0.1, 2, 2);
     CSUIFX::setBackgroundColorGradient(BUTTON, {5,5,5}, {20,20,20}, 2, 2);
     CSUIFX::setBackgroundColorClickEffect(BUTTON, {10,10,10});
     CSUIFX::setTitleColorGradient(BUTTON, {220,200,100}, {200,200,200}, 2, 2);

@@ -108,7 +108,7 @@ void CSFILESMAN::__saveAppSizes()
         return;
 
     FILE* f = _wfopen(appGeometryFilePath,L"w+");
-    //FILE* f = fopen(wcharPtrToCharPtr(filePath).c_str(),"w+");
+    //FILE* f = fopen(utf16_to_utf8(filePath).c_str(),"w+");
 
     int n = SECTION.size();
 
@@ -169,7 +169,7 @@ void CSFILESMAN::__setAppSizes()
 }
 
 
-int MAX_TRANSLATION_TEXT_LENGTH_REQUESTED = 500-1;
+extern int MAX_TRANSLATION_TEXT_LENGTH_REQUESTED;
 
 void CSFILESMAN::__saveAppTitles()
 {
@@ -394,7 +394,7 @@ void CSFILESMAN::__getAppTitles()
     wchar_t* str2 = csAlloc<wchar_t>(MAX_TRANSLATION_TEXT_LENGTH_REQUESTED+1);
     vector<wstring> wt;
     while(fgetws(str2, MAX_TRANSLATION_TEXT_LENGTH_REQUESTED, f) != 0)
-    {
+    {   //cout<<"i = "<<i<<" "<<utf16_to_utf8(str2)<<"\n";
         vector<wstring> titles = splitWords(str2, L"|");
         int m = titles.size();
 
@@ -408,7 +408,7 @@ void CSFILESMAN::__getAppTitles()
     if((wt.size() != n) || TRANSLATION_PROCESS_STATUS == 0)
     {
         if(wt.size() != n) TRANSLATION_PROCESS_STATUS = 0;
-        MessageBoxW(0, L"Language not supported !", L"Error", MB_OK|MB_ICONERROR);
+        MessageBoxW(0, L"Unable to parse results. This issue will be fixed very soon.", L"Error", MB_OK|MB_ICONERROR);
 
         if(TITLE.size() != n) 
         {
@@ -445,7 +445,7 @@ void CSFILESMAN::__getAppTitles()
     {
         for(int i=0; i<n; i++)
         {
-            if(wt[i] != L"-" && wt[i] != L"-\n" && wt[i] != L"- ."&& wt[i] != L"- .\n")
+            if(wt[i] != L"-" && wt[i] != L"-\n" && wt[i] != L"- ." && wt[i] != L"- .\n")
             {
                 TITLEFILE[i].Text = makeWString(wt[i].c_str());
             }
@@ -462,18 +462,14 @@ void CSFILESMAN::__getAppTitles()
 void CSFILESMAN::__setAppTitles()
 {
     int n = TITLEFILE.size();
-    //cout<<n<<"  "<<SECTION.size()<<"  ---text\n";
+    //cout<<" ------------------------------------------------\n";
     for(int i=0; i<n; i++)
     {
-        if(TITLEFILE[i].Text && allowTranslation[i])
+        if(TITLEFILE[i].Text  && allowTranslation[i])
         {
-            wchar_t* t = TITLE[i].Text;
-            TITLE[i].Text = makeWString(TITLEFILE[i].Text);
-            free(t);
-            InvalidateRect(SECTION[i],0,1);
+            PostMessage(SECTION[i], WM_TRANSLATED, 0,0);
+            
         }
-        /*CSSECMAN::setTitle(i, TITLEFILE[i], 0);
-        InvalidateRect(SECTION[i],0,1);*/
     }
 }
 
@@ -482,7 +478,7 @@ void CSFILESMAN::setSaveAppTitles(bool b)
     saveAppTitles = b;
 }
 
-void CSFILESMAN::setSaveAppSizes(bool b)
+void CSFILESMAN::setSaveAppGeometry(bool b)
 {
     saveAppSizes = b;
 }
@@ -495,7 +491,7 @@ bool __translateTitles()
 {
     // === PARAMÈTRES À MODIFIER ===
     std::string INPUT_FILE = "resources\\lang\\titles\\" + utf16_to_utf8(sourceLanguageCode) + ".txt";
-    std::string OUTPUT_FILE = wcharPtrToCharPtr(appTitleFilePath); //"D:\\projects\\CSigma\\resources\\lang\\titles\\hi.txt";
+    std::string OUTPUT_FILE = utf16_to_utf8(appTitleFilePath); //"D:\\projects\\CSigma\\resources\\lang\\titles\\hi.txt";
 
     if(!CSFILESMAN::fileExists(utf8_to_utf16(INPUT_FILE).c_str()))
         return 0;
@@ -682,8 +678,8 @@ void CSFILESMAN::__setAppTips()
                 TipsPopupParams[i].text[j].paragraph[k].Text = CSSTRUTILS::makeWString(TIPSFILE[i][j][k]);
                 //wprintf(L"%ls\n",TIPSFILE[i][j][k]);
                 free(t);
-
             }
+            //std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
     }
 }
@@ -756,6 +752,7 @@ bool __translateTips()
                     TIPSFILE[i][j][k] = ret[k];
                     free(t);
                 }
+                //std::this_thread::sleep_for(std::chrono::milliseconds(100));
             }
         }
     }

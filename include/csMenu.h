@@ -3,6 +3,7 @@
 
 #include "csSection.h"
 #include "csListBoxMin.h"
+#include "csStrUtils.h"
 
 class CSMENU
 {
@@ -36,5 +37,6 @@ class CSMENU
         int selectedItem;
         
 };
+
 
 #endif // CSMENU_H

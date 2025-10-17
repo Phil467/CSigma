@@ -13,7 +13,7 @@ extern vector<RECT> RF;
 bool saveAppSizes;
 
 extern wchar_t* appTitleFilePath;
-extern vector<wchar_t*> TITLEFILE;
+extern vector<CSTEXT> TITLEFILE;
 extern vector<bool> setTitleInit;
 extern bool saveAppTitles;
 
@@ -1160,6 +1160,16 @@ cout<<"gesture\n";
             static HBRUSH hBrush = CreateSolidBrush(RGB(20,20,20));
             return (LRESULT)hBrush;
 
+        }
+
+        else if(msg == WM_TRANSLATED)
+        {
+            if(TITLE[id].Text && allowTranslation[id])
+            {
+                //CSSECMAN::setTitle(id, CSTEXT{.Text=(wchar_t*)TITLEFILE[id].Text}, 1); // bug
+                TITLE[id].Text = TITLEFILE[id].Text;
+                InvalidateRect(SECTION[id],0,1);
+            }
         }
 
         int n = GROUPED_EVENTS_ARGS[id].size();
