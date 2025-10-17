@@ -1,5 +1,5 @@
 <div align="center">
-![logo](resources/img/csigma%20logo4w200x200b.png)
+    <img src="resources/img/csigma%20logo4w200x200b.png" alt="Logo">
 </div>
 ---
 
