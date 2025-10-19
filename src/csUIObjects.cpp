@@ -316,6 +316,7 @@ int CSUIOBJECTS::addTitle(int& id, wchar_t*title, SIZE size, int fontSize, wchar
 
 
 extern int csCreateRichEdit(int idpar, RECT marging, const wchar_t* defaultText, int style, int hMenuId);
+extern vector<bool> allowTranslation;
 
 CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementer(int idp, RECT r, double value, double incr, bool intNum)
 {
@@ -386,6 +387,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt(int idp, RECT r
     char*nb = (char*)utf16_to_utf8((const wchar_t*)step).c_str();
     bool sign = CSUTILS::signExtraction(nb); 
     nip.step.set(nb,0,sign);
+    allowTranslation[nip.idSection] = 0;
     //free(nb);
 
     bool*titleAutoRepos = csAlloc<bool>(1,1);
@@ -419,8 +421,10 @@ void incrementFunction(CSARGS Args)
         }
         free(TITLE[nip.idSection].Text);
         char*printFormat = CSARITHMETIC::getPrintFormat(res);
-        wchar_t* text = csAlloc<wchar_t>((strlen(printFormat)+1));
-        wsprintf(text, L"%s\0",  (wchar_t*)charPtrtoWcharPtr(printFormat).c_str());
+        /*wchar_t* text = csAlloc<wchar_t>((strlen(printFormat)+1));
+        wsprintf(text, L"%s\0",  (wchar_t*)charPtrtoWcharPtr(printFormat).c_str());*/
+        wchar_t* text = CSSTRUTILS::makeWString(CSSTRUTILS::utf8_to_utf16(printFormat).c_str());
+        
 
         TITLE[nip.idSection].Text = text;
         InvalidateRect(SECTION[nip.idSection],0,1);
@@ -503,8 +507,9 @@ void decrementFunction(CSARGS Args)
         free(TITLE[nip.idSection].Text);
         char*printFormat = CSARITHMETIC::getPrintFormat(res);
         
-        wchar_t* text = csAlloc<wchar_t>((strlen(printFormat)+1));
-        wsprintf(text, L"%s\0",  (wchar_t*)charPtrtoWcharPtr(printFormat).c_str());
+        //wchar_t* text = csAlloc<wchar_t>((strlen(printFormat)+1));
+        //wsprintf(text, L"%s\0",  (wchar_t*)charPtrtoWcharPtr(printFormat).c_str());
+        wchar_t* text = CSSTRUTILS::makeWString(CSSTRUTILS::utf8_to_utf16(printFormat).c_str());
 
         TITLE[nip.idSection].Text = text;
         InvalidateRect(SECTION[nip.idSection],0,1);
@@ -587,6 +592,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt1(int idp, RECT 
     char*nb = (char*)utf16_to_utf8((const wchar_t*)step).c_str();
     bool sign = CSUTILS::signExtraction(nb); 
     nip.step.set(nb,0,sign);
+    allowTranslation[nip.idSection] = 0;
     //free(nb);
 
 
@@ -621,6 +627,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt2(int idp, RECT 
     char*nb = (char*)utf16_to_utf8((const wchar_t*)step).c_str();
     bool sign = CSUTILS::signExtraction(nb); 
     nip.step.set(nb,0,sign);
+    allowTranslation[nip.idSection] = 0;
     //free(nb);
 
 

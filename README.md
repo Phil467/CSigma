@@ -146,6 +146,12 @@ void onButtonClick(CSARGS Args) {
 
 ---
 
+## 📄 Test Sample
+
+[`This video`](uiSamples/demo_video.mp4) shows what you will get after compiling and running the project. The file [`main.cpp`] contains the code necessary for designing the user interface as shown in the video.
+
+---
+
 ## 🤝 Contributing
 
 Contributions will be welcome once the core API stabilizes.  
@@ -311,6 +317,11 @@ void onButtonClick(CSARGS Args) {
 |-----------|-------------|
 | [`docs/CSigma_Architecture_EN.md`](docs/CSigma_Architecture_EN.md) | Présentation technique (anglais) |
 | [`docs/CSigma_Architecture_FR.md`](docs/CSigma_Architecture_FR.md) | Présentation technique (français) |
+---
+
+## 📄 Echantillon de test
+
+[`Cette vidéo`](uiSamples/demo_video.mp4) montre ce vous obtiendrez après avoir compilé et executé le projet. Le fichier [`main.cpp`] contient le code necessaire à la conception de l'interface utilisateur tel que montrée dans la vidéo.
 
 ---
 

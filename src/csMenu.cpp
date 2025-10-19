@@ -52,7 +52,7 @@ void CSMENU::init(int _idp, RECT r, bool _autoResize)
 
     
     int i;
-    idPopup.push_back(i=CSSECMAN::createSection(0, {0,0,200,300},  RGB(100,100,100), {0}, 0, 0, 0));
+    idPopup.push_back(i=CSSECMAN::createSection(0, {0,0,200,130*3},  RGB(100,100,100), {0}, 0, 0, 0));
     SetTimer(SECTION[i], 0, 20, 0);
 
     //CSSECMAN::newMouseHook(i);
@@ -111,11 +111,11 @@ int CSMENU::newGroup(const wchar_t* title, const wchar_t* iconPath1, const wchar
         CSSECMAN::removeAction((*idSection)[idSection->size()-1], ID_ACTION);
     }
 
-    CSSECMAN::joinPopup(BUTTON, idPopup[0], {0,0,160,133}, (POS_BOOL){.bLBottom=1}, 1, 1,0, idSection);
+    CSSECMAN::joinPopup(BUTTON, idPopup[0], {0,0,160,125*3+3}, (POS_BOOL){.bLBottom=1}, 1, 1,0, idSection);
     idSection->push_back(BUTTON);
     int id = idSection->size()-1;
 
-    int lbmId = newlbm(&idPopup[0], &(*idSection)[id], 8, (wchar_t*)(wstring(L"Menu-")+to_wstring(lbm.size())+L"-").c_str());
+    int lbmId = newlbm(&idPopup[0], &(*idSection)[id], 8*3, (wchar_t*)(wstring(L"Menu-")+to_wstring(lbm.size())+L"-").c_str());
     if(lastlbm) lastlbm->hide();
     lbm[lbmId]->show();
     lastlbm = lbm[lbmId];
