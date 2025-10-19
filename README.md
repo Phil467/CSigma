@@ -148,7 +148,7 @@ void onButtonClick(CSARGS Args) {
 
 ## 📄 Test Sample
 
-[`This video`](uiSamples/demo_video.mp4) shows what you will get after compiling and running the project. The file [`main.cpp`] contains the code necessary for designing the user interface as shown in the video.
+[`This video`](uiSamples/demo_video.mp4) (click on "View raw" to download) shows what you will get after compiling and running the project. The file [`main.cpp`](main.cpp) contains the code necessary for designing the user interface as shown in the video.
 
 ---
 
@@ -321,7 +321,7 @@ void onButtonClick(CSARGS Args) {
 
 ## 📄 Echantillon de test
 
-[`Cette vidéo`](uiSamples/demo_video.mp4) montre ce vous obtiendrez après avoir compilé et executé le projet. Le fichier [`main.cpp`] contient le code necessaire à la conception de l'interface utilisateur tel que montrée dans la vidéo.
+[`Cette vidéo`](uiSamples/demo_video.mp4) (cliquez sur "View raw" pour télécharger) montre ce vous obtiendrez après avoir compilé et executé le projet. Le fichier [`main.cpp`](main.cpp) contient le code necessaire à la conception de l'interface utilisateur tel que montrée dans la vidéo.
 
 ---
 
