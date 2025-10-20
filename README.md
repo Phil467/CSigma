@@ -166,7 +166,7 @@ CSigma is under the ['MIT License'](LICENSE)
 ---
 
 ### 🔧 Maintainer
-**Phil467**  
+**Philippe Levang Azeufack (Phil467)**  
 Developer and founder of the CSigma project  
 [GitHub: Phil467](https://github.com/Phil467)
 
@@ -183,7 +183,7 @@ Developer and founder of the CSigma project
 <div align="center">
 *Framework C++ natif pour les applications de bureau modernes et omnilingues.*
 </div>
----
+
 
 ## ⚙️ Vue d’ensemble
 
@@ -340,6 +340,6 @@ CSigma est sous la ['license MIT'](LICENSE)
 
 ### 🔧 Mainteneur
 
-**Phil467**  
+**Philippe Levang Azeufack (Phil467)**  
 Développeur et fondateur du projet CSigma  
 [GitHub : Phil467](https://github.com/Phil467)
