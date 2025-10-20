@@ -9,7 +9,7 @@
 <div align="center">
 *Native C++ Framework for Modern Omni Lingual Desktop Applications.*
 </div>
----
+
 
 ## ⚙️ Overview
 
@@ -161,7 +161,7 @@ Developers are encouraged to explore the current source structure and suggest im
 
 ## 📜 License
 
-To be defined (prototype stage)
+CSigma is under the ['MIT License'](LICENSE)
 
 ---
 
@@ -170,7 +170,7 @@ To be defined (prototype stage)
 Developer and founder of the CSigma project  
 [GitHub: Phil467](https://github.com/Phil467)
 
----
+
 ---
 <div align="center">
     <img src="resources/img/csigma%20logo4w200x200b.png" alt="Logo">
@@ -334,7 +334,7 @@ Les développeurs peuvent dès à présent explorer la structure du code et prop
 
 ## 📜 Licence
 
-À définir (phase prototype)
+CSigma est sous la ['license MIT'](LICENSE)
 
 ---
 
