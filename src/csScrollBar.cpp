@@ -201,6 +201,14 @@ void CSSCROLLBAR::setViewFrameBottomMarging(int marging)
         viewedAreaBottomMarging[*idc] = marging*geomCoef;
 }
 
+void CSSCROLLBAR::setEdge(int edge)
+{
+    if(*orient == CS_SBAR_HORIZONTAL)
+        *hEdge = edge;
+    else 
+        *vEdge = edge;
+}
+
 void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
 {
     idp = _idp;
@@ -229,6 +237,7 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
     mhId0 = csAlloc(1,-1);
     vEdge = csAlloc(1,0);
     hEdge = csAlloc(1,0);
+    geom = csAlloc<RECT>(1, geometry);
     bSize = 0;
     
     rcs = new vector<RECT>;
@@ -322,8 +331,8 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
         int edge = *hEdge;
         int thick = geometry.bottom*geomCoef;
         int t2 = thick;
-        *id = CSSECMAN::createSection(_idp, {edge/geomCoef, (cy - edge - thick)/geomCoef, (cx - 2*edge - thick)/geomCoef, thick/geomCoef},  RGB(200,200,200), {0,0,0,0});
-            
+        //*id = CSSECMAN::createSection(_idp, {edge/geomCoef, (cy - edge - thick)/geomCoef, (cx - 2*edge - thick)/geomCoef, thick/geomCoef},  RGB(200,200,200), {0,0,0,0});
+        *id = CSSECMAN::createSection(_idp, geometry,  RGB(200,200,200), {0,0,0,0});
         cursor[*id] = LoadCursor(0,IDC_SIZEWE);
         
         hdStackContext[*id] = CreateCompatibleDC(hdcontext[_idp]);
@@ -358,8 +367,8 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
         int edge = *vEdge;
         int thick = geometry.right*geomCoef;
         int t2 = thick;
-        *id = CSSECMAN::createSection(_idp, {(cx - edge - thick)/geomCoef, edge/geomCoef, thick/geomCoef, (cy - 2*edge - thick)/geomCoef},  RGB(200,200,200), {0,0,0,0});
-
+        //*id = CSSECMAN::createSection(_idp, {(cx - edge - thick)/geomCoef, edge/geomCoef, thick/geomCoef, (cy - 2*edge - thick)/geomCoef},  RGB(200,200,200), {0,0,0,0});
+        *id = CSSECMAN::createSection(_idp, geometry,  RGB(200,200,200), {0,0,0,0});
         hdStackContext[*id] = CreateCompatibleDC(hdcontext[_idp]);
         hStackBmp[*id] = CreateCompatibleBitmap(hdcontext[_idp], thick, GetSystemMetrics(SM_CYSCREEN));
         SelectBitmap(hdStackContext[*id], hStackBmp[*id]);
@@ -394,11 +403,11 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
 
     bool*block = csAlloc<bool>(1,0);
 
-    Args.init(26);
+    Args.init(27);
     Args.regArg(rcs, colors, value, value0, hmarg, vmarg, 
                     width, szzoom, orient, tLength, rectSelect, mhId, scval, idc, 
                     scType, idMask, block, oldClientPos, oldClientSize, CX, CY, cloths, 
-                    threadBool, mhId0, hEdge, vEdge);
+                    threadBool, mhId0, hEdge, vEdge, geom);
     
     CSSECMAN::addAction(*id, groupMsg, Args);
     //CSSECMAN::addAction(idp, parentResize, 9, idc, id, &hEdge, &vEdge, &CX, &CY, &bSize, orient, &idp);
@@ -440,7 +449,7 @@ void CSSCROLLBAR::setPositionRatio(float posRatio)
     else
     {
         *value0 = *value = posRatio; 
-        //SendMessage(SECTION[idp],WM_SIZE,0,0);
+        //PostMessage(SECTION[idp],WM_SIZE,0,0);
     }
 }
 
@@ -475,7 +484,7 @@ void CSSCROLLBAR::mouseLeaveHide(int alphaMin)
     getParams()->AutoAlphaFade.State = CS_AAF_HIDE_CNTR;
     getParams()->AutoAlphaFade.SetGeometry = 0;
     getParams()->MouseLeaveTransparency = 1;
-    SendMessage(SECTION[*id],WM_MOUSELEAVE,0,0);*/
+    PostMessage(SECTION[*id],WM_MOUSELEAVE,0,0);*/
 }
 void CSSCROLLBAR::setClient(int _idc, int _idMask)
 {
@@ -720,7 +729,7 @@ void resize(CSARGS Args)
     }
 
     *(vector<RECT>*)Args[0] = rcs;
-    *block = 0; // vaut 1 pour une reception (sendmessage) venant de wm_mouseMouve
+    *block = 0; // vaut 1 pour une reception (PostMessage) venant de wm_mouseMouve
 }
 
 void autoRepos(CSARGS Args)
@@ -739,30 +748,30 @@ void autoRepos(CSARGS Args)
 
         int idc = *(int*)Args[13];
         int id = (int)Args;
+        RECT r = *(RECT*)Args[26];
+        //cout<<"pr = "<<r.left<<"\n";
 
         if(orientation == CS_SBAR_HORIZONTAL)
         {
             int thick = RECTCL[id].bottom;
-            RECT r = RECTPARREFSAVED[id];
             int edge = *(int*)Args[24];
 
             int a = withVScroll[idp] ? thick : 0;
-            MoveWindow(SECTION[id], /*r.left + */edge, cy /*- r.top*/ - edge - thick, 
-                                            cx /*- r.left*/ - 2*edge - a, thick, 0);
+            MoveWindow(SECTION[id], r.left + edge, cy + edge - thick, 
+                                            cx - r.left - 2*edge - a, thick, 0);
         }
         else if(orientation == CS_SBAR_VERTICAL)
         {
             int thick = RECTCL[id].right;
-            RECT r = RECTPARREFSAVED[id];
             int edge = *(int*)Args[25];
 
-            MoveWindow(SECTION[id], cx /*- r.left*/ - edge - thick, /*r.top +*/ edge,  
-                                            thick, cy /*- r.top*/ - 2*edge, 1);
+            MoveWindow(SECTION[id], cx + edge - thick, r.top + edge,  
+                                            thick, cy - r.top - 2*edge, 1);
          }
          *(int*)Args[19] = cx;
          *(int*)Args[20] = cy;
     }
-}
+} 
 void autoRepos_parentContext(CSARGS Args)
 {
     //int idp = int(Args);
@@ -779,24 +788,23 @@ void autoRepos_parentContext(CSARGS Args)
 
         int idc = *(int*)Args[0];
         int idScroll = *(int*)Args[1];
+        RECT r = *(RECT*)Args[26];
         if(orientation == CS_SBAR_HORIZONTAL)
         {
             int thick = RECTCL[idScroll].bottom;
-            RECT r = RECTPARREFSAVED[idScroll];
             int edge = *(int*)Args[2];
             
             int a = withVScroll[idp] ? thick : 0;
-            MoveWindow(SECTION[idScroll], /*r.left + */edge, cy /*- r.top*/ - edge - thick, 
-                                            cx /*- r.left*/ - 2*edge - a, thick, 1);
+            MoveWindow(SECTION[idScroll], r.left + edge, cy - r.top - edge - thick, 
+                                            cx - r.left - 2*edge - a, thick, 1);
         }
         else if(orientation == CS_SBAR_VERTICAL)
         {
             int thick = RECTCL[idScroll].right;
-            RECT r = RECTPARREFSAVED[idScroll];
             int edge = *(int*)Args[3];
-
-            MoveWindow(SECTION[idScroll], cx /*- r.left*/ - edge - thick, /*r.top +*/ edge,  
-                                            thick, cy /*- r.top*/ - 2*edge, 1);
+cout<<"rtop = "<<r.top<<"\n";
+            MoveWindow(SECTION[idScroll], cx - r.left - edge - thick, r.top + edge,  
+                                            thick, cy - r.top*- 2*edge, 1);
         }
         
         *(int*)Args[4] = cx;
@@ -926,7 +934,7 @@ void mouseMove(CSARGS Args)
             _apply(Args);
         }
     }
-    //SendMessage(HWND(Args),WM_SIZE,0,0);
+    //PostMessage(HWND(Args),WM_SIZE,0,0);
     //InvalidateRect(HWND(Args), 0,1);
     
 }
@@ -1086,7 +1094,7 @@ void _apply(CSARGS Args)
         }
     }
 
-    SendMessage(HWND(Args),WM_SIZE,0,0);
+    PostMessage(HWND(Args),WM_SIZE,0,0);
 }
 
 
@@ -1125,7 +1133,7 @@ void timer_(CSARGS Args)
             if(oldClientPos->x != hdcontextExtInPos[idc].x)
             {
                 oldClientPos->x = hdcontextExtInPos[idc].x;
-                SendMessage((HWND)Args,WM_SIZE,0,0);
+                PostMessage((HWND)Args,WM_SIZE,0,0);
             }
             else if(oldClientSize->cx != hdcontextExtSize[idc].cx)
             {
@@ -1144,7 +1152,7 @@ void timer_(CSARGS Args)
             {
                 hdcontextExtInPos[idc].x = 0;
                 InvalidateRect(SECTION[idc], &bltRect[idc], 1);
-                SendMessage((HWND)Args, WM_SIZE, 0,0);
+                PostMessage((HWND)Args, WM_SIZE, 0,0);
             }
         }
         else if(orientation == CS_SBAR_VERTICAL)
@@ -1152,7 +1160,7 @@ void timer_(CSARGS Args)
             if(oldClientPos->y != hdcontextExtInPos[idc].y)
             {
                 oldClientPos->y = hdcontextExtInPos[idc].y;
-                SendMessage((HWND)Args,WM_SIZE,0,0);
+                PostMessage((HWND)Args,WM_SIZE,0,0);
             }
             else if(oldClientSize->cy != hdcontextExtSize[idc].cy) // superflux, modifer
             {   //std::cout<<"hey00000\n";
@@ -1173,7 +1181,7 @@ void timer_(CSARGS Args)
             {
                 hdcontextExtInPos[idc].y = 0;
                 InvalidateRect(SECTION[idc], &bltRect[idc], 1);
-                SendMessage((HWND)Args, WM_SIZE, 0,0);
+                PostMessage((HWND)Args, WM_SIZE, 0,0);
             }
         }
 
@@ -1365,7 +1373,7 @@ void mouseWheel(CSARGS Args)
                     hdcontextExtInPos[idc].x = -dx;*/
                     //cout<<" dx = "<<dx<<"\n";
 
-                    SendMessage(SECTION[withHScroll[idc]], WM_SIZE, 0,0);
+                    PostMessage(SECTION[withHScroll[idc]], WM_SIZE, 0,0);
                 }
                 if(withVScroll[idc] && vZoom[idc] <= zoomParams[idc].vmax)
                 {
@@ -1376,7 +1384,7 @@ void mouseWheel(CSARGS Args)
                     long dy = 1.0*((bltRect[idc].bottom-bltRect[idc].top-hdcontextExtOutPos[idc].y)/2 - pt.y)*vZoom[idc];
                     hdcontextExtInPos[idc].y = -dy;*/
 
-                    SendMessage(SECTION[withVScroll[idc]], WM_SIZE, 0,0);
+                    PostMessage(SECTION[withVScroll[idc]], WM_SIZE, 0,0);
                 }
                 InvalidateRect(SECTION[idc], &bltRect[idc], 1);
             }
@@ -1428,7 +1436,7 @@ void mouseWheel(CSARGS Args)
                     long dx = 1.0*((bltRect[idc].right-bltRect[idc].left-hdcontextExtOutPos[idc].y)/2 - pt.x)*hZoom[idc];
                     hdcontextExtInPos[idc].x = -dx;*/
 
-                    SendMessage(SECTION[withHScroll[idc]], WM_SIZE, 0,0);
+                    PostMessage(SECTION[withHScroll[idc]], WM_SIZE, 0,0);
                 }
                 if(withVScroll[idc] && vZoom[idc] >= zoomParams[idc].vmin)
                 {
@@ -1440,7 +1448,7 @@ void mouseWheel(CSARGS Args)
                     long dy = 1.0*((bltRect[idc].bottom-bltRect[idc].top-hdcontextExtOutPos[idc].y)/2 - pt.y)*vZoom[idc];
                     hdcontextExtInPos[idc].y = -dy;*/
                     
-                    SendMessage(SECTION[withVScroll[idc]], WM_SIZE, 0,0);
+                    PostMessage(SECTION[withVScroll[idc]], WM_SIZE, 0,0);
                 }
                 InvalidateRect(SECTION[idc], &bltRect[idc], 1);
             }

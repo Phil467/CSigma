@@ -22,9 +22,9 @@ void forceEventFunction(CSARGS Args);
 
 int ROOT, MENU_SECTION, MIDDLE_LEFT_SECTION, MIDDLE_TOP_SECTION, MIDDLE_MIDDLE_SECTION, MIDDLE_SECTION, RIGHT_SECTION, BOTTOM_SECTION;
 int NR_SECTION, CS_SECTION, BIS_SECTION;
-int BTN_NEW_FILE, BTN_NEW_OUTPUT, BTN_REMOVE_FILE, BNT_RANDOM_NUMBER, BTN_ADD_TO_DATA_LIST;
-int BTN_REMOVE_SAVE_1, BTN_REMOVE_UNDO_1, BTN_1, BTN_2, BTN_3, BTN_4;
-int STATIC_SEARCH, BUTTON_SEARCH;
+int BNT_RANDOM_NUMBER, BTN_ADD_TO_DATA_LIST, BTN_DEL_TO_DATA_LIST;
+int BTN_1, BTN_2, BTN_3, BTN_4;
+int STATIC_SEARCH, BUTTON_SEARCH, ROOT_RND_NUM_VIEWER, BTN_VIEW_RND_NUM_VIEWER;
 int MENU_NS, MENU_BIS, MENU_CS, MENU_PREFERENCES, MENU_ABOUT;
 int SYSCOMMAND_SECTION, SYS_CLOSE, SYS_MAX, SYS_MIN, TITLE_SECTION, RIGHT_SECTION_CHILD;
 int ABOUT_UI, ABOUT_UI_CLIENT, ABOUT_UI_BOTTOM, ABOUT_SUB_MENU, ABOUT_P1, ABOUT_P2, ABOUT_P3, ABOUT_P4, ABOUT_PTITLE, ABOUT_PINDEX;
@@ -37,14 +37,14 @@ int smy = GetSystemMetrics(SM_CYSCREEN);
 
 
 CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", CS_SAVE_APP_STRINGS, CS_SAVE_APP_GEOMETRY) //--------------------------------------------------------------------------------------------------------------------------------
-
+//CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", 0, 0)
 float geomCoef = 1.5;
 setGeometryCoef(geomCoef);
 
 // /***************************** Root ********************************** */
 
 ROOT = createSection(-1, {100,25,600,500},  RGB(30,30,30), {1,1,1,1,1,1,1,1});
-int ICON_ROOT  = setIcon(ROOT, L"resources/img/icon20.ico", L"resources/img/icon96.ico", {2,2,21,21});
+int ICON_ROOT  = setIcon(ROOT, L"resources/img/logos/icon.ico", L"resources/img/logos/icon.ico", {2,2,21,21});
 CSSECMAN::enableDarkEdge(ROOT);
 CSSECMAN::setMinMaxInfo(ROOT, MINMAXINFO{.ptMinTrackSize={400,250}});
 
@@ -192,10 +192,10 @@ fontSizeInc.setMinBound("8");
 fontSizeInc.setMaxBound("30");
 CSSECMAN::setBorderColorAndThick(fontSizeInc.idSection, RGB(60,60,60), 1);
 
-void setFontSize(CSARGS Args);
-csSetUpdatingFunction(fontSizeInc.idText, setFontSize, 2, &MIDDLE_MIDDLE_SECTION, &fontSizeInc.idSection);
+//void setFontSize(CSARGS Args);
+//csSetUpdatingFunction(fontSizeInc.idText, setFontSize, 2, &MIDDLE_MIDDLE_SECTION, &fontSizeInc.idSection);
 
-CSDYNAMIC_SIMPLE_TEXT tips0;
+CSDYNAMIC_TEXT tips0;
 tips0.marg = {10,10,10,10};
 tips0.updateGASize = 1;
 tips0.view = 1;
@@ -258,7 +258,7 @@ CSSCROLLBAR vscrollAbout = CSUIOBJECTS::addVScrollBar(&ABOUT_UI_CLIENT, &ABOUT_U
 hscrollAbout.setViewFrameBottomMarging(10);
 vscrollAbout.setViewFrameRightMarging(10);
 
-int idcv = csGraphics::loadImage(ABOUT_UI_CLIENT, L"resources/img/csigma logo4w.bmp", {1,1}, {0,0});
+int idcv = csGraphics::loadImage(ABOUT_UI_CLIENT, L"resources/img/logos/logo.bmp", {1,1}, {0,0});
 SIZE sizecv = csGraphics::getImageSize(ABOUT_UI_CLIENT, idcv);
 csGraphics::showImage(ABOUT_UI_CLIENT, idcv, 1, {0}, sizecv);
 
@@ -294,7 +294,7 @@ h = 16, marg = 4, total = h+marg;
 CS_NUMERIC_INCREMENTER_PARAMS internPrec = CSUIOBJECTS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5,65,h}, L"1", L"1", INPUT_FORMAT_INTERGER);
 internPrec.setMinBound("1");
 
-CSDYNAMIC_SIMPLE_TEXT tips;
+CSDYNAMIC_TEXT tips;
 tips.marg = {10,10,10,10};
 tips.updateGASize = 1;
 tips.view = 1;
@@ -309,7 +309,7 @@ CSSECMAN::addTips(internPrec.idSection, {0,0,250/geomCoef, 200/geomCoef}, (POS_B
 
 CS_NUMERIC_INCREMENTER_PARAMS externPrec = CSUIOBJECTS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*1,65,h}, L"1", L"1", INPUT_FORMAT_INTERGER);
 externPrec.setMinBound("1");
-CSDYNAMIC_SIMPLE_TEXT tips1;
+CSDYNAMIC_TEXT tips1;
 tips1.marg = {10,10,10,10};
 tips1.updateGASize = 1;
 tips1.view = 1;
@@ -325,7 +325,7 @@ CSSECMAN::addTips(externPrec.idSection, {0,0,200/geomCoef, 150/geomCoef}, (POS_B
 
 CS_NUMERIC_INCREMENTER_PARAMS Nnb = CSUIOBJECTS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*2,65,h}, L"500", L"1", INPUT_FORMAT_INTERGER);
 Nnb.setMinBound("1");
-CSDYNAMIC_SIMPLE_TEXT tips2;
+CSDYNAMIC_TEXT tips2;
 tips2.marg = {10,10,10,10};
 tips2.updateGASize = 1;
 tips2.view = 1;
@@ -343,7 +343,7 @@ CSSECMAN::addTips(Nnb.idSection, {0,0,200/geomCoef, 170/geomCoef}, (POS_BOOL){.b
 CS_NUMERIC_INCREMENTER_PARAMS minDigit = CSUIOBJECTS::numericIncrementerExt1(MIDDLE_LEFT_SECTION, {5,5+total*3,65,h}, L"0", L"1", INPUT_FORMAT_INTERGER);
 minDigit.setMinBound("0");
 minDigit.setMaxBound("9");
-CSDYNAMIC_SIMPLE_TEXT tips3;
+CSDYNAMIC_TEXT tips3;
 tips3.marg = {10,10,10,10};
 tips3.updateGASize = 1;
 tips3.view = 1;
@@ -365,11 +365,30 @@ maxDigit.setMaxBound("9");
 CSSECMAN::addTips(maxDigit.idSection, {0,0,200/geomCoef, 170/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
 /********************************************************************************** */
 
-void getRandomData(CSARGS Args);
-BNT_RANDOM_NUMBER = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Nombre aléatoire\0", {5,5+total*5,65,h});
-CSSECMAN::addAction(BNT_RANDOM_NUMBER, getRandomData, 4, &Nnb.idSection, &minDigit.idSection, &maxDigit.idSection, &MIDDLE_MIDDLE_SECTION);
+//ROOT_RND_NUM_VIEWER = createSection(0, {1,1,400,400},  RGB(20,20,20), {0});
+ROOT_RND_NUM_VIEWER = createSection(0, {200,200,400,400},  RGB(30,30,30), {1,1,1,1,1,1,1,1}, 1, 1, 0);
+CSSECMAN::enableDarkEdge(ROOT_RND_NUM_VIEWER);
+CSSECMAN::setMinMaxInfo(ROOT_RND_NUM_VIEWER, MINMAXINFO{.ptMinTrackSize={200,150}});
+CSUIOBJECTS::addTitle(ROOT_RND_NUM_VIEWER, L"RANDOM NUMBER",{0}, 16, L"Arial Black", ICON_ROOT);
+CSSYSCOMMAND_SECTION SYS_CMD_RND = CSUIOBJECTS::addSysCommand(ROOT_RND_NUM_VIEWER, {400});
 
-CSDYNAMIC_SIMPLE_TEXT tipsMSG;
+CSSCROLLBAR rnd_vscroll = CSUIOBJECTS::addVScrollBar(&ROOT_RND_NUM_VIEWER, &ROOT_RND_NUM_VIEWER, 0, 10, {0,35});
+
+csGraphics::setGraphicAreaPosition(ROOT_RND_NUM_VIEWER, {10,35});
+csGraphics::setGraphicAreaColor(ROOT_RND_NUM_VIEWER, {30,30,30}, {0});
+csGraphics::setMouseWheelPreference(ROOT_RND_NUM_VIEWER, CS_MOUSEWHEEL_VSCROLL);
+rnd_vscroll.setViewFrameRightMarging(10);
+
+CSDYNAMIC_TEXT dtxt;
+dtxt.marg = {10,10,10,10};
+dtxt.updateGASize = 1;
+dtxt.view = 1;
+dtxt.paragraph.push_back(CSTEXT{.Text=makeWString(L"0"), .Font=L"calibri", .FontSize = 14, .Italic=0,
+                                .Bold=FW_BOLD, .Color={100,200,100}});
+dtxt.pSpace.push_back(5);
+csGraphics::setDynamicText(ROOT_RND_NUM_VIEWER, dtxt);
+
+CSDYNAMIC_TEXT tipsMSG;
 tipsMSG.marg = {10,10,10,10};
 tipsMSG.updateGASize = 1;
 tipsMSG.view = 1;
@@ -382,10 +401,11 @@ tipsMSG.paragraph.push_back(CSTEXT{.Text=txt, .Font=L"calibri", .FontSize = 12, 
 tipsMSG.pSpace.push_back(5);
 CSSECMAN::addTips(BNT_RANDOM_NUMBER, {0,0,200/geomCoef, 150/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG);
 
+
 /********************************************************************************** */
 
 BTN_ADD_TO_DATA_LIST = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Ajouter\0", {5,5+total*6,65,h});
-CSDYNAMIC_SIMPLE_TEXT tipsMSG1;
+CSDYNAMIC_TEXT tipsMSG1;
 tipsMSG1.marg = {10,10,10,10};
 tipsMSG1.updateGASize = 1;
 tipsMSG1.view = 1;
@@ -397,28 +417,177 @@ tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Ajouter une donnée à la liste.\0",
 tipsMSG1.pSpace.push_back(5);
 CSSECMAN::addTips(BTN_ADD_TO_DATA_LIST, {0,0,200/geomCoef, 150/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG1);
 
+
 /********************************************************************************** */
 
-CS_NUMERIC_INCREMENTER_PARAMS activeNum = CSUIOBJECTS::numericIncrementerExt2(MIDDLE_LEFT_SECTION, {5,5+total*7,65,h}, L"0", L"1", INPUT_FORMAT_INTERGER);
+BTN_DEL_TO_DATA_LIST = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Supprimer\0", {5,5+total*7,65,h});
+CSDYNAMIC_TEXT tipsMSG2;
+tipsMSG2.marg = {10,10,10,10};
+tipsMSG2.updateGASize = 1;
+tipsMSG2.view = 1;
+tipsMSG2.paragraph.push_back(CSTEXT{.Text=L"Supprimer\0", .Font=L"calibri", .FontSize = 14, .Italic=0,
+                                .Bold=FW_BOLD, .Color={150,150,100}});
+tipsMSG2.pSpace.push_back(5);
+tipsMSG2.paragraph.push_back(CSTEXT{.Text=L"Supprimer une donnée à la liste.\0", .Font=L"calibri", .FontSize = 12, .Italic=1,
+                                .Bold=FW_THIN, .Color={150,150,150}});
+tipsMSG2.pSpace.push_back(5);
+CSSECMAN::addTips(BTN_DEL_TO_DATA_LIST, {0,0,200/geomCoef, 150/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG2);
+
+
+/********************************************************************************** */
+
+CS_NUMERIC_INCREMENTER_PARAMS activeNum = CSUIOBJECTS::numericIncrementerExt2(MIDDLE_LEFT_SECTION, {5,5+total*8,65,h}, L"0", L"1", INPUT_FORMAT_INTERGER);
 activeNum.setMinBound("0");
 activeNum.setMaxBound("9");
 
-CS_STRING_INCREMENTER_PARAMS* strInc = CSUIOBJECTS::stringIncrementer(MIDDLE_LEFT_SECTION, {5,5+total*8,65,h}, L"string 1\0", 1, 1,
+CS_STRING_INCREMENTER_PARAMS* strInc = CSUIOBJECTS::stringIncrementer(MIDDLE_LEFT_SECTION, {5,5+total*9,65,h}, L"Nombre 1\0", 1, 1,
                                                         {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0});
-strInc->newItem(L"string 2\0");
-strInc->newItem(L"string 3\0");
-strInc->newItem(L"string 4\0");
-strInc->newItem(L"string 5\0");
-strInc->newItem(L"string 6\0");
-strInc->newItem(L"string 7\0");
-strInc->newItem(L"string 8\0");
-strInc->newItem(L"string 9\0");
+                                                    
 
-BTN_1 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Afficher/Masquer le logo", {5,5+total*10,65,h});
-BTN_2 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Lire/Arrêter l'animation", {5,5+total*11,65,h});
-BTN_3 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Bouton 3", {5,5+total*12,65,h});
-BTN_4 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Bouton 4", {5,5+total*13,65,h});
+void getRandomData(CSARGS Args);
+BNT_RANDOM_NUMBER = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Nombre aléatoire\0", {5,5+total*5,65,h});
+CSSECMAN::addAction(BNT_RANDOM_NUMBER, getRandomData, 5, &Nnb.idSection, &minDigit.idSection, &maxDigit.idSection, &ROOT_RND_NUM_VIEWER, strInc);
 
+
+void(*autoScrollText)(long, long, void*, void*)  = [](long currentItem, long prevItem, void* _rnd_vscroll, void* _strInc)
+{
+    CSSCROLLBAR* rnd_vscroll = (CSSCROLLBAR*)_rnd_vscroll;
+    CS_STRING_INCREMENTER_PARAMS* strInc = (CS_STRING_INCREMENTER_PARAMS*)_strInc;
+
+    long py = csGraphics::getDynamicTextParagraphPos(ROOT_RND_NUM_VIEWER, currentItem);
+    long cy = csGraphics::getGraphicAreaYSize(ROOT_RND_NUM_VIEWER);
+    long vcy = csGraphics::getViewAreaYSize(ROOT_RND_NUM_VIEWER);
+    long gpy = csGraphics::getGraphicAreaInYPos(ROOT_RND_NUM_VIEWER);
+    long vpy = csGraphics::getViewAreaYPos(ROOT_RND_NUM_VIEWER);
+    long _py = 0;
+    if(prevItem >= 0 && prevItem < strInc->item.size())
+        _py = csGraphics::getDynamicTextParagraphPos(ROOT_RND_NUM_VIEWER, currentItem);
+    else 
+        _py = py + 20 < cy ? py + 20 : cy;
+
+    long dpy = _py - py;
+    if(dpy >= vcy) return; 
+
+    if(_py - gpy + vpy > vcy || py - gpy + vpy < 0)
+        rnd_vscroll->setPositionRatio(1.0*_py/cy);
+};
+
+CSSECMAN::addAction(
+    BTN_ADD_TO_DATA_LIST,
+    (void (*)(CSARGS))[](CSARGS Args)
+    {
+        if((UINT)Args == WM_LBUTTONDOWN || (UINT)Args == WM_LBUTTONDBLCLK)
+        {
+            CS_STRING_INCREMENTER_PARAMS* strInc = (CS_STRING_INCREMENTER_PARAMS*)Args[0];
+            strInc->newItem((wstring(L"Nombre ")+to_wstring(strInc->item.size()+1)).c_str());
+            strInc->currentItem = strInc->item.size()-1;
+            
+            SendMessage(sHandle(strInc->idUp), WM_LBUTTONUP, 0,0); 
+
+            csGraphics::addDynamicText(ROOT_RND_NUM_VIEWER, CSTEXT{.Text=makeWString(L"0"), .Font=L"calibri", .FontSize = 14, .Italic=0,
+                .Bold=FW_BOLD, .Color={150, 100, 100}}, 5);
+            if(strInc->currentItem > 0)
+                csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, strInc->currentItem-1, {150,150,100});
+            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, strInc->currentItem, {100,200,100});
+            //csGraphics::updateGraphicArea(ROOT_RND_NUM_VIEWER,0);
+            SendMessage(sHandle(BNT_RANDOM_NUMBER), WM_LBUTTONUP, 0,0);
+
+            ((void(*)(long, long, void*, void*))Args[2])(strInc->currentItem, strInc->currentItem-1>=0?strInc->currentItem-1:0, Args[1], Args[0]);
+        }
+    },
+    3, strInc, &rnd_vscroll, autoScrollText
+);
+
+CSSECMAN::addAction(
+    BTN_DEL_TO_DATA_LIST,
+    (void (*)(CSARGS))[](CSARGS Args)
+    {
+        if((UINT)Args == WM_LBUTTONDOWN || (UINT)Args == WM_LBUTTONDBLCLK)
+        {
+            CS_STRING_INCREMENTER_PARAMS* strInc = (CS_STRING_INCREMENTER_PARAMS*)Args[0];
+
+            if(!strInc->item.size()) return;
+            
+            if(!strInc->removeItem(strInc->currentItem)) return;
+            csGraphics::removeDynamicTextParagraph(ROOT_RND_NUM_VIEWER, strInc->currentItem);
+            
+            for(int i=0; i<strInc->item.size(); i++)
+            {
+                strInc->item[i] = L"Nombre " + to_wstring(i+1);
+            }
+            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, strInc->currentItem, {100,200,100});
+            csGraphics::updateGraphicArea(ROOT_RND_NUM_VIEWER,0);
+
+            ((void(*)(long, long, void*, void*))Args[2])(strInc->currentItem, strInc->currentItem-1>=0?strInc->currentItem-1:0, Args[1], Args[0]);
+        }
+    },
+    3, strInc, &rnd_vscroll, autoScrollText
+);
+
+BTN_VIEW_RND_NUM_VIEWER = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Afficher les nombres", {5,5+total*10,65,h});
+CSSECMAN::addAction(
+    BTN_VIEW_RND_NUM_VIEWER,
+    (void (*)(CSARGS))[](CSARGS Args)
+    {
+        if((UINT)Args == WM_LBUTTONDOWN || (UINT)Args == WM_LBUTTONDBLCLK)
+        {
+            if(CSSECMAN::isSectionVisible(ROOT_RND_NUM_VIEWER)) CSSECMAN::setVisible(ROOT_RND_NUM_VIEWER, 0);
+            else CSSECMAN::setVisible(ROOT_RND_NUM_VIEWER, 1);
+        }
+    },
+    0
+);
+
+CSSECMAN::addAction(
+    strInc->idDown,
+    (void (*)(CSARGS))[](CSARGS Args)
+    {
+        if((UINT)Args == WM_LBUTTONDOWN  || (UINT)Args == WM_LBUTTONDBLCLK)
+        {
+            CS_STRING_INCREMENTER_PARAMS* strInc = (CS_STRING_INCREMENTER_PARAMS*)Args[0];
+            int currentItem = strInc->currentItem;
+            int prevItem = (strInc->currentItem+1)%strInc->item.size();
+
+            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, prevItem, {150,150,100});
+            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, currentItem, {100,200,100});
+            csGraphics::updateGraphicArea(ROOT_RND_NUM_VIEWER,0);
+
+            ((void(*)(long, long, void*, void*))Args[2])(currentItem, prevItem, Args[1], Args[0]);
+            
+        }
+    },
+    3, strInc, &rnd_vscroll, autoScrollText
+);
+
+CSSECMAN::addAction(
+    strInc->idUp,
+    (void (*)(CSARGS))[](CSARGS Args)
+    {
+        if((UINT)Args == WM_LBUTTONDOWN  || (UINT)Args == WM_LBUTTONDBLCLK)
+        {
+            CS_STRING_INCREMENTER_PARAMS* strInc = (CS_STRING_INCREMENTER_PARAMS*)Args[0];
+            int currentItem = strInc->currentItem;
+            int prevItem = (strInc->currentItem-1);
+
+            if(prevItem < 0 ) prevItem = strInc->item.size()-1;
+
+            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, prevItem, {150,150,100});
+            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, currentItem, {100,200,100});
+            csGraphics::updateGraphicArea(ROOT_RND_NUM_VIEWER,0);
+
+            ((void(*)(long, long, void*, void*))Args[2])(currentItem, prevItem, Args[1], Args[0]);
+        }
+    },
+    3, strInc, &rnd_vscroll, autoScrollText
+);
+
+BTN_1 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Afficher/Masquer le logo", {5,5+total*11,65,h});
+BTN_2 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Lire/Arrêter l'animation", {5,5+total*12,65,h});
+BTN_3 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Bouton 3", {5,5+total*13,65,h});
+BTN_4 = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Bouton 4", {5,5+total*14,65,h});
+
+void setFontSize(CSARGS Args);
+csSetUpdatingFunction(fontSizeInc.idText, setFontSize, 3, &ROOT_RND_NUM_VIEWER, &fontSizeInc.idSection, strInc);
 
 /*********************************************************** */
 
@@ -434,14 +603,14 @@ csGraphics::updateGraphicArea(MIDDLE_MIDDLE_SECTION, 1);
 
 vscroll1.update();
 
-CSDYNAMIC_SIMPLE_TEXT dst;
+CSDYNAMIC_TEXT dst;
 dst.marg = {10,10};
 dst.updateGASize = 1;
 dst.paragraph.push_back(CSTEXT{.Text=L"0\0", .Font=L"calibri light", .FontSize = 12, .Italic=0,
                                 .Bold=FW_THIN, .Color={150,150,150}});
 dst.pSpace.push_back(12);
 dst.view = 0;
-csGraphics::setDynamicSimpleText(MIDDLE_MIDDLE_SECTION, dst);
+csGraphics::setDynamicText(MIDDLE_MIDDLE_SECTION, dst);
 
 GA_CLIENT = MIDDLE_MIDDLE_SECTION;
 
@@ -454,7 +623,7 @@ csGraphics::showImage(GA_CLIENT, idImg1, 1, {0}, {0});
 
 POINT logoPos = {100,100};
 SIZE logoSize = {200,200};
-int idlogo1 = csGraphics::loadImage(GA_CLIENT, L"resources/img/csigma logo4w200x200b.bmp", logoPos, logoSize);
+int idlogo1 = csGraphics::loadImage(GA_CLIENT, L"resources/img/logos/logo.bmp", logoPos, logoSize);
 csGraphics::showImage(GA_CLIENT, idlogo1, 1, {0}, {0});
 
 int fact = std::max(ceil(1.0*size1.cx/smx), ceil(1.0*size1.cy/smy));
@@ -640,7 +809,9 @@ void getRandomData(CSARGS Args)
             char *str = CSARITHMETIC::getPrintFormat(number);
             wstring w = charPtrtoWcharPtr(str).c_str();
 
-            sDynSimpleText(idGaphicArea).paragraph[0].setText(w.c_str());
+            CS_STRING_INCREMENTER_PARAMS* strInc = (CS_STRING_INCREMENTER_PARAMS*)Args[4];
+            sDynSimpleText(idGaphicArea).paragraph[strInc->currentItem].setText(w.c_str());
+
             csGraphics::updateGraphicArea(idGaphicArea, 1);
 
             free(str);
@@ -658,11 +829,13 @@ void setFontSize(CSARGS Args)
 {
     //if(UINT(Args) == WM_LBUTTONUP)
     {
+        cout<<"sdsd\n";
         int idGaphicArea = *(int*)Args[0];
         int idFontSizeSection = *(int*)Args[1];
+        CS_STRING_INCREMENTER_PARAMS* strInc = (CS_STRING_INCREMENTER_PARAMS*)Args[2];
 
         int fsize = strtod(utf16_to_utf8(sTitle(idFontSizeSection).Text).c_str(), 0);
-        sDynSimpleText(idGaphicArea).paragraph[0].FontSize = {fsize};
+        sDynSimpleText(idGaphicArea).paragraph[strInc->currentItem].FontSize = {fsize};
 
         csGraphics::updateGraphicArea(idGaphicArea,0);
     }
@@ -678,12 +851,12 @@ void appTranslateStrings(CSARGS Args)
 
     COLORREF sectionColor1 = RGB(160,160,220), sectionColor2 = RGB(160,160,230), sectionColor3 = RGB(160,160,220);
     COLORREF dColor1 = RGB(30,40,30), dColor2 = RGB(30,50,30), dColor3 = RGB(160,220,160);
-    
+
     CSLANGMAN::setViewLanguage(i);
     CSLANGMAN::translateAppStrings();
 
     *(bool*)Args[0] = CSLANGMAN::getTranslationProcessStatus();
-    
+
     if(CSLANGMAN::getTranslationProcessStatus())
     {
 
@@ -809,7 +982,7 @@ void showHideLogo(CSARGS Args)
         }
         //CSSECMAN::updateSection(idga);
         csGraphics::updateGraphicArea(idga,1);
-        
+
     }
 }
 
@@ -830,7 +1003,7 @@ void stretchLogo(CSARGS Args)
             if(!start) start = 1;
             else start = 0;
         }
-        
+
         thread t(
             [](CSARGS Args)
             {
@@ -848,7 +1021,7 @@ void stretchLogo(CSARGS Args)
 
                         POINT imgPos = *(POINT*)Args[2];
                         SIZE imgSz = *(SIZE*)Args[3];
-                        
+
                         int tlen = 2*count;
                         csGraphics::setImageSize(idga, idImg, {imgSz.cx+tlen, imgSz.cy+tlen});
                         csGraphics::setImagePos(idga, idImg, {imgPos.x-tlen/2, imgPos.y-tlen/2});
@@ -875,7 +1048,7 @@ void stretchLogo(CSARGS Args)
 
             POINT imgPos = *(POINT*)Args[2];
             SIZE imgSz = *(SIZE*)Args[3];
-            
+
             //if(count%2 == 0)
             {
                 int tlen = 2*count;

@@ -40,4 +40,20 @@ using namespace std;
 int getId(HWND hwnd);
 LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
+// Template variadique pour exécuter une fonction si msg correspond à l'un des messages
+// Utilise fold expressions (C++17) pour vérifier si msg correspond à l'un des msgs
+template<typename Func, typename... Msgs>
+void CS_ACT(Func&& func, UINT msg, Msgs... msgs)
+{
+    if (((msg == msgs) || ...))
+    {
+        func();
+    }
+}
+
+// Exemple d'utilisation :
+// CS_ACT([&](){ /* code avec capture */ }, msg, WM_LBUTTONDBLCLK, WM_LBUTTONDOWN);
+// CS_ACT([](){ /* code sans paramètres */ }, msg, WM_LBUTTONDBLCLK, WM_LBUTTONDOWN);
+// void myFunc() { /* ... */ }
+// CS_ACT(myFunc, msg, WM_LBUTTONDBLCLK, WM_LBUTTONDOWN);
 #endif // CSSECTION_H

@@ -40,6 +40,14 @@ void setGraphicAreaSize(int id, SIZE size);
 void setGraphicAreaXSize(int id, long cx);
 void setGraphicAreaYSize(int id, long cy);
 void setGraphicAreaColor(int id, CSRGBA background, CSRGBA border);
+
+SIZE getGraphicAreaSize(int id);
+long getGraphicAreaXSize(int id);
+long getGraphicAreaYSize(int id);
+POINT getGraphicAreaInPos(int id);
+long getGraphicAreaInXPos(int id);
+long getGraphicAreaInYPos(int id);
+
 void updateGraphicArea(int id, bool reCreate);
 
 void updateBackground(int id);
@@ -57,7 +65,22 @@ void setMap(int id, SIZE size);
 void mapImageEntity(int id, int idEnt);
 
 void viewText(int id, wchar_t* text, CSRGBA color, POINT pos, wchar_t* fontName, int fontSize, bool italic, DWORD weight, int width);
-void setDynamicSimpleText(int id, CSDYNAMIC_SIMPLE_TEXT dst);
+void setDynamicText(int id, CSDYNAMIC_TEXT dst);
+void addDynamicText(int id, CSTEXT paragraph, int pSpace);
+void setDynamicTextParagraphColor(int id, int idParag, CSRGBA color);
+CSRGBA getDynamicTextParagraphColor(int id, int idParag);
+int  getDynamicTextParagraphPos(int id, int idParag);
+int getDynamicTextParagraphsNumber(int id);
+void removeDynamicTextParagraph(int id, int idParag);
+
+POINT getViewAreaPos(int id);
+long getViewAreaXPos(int id);
+long getViewAreaYPos(int id);
+SIZE getViewAreaSize(int id);
+long getViewAreaXSize(int id);
+long getViewAreaYSize(int id);
+long getViewAreaRight(int id);
+long getViewAreaBottom(int id);
 }
 
 #endif // CSGRAPHICS_H

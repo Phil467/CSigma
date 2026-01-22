@@ -33,7 +33,7 @@ class CSSCROLLBAR
 
         void setViewFrameRightMarging(int marging);
         void setViewFrameBottomMarging(int marging);
-
+        void setEdge(int edge);
         void updateViewArea();
 
     protected:
@@ -56,6 +56,7 @@ class CSSCROLLBAR
     int *CX, *CY;
     bool *threadBool, bSize;
     int *vEdge, *hEdge;
+    RECT* geom;
 };
 
 

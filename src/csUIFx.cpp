@@ -31,7 +31,7 @@ extern vector<TIPS_POPUP_PARAMS> TipsPopupParams;
 extern vector<AUTO_TRANSFORMATION> AutoTransform;
 extern vector<int> AUTOTRANSCOUNT;
 
-extern vector<CSDYNAMIC_SIMPLE_TEXT> dynSimpleText;
+extern vector<CSDYNAMIC_TEXT> dynSimpleText;
 
 bool CLICK_EFFECT_BOOL = 0;
 extern POINT TIMER_POINT;

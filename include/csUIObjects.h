@@ -7,8 +7,8 @@
 
 namespace CSUIOBJECTS
 {
-    CSSCROLLBAR addHScrollBar(int* idp, int* idClient=0, int* idMask=0, int thick=10, int autoHideIntensity=5);
-    CSSCROLLBAR addVScrollBar(int* idp, int* idClient=0, int* idMask=0, int thick=10, int autoHideIntensity=5);
+    CSSCROLLBAR addHScrollBar(int* idp, int* idClient=0, int* idMask=0, int thick=10, RECT geometry={0}, int autoHideIntensity=5);
+    CSSCROLLBAR addVScrollBar(int* idp, int* idClient=0, int* idMask=0, int thick=10, RECT geometry={0}, int autoHideIntensity=5);
     CSSYSCOMMAND_SECTION addSysCommand(int& id, POINT pos);
     //int addTitle(int& id, wchar_t*title, SIZE size={0}, char*iconPath=0, int fontSize = 16, wchar_t*fontName = L"Bauhaus 93");
     int addTitle(int& id, wchar_t*title, SIZE size, int fontSize = 16, wchar_t*fontName = L"Bauhaus 93", int iconId=-1, int alphaLevel=0);

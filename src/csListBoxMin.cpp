@@ -1897,7 +1897,7 @@ void makeCutPaste(CSARGS Args)
                     drawGDIRectangle(dc,bkgcol3[i],bkgcol3[i],1,{0,0,pos.right-pos.left, pos.bottom-pos.top});
                     TextOutW(dc,posTitle[i].x-posImg[i].x,(r.bottom-imgSize.cy)/2,(LPCWSTR)title[i],wcslen(title[i]));
                     BitBlt(dc,1,(r.bottom-imgSize.cy)/2,imgSize.cx,imgSize.cy, dcs3[i],0,0,SRCCOPY);
-                    SendMessage(SECTION[cutPasteViewer],WM_ERASEBKGND,0,0);
+                    PostMessage(SECTION[cutPasteViewer],WM_ERASEBKGND,0,0);
                     //InvalidateRect(SECTION[cutPasteViewer],0,1);
                     *cutPasteStart = 0;
                     *cutPasteDone0 = 1;

@@ -56,7 +56,7 @@ extern vector<vector<BIND_DIM_GEOM_PARAMS>> bSizeBind;
 
 extern vector<bool> updateAfterResizeMsg;
 
-extern vector<CSDYNAMIC_SIMPLE_TEXT> dynSimpleText;
+extern vector<CSDYNAMIC_TEXT> dynSimpleText;
 extern vector<TIPS_POPUP_PARAMS> TipsPopupParams;
 
 extern vector<HDC> hdStackContextExt;
@@ -400,7 +400,7 @@ CSTEXT& CSSECMAN::sTitle(int id)
     return TITLE[id];
 }
 
-CSDYNAMIC_SIMPLE_TEXT& CSSECMAN::sDynSimpleText(int id)
+CSDYNAMIC_TEXT& CSSECMAN::sDynSimpleText(int id)
 {
     return dynSimpleText[id];
 }
@@ -882,7 +882,7 @@ extern bool saveAppTips;
 extern vector<vector<vector<wchar_t*>>> TIPSFILE;
 vector<int> tips_src_ids;
 
-void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips, bool withTips, vector<int>*idsSrc)
+void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_TEXT tips, bool withTips, vector<int>*idsSrc)
 {
     TIPS_POPUP_PARAMS tpp;
     tpp.Ids.push_back(idPopup);
@@ -910,6 +910,14 @@ void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay
         }
     
     }
+    if(tips.pSpace.size() > tips.pPos.size())
+    {
+        for(int i=0; i<tips.pSpace.size(); i++)
+        {
+            tips.pPos.push_back(0);
+        }
+    }
+
     tpp.text.push_back(tips);
     tpp.Lock = locked;
     tpp.Delay = delay;
@@ -940,17 +948,29 @@ void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay
     }
 }
 
-void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT* tips, vector<int>*idsSrc)
+void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_TEXT* tips, vector<int>*idsSrc)
 {
-    if(tips) joinPopup(id, idPopup, rTips, pb, delay, locked, *tips, 1, idsSrc);
+
+    if(tips) 
+    {
+
+        if(tips->pSpace.size() > tips->pPos.size())
+        {
+            for(int i=0; i<tips->pSpace.size(); i++)
+            {
+                tips->pPos.push_back(0);
+            }
+        }
+        joinPopup(id, idPopup, rTips, pb, delay, locked, *tips, 1, idsSrc);
+    }
     else 
     {
-        CSDYNAMIC_SIMPLE_TEXT _tips;
+        CSDYNAMIC_TEXT _tips;
         joinPopup(id, idPopup, rTips, pb, delay, locked, _tips, 0, idsSrc);
     }
 }
 
-void CSSECMAN::addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips)
+void CSSECMAN::addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_TEXT tips)
 {
     tips_src_ids.push_back(id);
     CSSECMAN::joinPopup(id, TIPS_POPUP, rTips, pb, delay, locked, tips, 1, &tips_src_ids);
@@ -1001,7 +1021,7 @@ void CSSECMAN::_updateApp(int id)
             float xcf = 1.0*GetSystemMetrics(SM_CXSCREEN)/SMX;
             float ycf = 1.0*GetSystemMetrics(SM_CYSCREEN)/SMY;
 
-        cout<<"smx = "<<SMX<<"\n";
+        //cout<<"smx = "<<SMX<<"\n";
 
             SMX = GetSystemMetrics(SM_CXSCREEN);
             SMY = GetSystemMetrics(SM_CYSCREEN);
@@ -1079,6 +1099,15 @@ void CSSECMAN::autoFitToTitle(int id, int marging)
 void CSSECMAN::setMinMaxInfo(int id, MINMAXINFO mmi)
 {
     minMaxInfo[id] = mmi;
+}
+
+bool CSSECMAN::isSectionVisible(int id)
+{
+    return IsWindowVisible(SECTION[id]);
+}
+void CSSECMAN::setVisible(int id, int showType)
+{
+    ShowWindow(SECTION[id], showType);
 }
 
 /*********************************************************************************************************** */

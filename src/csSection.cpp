@@ -115,7 +115,7 @@ vector<vector<CSLOADED_IMAGE>> loadedImage;
 vector<vector<void(*)(CSARGS)>> GROUPED_EVENTS_FUNC;
 vector<vector<CSARGS>> GROUPED_EVENTS_ARGS;
 
-vector<CSDYNAMIC_SIMPLE_TEXT> dynSimpleText;
+vector<CSDYNAMIC_TEXT> dynSimpleText;
 vector<CSZOOM_PARAMS> zoomParams;
 vector<bool> updateAfterResizeMsg;
 vector<CSAPP_ICON> appIcon;
@@ -151,7 +151,7 @@ int HIDDEN_WINDOW_PART[4];
 void geometryBinding(int& id);
 void sizeMoveWaitListExecute(int id);
 void sizeMoveAll(int _id, bool automatic=1, SIZE _deltaSize= {0}, POINT _deltaPos= {0});
-void _blitDynamicSimpleText(int id);
+void _blitDynamicText(int id);
 
 using namespace CSSECMAN;
 using namespace CSUTILS;
@@ -161,11 +161,11 @@ int SMX, SMY;
 
 #include "csTranslator.h"
 
-int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE edgeResize, bool show, bool isRoot, bool attach)
+int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE edgeResize, bool show, bool rootStyle, bool attach)
 {
     int i = SECTION.size();
     RECT geom = r(_geom.left*geomCoef, _geom.top*geomCoef, _geom.right*geomCoef, _geom.bottom*geomCoef, i);
-    
+
     if(i == 1)
     {
         if((saveAppTitles && !CSFILESMAN::fileExists(appTitleFilePath)))
@@ -270,7 +270,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
     tSizeBind.push_back(newVector<BIND_DIM_GEOM_PARAMS>());
     bSizeBind.push_back(newVector<BIND_DIM_GEOM_PARAMS>());
 
-    TipsPopupParams.push_back({newVector<int>(),0, newVector<RECT>(), newVector<POS_BOOL>(), newVector<CSDYNAMIC_SIMPLE_TEXT>(),0,0,0,0});
+    TipsPopupParams.push_back({newVector<int>(),0, newVector<RECT>(), newVector<POS_BOOL>(), newVector<CSDYNAMIC_TEXT>(),0,0,0,0});
     AutoTransform.push_back({0});
     AUTOTRANSCOUNT.push_back(INT_MAX);
 
@@ -282,7 +282,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
     hZoom.push_back({1});
     vZoom.push_back({1});
     mouseWheelPreference.push_back(3);
-    
+
     hdcontextExtBkgColor.push_back({0});
     hdcontextExtBrdColor.push_back({0});
 
@@ -295,7 +295,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
 
     updateAfterResizeMsg.push_back(0);
 
-    dynSimpleText.push_back({newVector<CSTEXT>(),newVector<int>(),0});
+    dynSimpleText.push_back({newVector<CSTEXT>(),newVector<int>(),newVector<int>(),0});
 
     ICONID.push_back(-1);
     layeredStyle.push_back(0);
@@ -322,9 +322,9 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
         wndClass.push_back(wc);
 
     }
-    
+
     HWND hPopup;
-    if(id == -1 || isRoot)
+    if(id == -1 || rootStyle)
     {
         SECTIONSTYLE.push_back(0);
         hPopup = CreateWindowExW(
@@ -339,11 +339,11 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
 
         SECTIONSTYLE.push_back(1);
         hPopup = CreateWindowExW(
-                     0,               
-                     wndClass[0]->lpszClassName,              
-                     NULL,                          
-                     WS_POPUP|WS_CHILD,      
-                     geom.left, geom.top, geom.right, geom.bottom,            
+                     0,
+                     wndClass[0]->lpszClassName,
+                     NULL,
+                     WS_POPUP|WS_CHILD,
+                     geom.left, geom.top, geom.right, geom.bottom,
                      par, 0, _hInstance, NULL
                  );
 
@@ -360,7 +360,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
 
     RegisterTouchWindow(hPopup, TWF_WANTPALM);
 
-    
+
     InvalidateRect(hPopup,0,1);
     if(show)
         ShowWindow(hPopup, SW_SHOWNORMAL);
@@ -392,7 +392,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
     if (SUCCEEDED(DwmIsCompositionEnabled(&isDwmEnabled)) && isDwmEnabled) {
         DwmExtendFrameIntoClientArea(hPopup, &shadow);
     }*/
- 
+
     /*LONG_PTR style = GetWindowLongPtr(hPopup, GWL_STYLE);
     style &= ~(WS_CHILD);
     style |= WS_POPUP | WS_THICKFRAME;
@@ -408,7 +408,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
         RECTPARREFSAVED[i] = CSUTILS::rectInParentRef(i);
         RECTPARREF[i] = RECTPARREFSAVED[i];
     }
-             
+
     return SECTION.size()-1;
 }
 
@@ -439,7 +439,7 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     static int xsframe = GetSystemMetrics(SM_CXSIZEFRAME);
     static int ysframe = GetSystemMetrics(SM_CYSIZEFRAME);
     static int capt = GetSystemMetrics(SM_CYCAPTION);
-    
+
     if(id > -1)
     {
 
@@ -496,7 +496,7 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     bact = 0;
                 }
            }
-            
+
         } */
         /*if(msg == WM_WINDOWPOSCHANGING)
         {
@@ -629,7 +629,7 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             if(CURSOR_NCHITTEST_POS == CURSOR_NCHITTEST_POS_CLIENT)
             {
                 hc = (LRESULT)SetCursor(cursor[id]);
-            
+
                 return hc;
             }
         }
@@ -637,7 +637,7 @@ if(msg == WM_GESTURE)
     {
 cout<<"gesture\n";
     }
-        
+
 
         if(msg == WM_LBUTTONDOWN)
         {
@@ -720,9 +720,9 @@ cout<<"gesture\n";
             RECTPARREF[id] = CSUTILS::rectInParentRef(id);
 
             if(withVScroll[id])
-                SendMessage(SECTION[withVScroll[id]],WM_TIMER,0,0); //autoresize
+                PostMessage(SECTION[withVScroll[id]],WM_TIMER,0,0); //autoresize
             if(withHScroll[id])
-                SendMessage(SECTION[withHScroll[id]],WM_TIMER,0,0); //autoresize
+                PostMessage(SECTION[withHScroll[id]],WM_TIMER,0,0); //autoresize
 
 
             if(BORDERTHICK[id] || TITLE[id].Text)
@@ -787,7 +787,7 @@ cout<<"gesture\n";
                     RECTPARREFSAVED[i] = CSUTILS::rectInParentRef(i);
                 }
                 moving = 0;
-                
+
                 // redessiner la partie cachee pour eviter le noir
                 int d = HIDDEN_WINDOW_PART[0];
                 RECT r = {0,0, d, RECTCL[id].bottom};
@@ -808,7 +808,7 @@ cout<<"gesture\n";
                 r = {0,RECTCL[id].bottom-d, RECTCL[id].right, RECTCL[id].bottom};
                 InvalidateRect(hwnd, &r,1);
                 HIDDEN_WINDOW_PART[3] = {0};
-                
+
                 __getHiddenWindowPart(id, RECTWND[id]);
             }
             //cout<<"++---------------exit-----------------------\n";
@@ -910,7 +910,7 @@ cout<<"gesture\n";
 
             }
 
-            CSUIFX::_mouseHover_colorGradient(hwnd, id); 
+            CSUIFX::_mouseHover_colorGradient(hwnd, id);
             if(mhgradient[id].init == 0)
             {
                 InvalidateRect(hwnd, 0,1);
@@ -932,10 +932,10 @@ cout<<"gesture\n";
                     RECT r = {rc.left-xsframe, rc.top-ysframe, rc.right+2*xsframe, rc.bottom+2*ysframe};
 
                     RECT rr = LAST_WORKAREA;
-                    
+
                     sizeMoveAll(id, 0, {rc.right-rr.right, rc.bottom-rr.bottom}, {0});
                     SetWindowPos(hwnd, 0, r.left, r.top, r.right, r.bottom, SWP_NOZORDER);
-                    
+
                     LAST_WORKAREA = r;
                 }
                 LAST_TASKBAR_POS = taskbarInfo.edge;
@@ -959,7 +959,7 @@ cout<<"gesture\n";
             if(RECTPARREF[id].left >= rp.right || RECTWND[id].top >= rp.bottom ||
                 RECTPARREF[id].right <= 0 || RECTWND[id].bottom <= 0)
             {
-                
+
 
                 SetWindowPos(hwnd,0, (rp.right-rc.right)/2, (rp.bottom-rc.bottom)/2, 0, 0, SWP_NOZORDER|SWP_NOSIZE);
             }*/
@@ -1041,10 +1041,10 @@ cout<<"gesture\n";
 
             if(mhgradient[id].TimeStep)
             {
-                
+
                 if(SECTIONSTYLE[id])
                 {
-                    
+
                     if(mhgradient[id].TitleGradient)
                         TITLE[id].Color = mhgradient[id].ActiveTitleColor;
                     if(mhgradient[id].BorderGradient)
@@ -1074,7 +1074,7 @@ cout<<"gesture\n";
             {
                 //HDC
                 BitBlt(hdStackContext[id],0,0,RECTCL[id].right, RECTCL[id].bottom, hdBkgContext[id], 0,0, SRCCOPY);
-                
+
                 if(mhgradient[id].ImageGradient)
                 {
                     HDC idc = imageGradients[id][mhgradient[id].ActiveImageIndex].dc;
@@ -1139,7 +1139,7 @@ cout<<"gesture\n";
                 BitBlt(hdc,0,0,RECTCL[id].right, RECTCL[id].bottom, hdBkgContext[id], 0,0, SRCCOPY);
                 _drawTitle(id, hdc);
             }
-            //_blitDynamicSimpleText(id);
+            //_blitDynamicText(id);
             //BitBlt(hdcontext[id],0,0,hdcSize[id].cx, hdcSize[id].cy, hdBkgContext[id], 0,0, SRCCOPY);
 
 
@@ -1187,7 +1187,7 @@ cout<<"gesture\n";
                 }
             }
         }
-        
+
         if(msg == WM_LBUTTONDOWN || msg == WM_NCLBUTTONDOWN)
         {
             //SetForegroundWindow(SECTION[0]);
@@ -1196,14 +1196,14 @@ cout<<"gesture\n";
             char className[10000];
             GetClassNameA(fwnd, (LPSTR)className, 10000);
             cout<<SECTION[0]<<" "<<className<<"\n";*/
-            
+
             SetWindowPos(SECTION[0], HWND_TOP, 0,0,0,0, SWP_NOSIZE|SWP_NOMOVE);
-            
+
         }
         /*if(msg == WM_NCLBUTTONDBLCLK && CURSOR_NCHITTEST_POS == CURSOR_NCHITTEST_POS_CAPTION && !SECTIONSTYLE[id])
         {
             // L'utilisateur commence a déplacer ou redimensionner
-            
+
             if(isMaximized[id] == 0)
             {
                 RECTRESTORE[id] = RECTWND[id];
@@ -1211,7 +1211,7 @@ cout<<"gesture\n";
                 SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, 0);
                 RECT r = {rc.left-xsframe, rc.top-ysframe, rc.right+2*xsframe, rc.bottom+2*ysframe};
                 LAST_WORKAREA = rc;
-                
+
                 RECT rr;
                 GetClientRect(hwnd, &rr);
                 sizeMoveAll(id, 0, {rc.right-rr.right, rc.bottom-rr.bottom}, {0});
@@ -1244,10 +1244,10 @@ cout<<"gesture\n";
             switch (gi.dwID)
             {
             case GID_ZOOM:
-                
+
                 bHandle = 1;
                 break;
-            
+
             default:
                 break;
             }
@@ -1279,8 +1279,8 @@ void _blitExtDc(int id)
                 SetStretchBltMode(hdStackContext[id], COLORONCOLOR);
 
             _blitEntities(id);
-            StretchBlt(hdStackContext[id],pout.x,pout.y,bltRect[id].right, bltRect[id].bottom, 
-                        hdcontextExt[id], pin.x + zoomParams[id].focus.x, pin.y + zoomParams[id].focus.y, 
+            StretchBlt(hdStackContext[id],pout.x,pout.y,bltRect[id].right, bltRect[id].bottom,
+                        hdcontextExt[id], pin.x + zoomParams[id].focus.x, pin.y + zoomParams[id].focus.y,
                         bltRect[id].right/hZoom[id], bltRect[id].bottom/vZoom[id], SRCCOPY);
         }
     }
@@ -1311,7 +1311,7 @@ void _blitEntities(int id)
                 _blitImage(id, idt);
             }
         }
-        _blitDynamicSimpleText(id);
+        _blitDynamicText(id);
         bltUpdate[id] = 0;
     }
 }
@@ -1323,24 +1323,24 @@ void _blitImage(int id, int i)
     {
         if(li.eraseBkg)
         {
-            TransparentBlt(hdcontextExt[id], li.outPos.x, li.outPos.y, li.outSize.cx, li.outSize.cy, 
+            TransparentBlt(hdcontextExt[id], li.outPos.x, li.outPos.y, li.outSize.cx, li.outSize.cy,
             li.outDc, li.inPos.x, li.inPos.y, li.inSize.cx, li.inSize.cy, li.bkgColor);
         }
         else
         {
-            StretchBlt(hdcontextExt[id], li.outPos.x, li.outPos.y, li.outSize.cx, li.outSize.cy, 
+            StretchBlt(hdcontextExt[id], li.outPos.x, li.outPos.y, li.outSize.cx, li.outSize.cy,
             li.outDc, li.inPos.x, li.inPos.y, li.inSize.cx, li.inSize.cy, SRCCOPY);
         }
     }
 }
 
-extern void viewDynamicSimpleText(int id, vector<CSTEXT> paragraph, vector<int> pSpace, RECT marg, bool updateGASize);
-void _blitDynamicSimpleText(int id)
+extern void viewDynamicText(int id, vector<CSTEXT> paragraph, vector<int> pSpace, vector<int>& pPos, RECT marg, bool updateGASize);
+void _blitDynamicText(int id)
 {
     if(dynSimpleText[id].view)
     {
-        viewDynamicSimpleText(id, dynSimpleText[id].paragraph, dynSimpleText[id].pSpace, dynSimpleText[id].marg, dynSimpleText[id].updateGASize);
-        
+        viewDynamicText(id, dynSimpleText[id].paragraph, dynSimpleText[id].pSpace, dynSimpleText[id].pPos, dynSimpleText[id].marg, dynSimpleText[id].updateGASize);
+
     }
 }
 

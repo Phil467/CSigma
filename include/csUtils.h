@@ -56,7 +56,7 @@ void _CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* sourceLanguageCode=L"
 int _CSIGMA_APP_RUN_();
 void __setAllRects();
 void catchEventsGroup(int id, int idEvents, bool b);
-int createSection(int id, RECT geom,  COLORREF color, CSRESIZE_EDGE edgeResize, bool show=1, bool isRoot=0, bool attach=1);
+int createSection(int id, RECT geom,  COLORREF color, CSRESIZE_EDGE edgeResize, bool show=1, bool rootStyle=0, bool attach=1);
 int addAction(int id, void(*f)(CSARGS), CSARGS& args);
 int addAction(int id, void(*f)(CSARGS), int nbArgs, ...);
 bool removeAction(int id, int idAction);
@@ -65,7 +65,7 @@ int setIcon(int id, wchar_t*pathSmallIcon, wchar_t*pathBigIcon, RECT rectSmall =
 void setIcon(int id, int idIcon);
 HWND sHandle(int id);
 CSTEXT& sTitle(int id);
-CSDYNAMIC_SIMPLE_TEXT& sDynSimpleText(int id);
+CSDYNAMIC_TEXT& sDynSimpleText(int id);
 RECT sRectParentContext(int id);
 RECT sRectParentContextStatic(int id);
 RECT sRectClient(int id);
@@ -118,9 +118,9 @@ TASKBAR_INFO getTaskbarInfo();
 
 void setLockable(int id, CSLOCKED_MODE lm);
 void updateAfterResizing(int id);
-void joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips, bool withTips, vector<int>*idsSrc=0);
-void joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT* tips, vector<int>*idsSrc=0);
-void addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_SIMPLE_TEXT tips);
+void joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_TEXT tips, bool withTips, vector<int>*idsSrc=0);
+void joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_TEXT* tips, vector<int>*idsSrc=0);
+void addTips(int id, RECT rTips, POS_BOOL pb, int delay, bool locked, CSDYNAMIC_TEXT tips);
 void enableDarkEdge(int id);
 
 void updateSection(int id);
@@ -135,6 +135,8 @@ void resetMouseHook(int id, int idHook);
 int attach(int id, int idp);
 int detach(int id);
 
+bool isSectionVisible(int id);
+void setVisible(int id, int showType);
 }
 
 namespace CSUTILS

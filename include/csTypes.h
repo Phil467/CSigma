@@ -273,10 +273,12 @@ typedef struct
 {
     vector<CSTEXT> paragraph;
     vector<int> pSpace;
+    vector<int> pPos;
     RECT marg;
     bool updateGASize;
     bool view;
-}CSDYNAMIC_SIMPLE_TEXT;
+    
+}CSDYNAMIC_TEXT;
 
 typedef struct
 {
@@ -291,7 +293,7 @@ typedef struct
     vector<int>* Ids_src;
     vector<RECT> Geometry;
     vector<POS_BOOL> Bpos;
-    vector<CSDYNAMIC_SIMPLE_TEXT> text;
+    vector<CSDYNAMIC_TEXT> text;
     unsigned int Delay;
     unsigned MouseHoverCount;
     unsigned MouseLeaveCount;
@@ -480,6 +482,7 @@ typedef struct
     vector<bool> status;
     
     void newItem(const wchar_t* title, bool status=1);
+    bool removeItem(int idItem);
 
 }CS_STRING_INCREMENTER_PARAMS;
 

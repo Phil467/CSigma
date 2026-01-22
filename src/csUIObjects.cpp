@@ -27,13 +27,21 @@ int TIPS_POPUP;
 extern float geomCoef;
 void smoothScrolling(CSARGS Args);
 
-CSSCROLLBAR CSUIOBJECTS::addHScrollBar(int* idp, int* idClient, int* idMask, int thick, int autoHideIntensity)
+CSSCROLLBAR CSUIOBJECTS::addHScrollBar(int* idp, int* idClient, int* idMask, int thick, RECT geometry, int autoHideIntensity)
 {
     RECT r = RECTCL[*idp];
     int*idc = idClient;
     if(!idc) idc = idp;
-    CSSCROLLBAR hscroll(*idp, {0,r.bottom-thick,r.right,thick});
     
+    RECT g = {
+                geometry.left, 
+                (geometry.top ? geometry.top : r.bottom-thick), 
+                (geometry.right ? geometry.right : r.right-geometry.left),
+                (geometry.bottom ? geometry.bottom : thick)
+            };
+
+    CSSCROLLBAR hscroll(*idp, g);
+
     if(idMask)
     {
         hscroll.setClient(*idc,*idMask);
@@ -42,7 +50,7 @@ CSSCROLLBAR CSUIOBJECTS::addHScrollBar(int* idp, int* idClient, int* idMask, int
     {
         hscroll.setClient(*idc,*idp);
     }
-    
+
     hscroll.mouseLeaveHide(autoHideIntensity);
     SetTimer(SECTION[hscroll.getId()],0,17,0);
     CSSECMAN::addAction(*idc,smoothScrolling,1,hscroll.getIdPtr());
@@ -50,12 +58,22 @@ CSSCROLLBAR CSUIOBJECTS::addHScrollBar(int* idp, int* idClient, int* idMask, int
     return hscroll;
 }
 
-CSSCROLLBAR CSUIOBJECTS::addVScrollBar(int* idp, int* idClient, int* idMask, int thick, int autoHideIntensity)
+CSSCROLLBAR CSUIOBJECTS::addVScrollBar(int* idp, int* idClient, int* idMask, int thick, RECT geometry, int autoHideIntensity)
 {
     RECT r = RECTCL[*idp];
     int*idc = idClient;
     if(!idc) idc = idp;
-    CSSCROLLBAR vscroll(*idp, {r.right-thick,0,thick,r.bottom}, 1, CS_SBAR_VERTICAL);
+
+    RECT g = {
+                (geometry.left ? geometry.left : r.right-thick),
+                geometry.top,
+                (geometry.right ? geometry.right : thick), 
+                (geometry.bottom ? geometry.bottom : r.bottom-geometry.top)
+    
+             };
+
+    CSSCROLLBAR vscroll(*idp, g, 1, CS_SBAR_VERTICAL);
+
     if(idMask)
     {
         vscroll.setClient(*idc,*idMask);
@@ -222,16 +240,16 @@ CSSYSCOMMAND_SECTION CSUIOBJECTS::addSysCommand(int& id, POINT pos)
         if(iconPath)
             size.cx += 26;
     }
-    
+
     int TITLE_SECTION = CSSECMAN::createSection(id, {2,0,size.cx,size.cy},  RGB(5,5,5), {0,0,0,0});
-    
+
     CSSECMAN::setBorderColorAndThick(TITLE_SECTION, RGB(20,20,20), 1);
     if(iconPath)
         CSUIFX::setImageGradient(TITLE_SECTION, iconPath, iconPath, {2,2}, {26,26}, 0.05, 2,1);
     CSSECMAN::setTitle(TITLE_SECTION, CSTEXT{.Text=title, .Font=fontName, .FontSize = fontSize, .Italic=0,
                                    .Bold=0, .Color={150,150,150},
                                    .Marging={35/geomCoef,0}, .Align = CS_TA_CENTER_LEFT, .Show=1});
-    
+
     CSSECMAN::inert(TITLE_SECTION,190);
     SetWindowTextW(SECTION[id], title);
 
@@ -253,7 +271,7 @@ CSSYSCOMMAND_SECTION CSUIOBJECTS::addSysCommand(int& id, POINT pos)
     };
 
     CSSECMAN::addAction(TITLE_SECTION, f, 0);
-    
+
     return TITLE_SECTION;
 }*/
 
@@ -279,7 +297,7 @@ int CSUIOBJECTS::addTitle(int& id, wchar_t*title, SIZE size, int fontSize, wchar
         if(iconId > -1) // remplace par autoFitToTitle()
             size.cx += appIcon[iconId].rectSmall.left+appIcon[iconId].rectSmall.right;
     }
-    
+
     int TITLE_SECTION = CSSECMAN::createSection(id, {2,0,size.cx,size.cy},  RGB(5,5,5), {0,0,0,0});
 
     CSSECMAN::setBorderColorAndThick(TITLE_SECTION, RGB(20,20,20), 1);
@@ -287,8 +305,8 @@ int CSUIOBJECTS::addTitle(int& id, wchar_t*title, SIZE size, int fontSize, wchar
                                    .Bold=0, .Color={150,150,150},
                                    .Marging={(iconId>-1?appIcon[iconId].rectSmall.left+appIcon[iconId].rectSmall.right:0)+5,0}, .Align = CS_TA_CENTER_LEFT, .Show=1});
     ICONID[TITLE_SECTION] = iconId;
-    
-    
+
+
     CSSECMAN::inert(TITLE_SECTION,255-alphaLevel);
     SetWindowTextW(SECTION[id], title);
 
@@ -310,7 +328,7 @@ int CSUIOBJECTS::addTitle(int& id, wchar_t*title, SIZE size, int fontSize, wchar
     };
 
     CSSECMAN::addAction(TITLE_SECTION, f, 0);
-    
+
     return TITLE_SECTION;
 }
 
@@ -340,7 +358,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementer(int idp, RECT r, d
         wsprintf(num, L"%s\0", to_wstring((long)value).c_str());
     else
         wsprintf(num, L"%s\0", to_wstring(value).c_str());
-    
+
     nip.idText = csCreateRichEdit(nip.idSection, {4,4,((l+1)*3)*geomCoef,4}, (const wchar_t*)num, 0, 0);
     setRichEditColors(nip.idText, 0, RGB(120,120,120));
 
@@ -385,7 +403,7 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt(int idp, RECT r
     setRichEditColors(nip.idText, 0, RGB(120,120,120));
     csSetRichEditFormat(nip.idText, format);
     char*nb = (char*)utf16_to_utf8((const wchar_t*)step).c_str();
-    bool sign = CSUTILS::signExtraction(nb); 
+    bool sign = CSUTILS::signExtraction(nb);
     nip.step.set(nb,0,sign);
     allowTranslation[nip.idSection] = 0;
     //free(nb);
@@ -424,7 +442,7 @@ void incrementFunction(CSARGS Args)
         /*wchar_t* text = csAlloc<wchar_t>((strlen(printFormat)+1));
         wsprintf(text, L"%s\0",  (wchar_t*)charPtrtoWcharPtr(printFormat).c_str());*/
         wchar_t* text = CSSTRUTILS::makeWString(CSSTRUTILS::utf8_to_utf16(printFormat).c_str());
-        
+
 
         TITLE[nip.idSection].Text = text;
         InvalidateRect(SECTION[nip.idSection],0,1);
@@ -503,10 +521,10 @@ void decrementFunction(CSARGS Args)
         {
             res = res - nip.step;
         }
-        
+
         free(TITLE[nip.idSection].Text);
         char*printFormat = CSARITHMETIC::getPrintFormat(res);
-        
+
         //wchar_t* text = csAlloc<wchar_t>((strlen(printFormat)+1));
         //wsprintf(text, L"%s\0",  (wchar_t*)charPtrtoWcharPtr(printFormat).c_str());
         wchar_t* text = CSSTRUTILS::makeWString(CSSTRUTILS::utf8_to_utf16(printFormat).c_str());
@@ -534,7 +552,7 @@ void decrementFunction(CSARGS Args)
         {
             count++;
         }
-        
+
         if(count == delay)
         SendMessage(HWND(Args), WM_LBUTTONDBLCLK, 0, 0);
     }
@@ -543,7 +561,7 @@ void decrementFunction(CSARGS Args)
     {
         KillTimer(HWND(Args), timerid);
         ReleaseCapture();
-        
+
         if(titleAutoRepos)
         {
             CS_NUMERIC_INCREMENTER_PARAMS nip = *(CS_NUMERIC_INCREMENTER_PARAMS*)Args[0];
@@ -562,7 +580,7 @@ void decrementFunction(CSARGS Args)
             }
         }
         //InvalidateRect(SECTION[nip.idSection],0,1);
-        
+
     }
 
 };
@@ -585,12 +603,12 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt1(int idp, RECT 
     nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/u1.bmp\0", "resources/img/u1.bmp\0", {2,2,l,l});
     nip.idDown = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/d1.bmp\0", "resources/img/d1.bmp\0", {2+l,2,l,l});
 
-    
+
     nip.idText = csCreateRichEdit(nip.idSection, {(2+l*2+2)*geomCoef,4,4,4}, (const wchar_t*)value, 0, 0);
     setRichEditColors(nip.idText, 0, RGB(120,120,120));
     csSetRichEditFormat(nip.idText, format);
     char*nb = (char*)utf16_to_utf8((const wchar_t*)step).c_str();
-    bool sign = CSUTILS::signExtraction(nb); 
+    bool sign = CSUTILS::signExtraction(nb);
     nip.step.set(nb,0,sign);
     allowTranslation[nip.idSection] = 0;
     //free(nb);
@@ -619,13 +637,13 @@ CS_NUMERIC_INCREMENTER_PARAMS CSUIOBJECTS::numericIncrementerExt2(int idp, RECT 
     nip.idUp = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/next2.bmp\0", "resources/img/next.bmp\0", {r.right-l-2,2,l,l});
     nip.idDown = CSUIOBJECTS::iconButton02(nip.idSection, "resources/img/back2.bmp\0", "resources/img/back.bmp\0", {2,2,l,l});
 
-    
+
     int c = 2*geomCoef;
     nip.idText = csCreateRichEdit(nip.idSection, {(2+l+2)*geomCoef,c,(2+l+2)*geomCoef,c}, (const wchar_t*)value, 0, 0);
     setRichEditColors(nip.idText, 0, RGB(120,120,120));
     csSetRichEditFormat(nip.idText, format);
     char*nb = (char*)utf16_to_utf8((const wchar_t*)step).c_str();
-    bool sign = CSUTILS::signExtraction(nb); 
+    bool sign = CSUTILS::signExtraction(nb);
     nip.step.set(nb,0,sign);
     allowTranslation[nip.idSection] = 0;
     //free(nb);
@@ -712,7 +730,7 @@ void strDecrementFunction(CSARGS Args)
         {
             count++;
         }
-        
+
         if(count == delay)
         SendMessage(HWND(Args), WM_LBUTTONDBLCLK, 0, 0);
     }
@@ -721,7 +739,7 @@ void strDecrementFunction(CSARGS Args)
     {
         KillTimer(HWND(Args), timerid);
         ReleaseCapture();
-        
+
         if(titleAutoRepos)
         {
             CS_STRING_INCREMENTER_PARAMS sip = *(CS_STRING_INCREMENTER_PARAMS*)Args[0];
@@ -739,7 +757,7 @@ void strDecrementFunction(CSARGS Args)
             }
         }
         //InvalidateRect(SECTION[nip.idSection],0,1);
-        
+
     }
 
 };
@@ -753,7 +771,7 @@ void strIncrementFunction(CSARGS Args)
     if(msg == WM_LBUTTONDOWN||msg == WM_LBUTTONDBLCLK)
     {
         CS_STRING_INCREMENTER_PARAMS sip = *(CS_STRING_INCREMENTER_PARAMS*)Args[0];
-        
+
         if(!sip.item.size())
             return;
 
@@ -767,7 +785,7 @@ void strIncrementFunction(CSARGS Args)
         }
 
         ((CS_STRING_INCREMENTER_PARAMS*)Args[0])->currentItem = res;
-        
+
         wchar_t*& text = TITLE[sip.idSection].Text;
         int t;
         text = (wchar_t*)realloc(text, (t = wcslen(sip.item[res].c_str())+1)*sizeof(wchar_t));
@@ -795,7 +813,7 @@ void strIncrementFunction(CSARGS Args)
         {
             count++;
         }
-        
+
         if(count == delay)
         SendMessage(HWND(Args), WM_LBUTTONDBLCLK, 0, 0);
     }
@@ -804,7 +822,7 @@ void strIncrementFunction(CSARGS Args)
     {
         KillTimer(HWND(Args), timerid);
         ReleaseCapture();
-        
+
         if(titleAutoRepos)
         {
             CS_STRING_INCREMENTER_PARAMS sip = *(CS_STRING_INCREMENTER_PARAMS*)Args[0];
@@ -822,7 +840,7 @@ void strIncrementFunction(CSARGS Args)
             }
         }
         //InvalidateRect(SECTION[nip.idSection],0,1);
-        
+
     }
 
 };
@@ -837,6 +855,19 @@ void CS_STRING_INCREMENTER_PARAMS::newItem(const wchar_t* title, bool _status)
     status.push_back(_status);
 }
 
+bool CS_STRING_INCREMENTER_PARAMS::removeItem(int idItem)
+{
+    if(item.size()>1)
+    {
+        item.erase(item.begin()+idItem);
+        status.erase(status.begin()+idItem);
+
+        if(currentItem >= item.size()) currentItem = item.size()-1;
+        return 1;
+    }
+    return 0;
+}
+
 CS_STRING_INCREMENTER_PARAMS* CSUIOBJECTS::stringIncrementer(int idp, RECT r, wchar_t* value, long step, bool loopStyle, COEFS4 bindCoefs, FLAGS4 bindFlags)
 {
     CS_STRING_INCREMENTER_PARAMS sip = {0};
@@ -849,7 +880,7 @@ CS_STRING_INCREMENTER_PARAMS* CSUIOBJECTS::stringIncrementer(int idp, RECT r, wc
     bd = {sip.idSection, bindCoefs, bindFlags};
     CSSECMAN::bindGeometry(idp, bd);
     int l = (r.bottom-4);
-    
+
     CSSECMAN::setBorderThick(sip.idSection, 2);
     CSSECMAN::setTitle(sip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=10, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1, .ShowEntierText=1});
@@ -857,13 +888,13 @@ CS_STRING_INCREMENTER_PARAMS* CSUIOBJECTS::stringIncrementer(int idp, RECT r, wc
     sip.idUp = CSUIOBJECTS::iconButton02(sip.idSection, "resources/img/next2.bmp\0", "resources/img/next.bmp\0", {r.right-l-2,2,l,l});
     sip.idDown = CSUIOBJECTS::iconButton02(sip.idSection, "resources/img/back2.bmp\0", "resources/img/back.bmp\0", {2,2,l,l});
 
-    
+
     int c = 2*geomCoef;
     sip.idText = csCreateRichEdit(sip.idSection, {(2+l+2)*geomCoef,c,(2+l+2)*geomCoef,c}, (const wchar_t*)value, 0, 0);
     csSetRichEditFormat(sip.idText, INPUT_FORMAT_POSITIVE_INTERGER);
 
     sip.loopStyle = loopStyle;
-    
+
     bool*titleAutoRepos = csAlloc<bool>(1,0);
     CS_STRING_INCREMENTER_PARAMS* psip = new CS_STRING_INCREMENTER_PARAMS;
     *psip = sip;
@@ -946,7 +977,7 @@ void progressBarAction(CSARGS Args)
 
         if(statusIter > 0)
             statusIter = 900; //terminer le processus precedent
-            
+
 
         if(!isworking)
         {
@@ -1059,13 +1090,13 @@ void __workAnimFunc(int id, int* iter, double* maxLevel, double* level, wstring 
     {
         *iter = 0;
     }
-    
+
 }
 
 void __resultAnimFunc(int id, int *iter, int* resultAnimMaxTime, bool* status, wstring successMessage, wstring errorMessage)
 {
     static bool b = 0;
-   
+
     if(*status && !b)
     {
         CSSECMAN::setTitleColor(id, {70,200,70});

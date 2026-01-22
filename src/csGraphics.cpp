@@ -33,7 +33,7 @@ extern vector<BYTE> mouseWheelPreference;
 
 extern vector<bool> bltUpdate;
 
-extern vector<CSDYNAMIC_SIMPLE_TEXT> dynSimpleText;
+extern vector<CSDYNAMIC_TEXT> dynSimpleText;
 
 extern vector<vector<CSLOADED_IMAGE>> loadedImage;
 
@@ -485,13 +485,38 @@ void csGraphics::setGraphicAreaSize(int id, SIZE size)
 {
     hdcontextExtSize[id] = size;
 }
+SIZE csGraphics::getGraphicAreaSize(int id)
+{
+    return hdcontextExtSize[id];
+}
 void csGraphics::setGraphicAreaXSize(int id, long cx)
 {
     hdcontextExtSize[id].cx = cx;
 }
+long csGraphics::getGraphicAreaXSize(int id)
+{
+    return hdcontextExtSize[id].cx;
+}
 void csGraphics::setGraphicAreaYSize(int id, long cy)
 {
     hdcontextExtSize[id].cy = cy;
+}
+long csGraphics::getGraphicAreaYSize(int id)
+{
+    return hdcontextExtSize[id].cy;
+}
+
+POINT csGraphics::getGraphicAreaInPos(int id)
+{
+    return hdcontextExtInPos[id];
+}
+long csGraphics::getGraphicAreaInXPos(int id)
+{
+    return hdcontextExtInPos[id].x;
+}
+long csGraphics::getGraphicAreaInYPos(int id)
+{
+    return hdcontextExtInPos[id].y;
 }
 
 void csGraphics::setGraphicAreaColor(int id, CSRGBA background, CSRGBA border)
@@ -718,15 +743,94 @@ void csGraphics::viewText(int id, wchar_t* text, CSRGBA color, POINT pos, wchar_
 
 }
 
-void csGraphics::setDynamicSimpleText(int id, CSDYNAMIC_SIMPLE_TEXT dst)
-{
+void csGraphics::setDynamicText(int id, CSDYNAMIC_TEXT dst)
+{   
+    if(dst.pSpace.size() > dst.pPos.size())
+    {
+        for(int i=0; i<dst.pSpace.size(); i++)
+        {
+            dst.pPos.push_back(0);
+        }
+    }
     dynSimpleText[id] = dst;
     bltUpdate[id] = 1;
     //dynSimpleText[id].view = 1;
 }
 
+void csGraphics::addDynamicText(int id, CSTEXT paragraph, int pSpace)
+{   
+    dynSimpleText[id].paragraph.push_back(paragraph);
+    dynSimpleText[id].pSpace.push_back(pSpace);
+    dynSimpleText[id].pPos.push_back(0);
+
+    bltUpdate[id] = 1;
+}
+
+void csGraphics::setDynamicTextParagraphColor(int id, int idParag, CSRGBA color)
+{
+    dynSimpleText[id].paragraph[idParag].Color = color;
+    bltUpdate[id] = 1;
+}
+
+CSRGBA csGraphics::getDynamicTextParagraphColor(int id, int idParag)
+{
+    return dynSimpleText[id].paragraph[idParag].Color;
+}
+
+int csGraphics::getDynamicTextParagraphPos(int id, int idParag)
+{   
+    return dynSimpleText[id].pPos[idParag];
+}
+
+int csGraphics::getDynamicTextParagraphsNumber(int id)
+{   
+    return dynSimpleText[id].paragraph.size();
+}
+
+void csGraphics::removeDynamicTextParagraph(int id, int idParag)
+{   
+    free(dynSimpleText[id].paragraph[idParag].Text);
+    dynSimpleText[id].paragraph[idParag].Text = 0;
+    dynSimpleText[id].paragraph.erase(dynSimpleText[id].paragraph.begin()+idParag);
+    dynSimpleText[id].pPos.erase(dynSimpleText[id].pPos.begin()+idParag);
+    dynSimpleText[id].pSpace.erase(dynSimpleText[id].pSpace.begin()+idParag);
+}
+
+POINT csGraphics::getViewAreaPos(int id)
+{   
+    return {bltRect[id].left, bltRect[id].top};
+}
+long csGraphics::getViewAreaXPos(int id)
+{   
+    return bltRect[id].left;
+}
+long csGraphics::getViewAreaYPos(int id)
+{   
+    return bltRect[id].top;
+}
+SIZE csGraphics::getViewAreaSize(int id)
+{   
+    return {bltRect[id].right-bltRect[id].left, bltRect[id].bottom-bltRect[id].top};
+}
+long csGraphics::getViewAreaXSize(int id)
+{   
+    return bltRect[id].right-bltRect[id].left;
+}
+long csGraphics::getViewAreaYSize(int id)
+{   
+    return bltRect[id].bottom-bltRect[id].top;
+}
+long csGraphics::getViewAreaRight(int id)
+{   
+    return bltRect[id].right;
+}
+long csGraphics::getViewAreaBottom(int id)
+{   
+    return bltRect[id].bottom;
+}
+
 extern float geomCoef;
-void viewDynamicSimpleText(int id, vector<CSTEXT> paragraph, vector<int> pSpace, RECT marg, bool updateGASize)
+void viewDynamicText(int id, vector<CSTEXT> paragraph, vector<int> pSpace, vector<int>& pPos, RECT marg, bool updateGASize)
 {
     int n = paragraph.size();
     if(!n) return;
@@ -773,6 +877,7 @@ void viewDynamicSimpleText(int id, vector<CSTEXT> paragraph, vector<int> pSpace,
     int d = 0;
     for(int i=0; i<n; i++)
     {
+        pPos[i] = d;
         SelectFont(dc.dc, hf[i]);
         SetBkMode(dc.dc,TRANSPARENT);
         SetTextColor(dc.dc, RGB(paragraph[i].Color.r, paragraph[i].Color.g, paragraph[i].Color.b));
