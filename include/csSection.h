@@ -32,6 +32,8 @@
         CSSECMAN::_CSIGMA_APP_INIT_(hInstance, sourceLang, targetLang, saveAppStrings, saveAppGeometry);
 
 #define CSIGMA_MAIN_END() \
+        extern bool APP_CREATED;\
+        APP_CREATED = 1;\
         return CSSECMAN::_CSIGMA_APP_RUN_(); \
     }
 

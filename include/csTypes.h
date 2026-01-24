@@ -498,6 +498,13 @@ typedef struct
     bool centered;
 }CSAPP_ICON;
 
+typedef struct 
+{
+    int x;
+    float a;
+    int b;
+}CSLINEAR;
+
 template<class T> vector<T> newVector()
 {
     vector<T> v;

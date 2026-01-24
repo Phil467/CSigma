@@ -93,7 +93,7 @@ template<> wchar_t* csLIST<wchar_t>::toStringW(int from, int to)
         int end = to + 1;
         if(to >= tabSize)
             end = tabSize;
-        ret = (wchar_t*)malloc(end - from+1);
+        ret = (wchar_t*)malloc((end - from+1)*sizeof(wchar_t));
         wsprintf(ret,L"\0");
         wchar_t c[2];
         int j=0;
@@ -108,7 +108,7 @@ template<> wchar_t* csLIST<wchar_t>::toStringW(int from, int to)
         int end = from + 1;
         if(from >= tabSize)
             end = tabSize;
-        ret = (wchar_t*)malloc(end - to+1);
+        ret = (wchar_t*)malloc((end - to+1)*sizeof(wchar_t));
         wsprintf(ret,L"\0");
         wchar_t c[2];
         int j=0;

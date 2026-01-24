@@ -41,6 +41,7 @@ void setGraphicAreaXSize(int id, long cx);
 void setGraphicAreaYSize(int id, long cy);
 void setGraphicAreaColor(int id, CSRGBA background, CSRGBA border);
 
+HDC getGraphicContext(int id);
 SIZE getGraphicAreaSize(int id);
 long getGraphicAreaXSize(int id);
 long getGraphicAreaYSize(int id);
@@ -81,6 +82,7 @@ long getViewAreaXSize(int id);
 long getViewAreaYSize(int id);
 long getViewAreaRight(int id);
 long getViewAreaBottom(int id);
+RECT getViewAreaRect(int id);
 }
 
 #endif // CSGRAPHICS_H

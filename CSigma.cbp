@@ -69,6 +69,7 @@
 		<Unit filename="include/csArithmetic/csSQRT.h" />
 		<Unit filename="include/csFilesMan.h" />
 		<Unit filename="include/csGraphics.h" />
+		<Unit filename="include/csInput.h" />
 		<Unit filename="include/csLIST.h" />
 		<Unit filename="include/csLISTBOX.h" />
 		<Unit filename="include/csListBoxMin.h" />
@@ -82,14 +83,15 @@
 		<Unit filename="include/csSubClasses.h" />
 		<Unit filename="include/csTranslator.h" />
 		<Unit filename="include/csTypes.h" />
-		<Unit filename="include/csUIObjects.h" />
 		<Unit filename="include/csUIFx.h" />
+		<Unit filename="include/csUIObjects.h" />
 		<Unit filename="include/csUtils.h" />
 		<Unit filename="include/readwfile.h" />
 		<Unit filename="main.cpp" />
 		<Unit filename="src/csArgs.cpp" />
 		<Unit filename="src/csFilesMan.cpp" />
 		<Unit filename="src/csGraphics.cpp" />
+		<Unit filename="src/csInput.cpp" />
 		<Unit filename="src/csLIST.cpp" />
 		<Unit filename="src/csLISTBOX.cpp" />
 		<Unit filename="src/csListBoxMin.cpp" />
@@ -99,8 +101,8 @@
 		<Unit filename="src/csStrUtils.cpp" />
 		<Unit filename="src/csSubClasses.cpp" />
 		<Unit filename="src/csTranslator.cpp" />
-		<Unit filename="src/csUIObjects.cpp" />
 		<Unit filename="src/csUIFx.cpp" />
+		<Unit filename="src/csUIObjects.cpp" />
 		<Unit filename="src/csUtils.cpp" />
 		<Extensions />
 	</Project>

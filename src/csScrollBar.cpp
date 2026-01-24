@@ -758,7 +758,7 @@ void autoRepos(CSARGS Args)
 
             int a = withVScroll[idp] ? thick : 0;
             MoveWindow(SECTION[id], r.left + edge, cy + edge - thick, 
-                                            cx - r.left - 2*edge - a, thick, 0);
+                                            cx - r.left - 2*edge - a, thick, 1);
         }
         else if(orientation == CS_SBAR_VERTICAL)
         {

@@ -485,6 +485,10 @@ void csGraphics::setGraphicAreaSize(int id, SIZE size)
 {
     hdcontextExtSize[id] = size;
 }
+HDC csGraphics::getGraphicContext(int id)
+{
+    return hdcontextExt[id];
+}
 SIZE csGraphics::getGraphicAreaSize(int id)
 {
     return hdcontextExtSize[id];
@@ -819,6 +823,10 @@ long csGraphics::getViewAreaXSize(int id)
 long csGraphics::getViewAreaYSize(int id)
 {   
     return bltRect[id].bottom-bltRect[id].top;
+}
+RECT csGraphics::getViewAreaRect(int id)
+{   
+    return bltRect[id];
 }
 long csGraphics::getViewAreaRight(int id)
 {   

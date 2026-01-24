@@ -8,6 +8,7 @@
 #include "readwfile.h"
 #include "csListBoxMin.h"
 #include "csTranslator.h"
+#include "csInput.h"
 
 using namespace std;
 using namespace CSUTILS;
@@ -29,6 +30,7 @@ int MENU_NS, MENU_BIS, MENU_CS, MENU_PREFERENCES, MENU_ABOUT;
 int SYSCOMMAND_SECTION, SYS_CLOSE, SYS_MAX, SYS_MIN, TITLE_SECTION, RIGHT_SECTION_CHILD;
 int ABOUT_UI, ABOUT_UI_CLIENT, ABOUT_UI_BOTTOM, ABOUT_SUB_MENU, ABOUT_P1, ABOUT_P2, ABOUT_P3, ABOUT_P4, ABOUT_PTITLE, ABOUT_PINDEX;
 int GA_CLIENT, PROGRESS_INFO_SECTION, IMAGE_LIST_SECTION;
+int INPUTS_UI;
 
 int smx = GetSystemMetrics(SM_CXSCREEN);
 int smy = GetSystemMetrics(SM_CYSCREEN);
@@ -36,8 +38,8 @@ int smy = GetSystemMetrics(SM_CYSCREEN);
 
 
 
-CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", CS_SAVE_APP_STRINGS, CS_SAVE_APP_GEOMETRY) //--------------------------------------------------------------------------------------------------------------------------------
-//CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", 0, 0)
+//CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", CS_SAVE_APP_STRINGS, CS_SAVE_APP_GEOMETRY) //--------------------------------------------------------------------------------------------------------------------------------
+CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", 0, 0)
 float geomCoef = 1.5;
 setGeometryCoef(geomCoef);
 
@@ -226,7 +228,7 @@ MENU_ABOUT = menu.getIdButton(aboutMenuId);
 ABOUT_UI = createSection(0, {100,25,600,500},  RGB(40,40,40), {1,1,1,1,1,1,1,1}, 0, 1, 0);
 CSSECMAN::enableDarkEdge(ABOUT_UI);
 CSSECMAN::setIcon(ABOUT_UI, ICON_ROOT);
-CSUIOBJECTS::addTitle(ABOUT_UI, L"About",{60,CAPTION_AREA_SIZE/geomCoef}, 18, L"Arial black", ICON_ROOT);
+CSUIOBJECTS::addTitle(ABOUT_UI, L"À propos",{60,CAPTION_AREA_SIZE/geomCoef}, 18, L"Arial black", ICON_ROOT);
 
 ABOUT_UI_CLIENT = createSection(ABOUT_UI, {10/geomCoef,CAPTION_AREA_SIZE/geomCoef,590-10/geomCoef,500-CAPTION_AREA_SIZE/geomCoef-10-20},  RGB(0,0,0), {0}, 1);
 bd = {ABOUT_UI_CLIENT, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE, BIND_DEST_BOTTOM_EDGE,
@@ -238,7 +240,7 @@ bd = {ABOUT_UI_BOTTOM, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE, BIND_DEST_TOP_EDGE,
                                     BIND_DEST_RIGHT_EDGE, BIND_DEST_TOP_EDGE}};
 bindGeometry(ABOUT_UI, bd);
 
-CSSECMAN::setTitle(ABOUT_UI_BOTTOM, CSTEXT{.Text=L"Logo CSigma", .Font=L"calibri", .FontSize = 12, .Italic=0,
+CSSECMAN::setTitle(ABOUT_UI_BOTTOM, CSTEXT{.Text=L"CSigma Logo", .Font=L"calibri", .FontSize = 12, .Italic=0,
                                 .Bold=0, .Color={180,180,180},
                                 .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1});
 
@@ -369,7 +371,7 @@ CSSECMAN::addTips(maxDigit.idSection, {0,0,200/geomCoef, 170/geomCoef}, (POS_BOO
 ROOT_RND_NUM_VIEWER = createSection(0, {200,200,400,400},  RGB(30,30,30), {1,1,1,1,1,1,1,1}, 1, 1, 0);
 CSSECMAN::enableDarkEdge(ROOT_RND_NUM_VIEWER);
 CSSECMAN::setMinMaxInfo(ROOT_RND_NUM_VIEWER, MINMAXINFO{.ptMinTrackSize={200,150}});
-CSUIOBJECTS::addTitle(ROOT_RND_NUM_VIEWER, L"RANDOM NUMBER",{0}, 16, L"Arial Black", ICON_ROOT);
+CSUIOBJECTS::addTitle(ROOT_RND_NUM_VIEWER, L"Nombre Aléatoire",{0}, 16, L"Arial Black", ICON_ROOT);
 CSSYSCOMMAND_SECTION SYS_CMD_RND = CSUIOBJECTS::addSysCommand(ROOT_RND_NUM_VIEWER, {400});
 
 CSSCROLLBAR rnd_vscroll = CSUIOBJECTS::addVScrollBar(&ROOT_RND_NUM_VIEWER, &ROOT_RND_NUM_VIEWER, 0, 10, {0,35});
@@ -590,6 +592,15 @@ void setFontSize(CSARGS Args);
 csSetUpdatingFunction(fontSizeInc.idText, setFontSize, 3, &ROOT_RND_NUM_VIEWER, &fontSizeInc.idSection, strInc);
 
 /*********************************************************** */
+
+INPUTS_UI = createSection(0, {200,100,600,500},  RGB(40,40,40), {1,1,1,1,1,1,1,1}, 1, 1, 0);
+CSSECMAN::enableDarkEdge(INPUTS_UI);
+CSSECMAN::setIcon(INPUTS_UI, ICON_ROOT);
+CSUIOBJECTS::addTitle(INPUTS_UI, L"Entrée",{60,CAPTION_AREA_SIZE/geomCoef}, 18, L"Arial black", ICON_ROOT);
+CSSYSCOMMAND_SECTION SYS_CMD_INPUTS = CSUIOBJECTS::addSysCommand(INPUTS_UI, {600});
+int* inputPtr = inputContextExample(INPUTS_UI);
+
+/********************************************************* */
 
 CSSCROLLBAR hscroll1 = CSUIOBJECTS::addHScrollBar(&MIDDLE_MIDDLE_SECTION, &MIDDLE_MIDDLE_SECTION, 0, 10);
 CSSCROLLBAR vscroll1 = CSUIOBJECTS::addVScrollBar(&MIDDLE_MIDDLE_SECTION, &MIDDLE_MIDDLE_SECTION, 0, 10);

@@ -131,7 +131,7 @@ vector<bool> layeredStyle;
 extern bool __translateTitles();
 extern bool __translateTips();
 
-
+bool APP_CREATED = 0;
 
 HINSTANCE _hInstance;
 HWND hwndBtnDown;
