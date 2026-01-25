@@ -38,8 +38,8 @@ int smy = GetSystemMetrics(SM_CYSCREEN);
 
 
 
-CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", CS_SAVE_APP_STRINGS, CS_SAVE_APP_GEOMETRY) //--------------------------------------------------------------------------------------------------------------------------------
-//CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", 0, 0)
+//CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", CS_SAVE_APP_STRINGS, CS_SAVE_APP_GEOMETRY) //--------------------------------------------------------------------------------------------------------------------------------
+CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", 0, 0)
 float geomCoef = 1.5;
 setGeometryCoef(geomCoef);
 
@@ -58,8 +58,9 @@ CSUIOBJECTS::createToolTips(RGB(40,40,40));
 
 /*************************************** MIDDLE_SECTION ************************************ */
 CSBIND_GEOM_PARAMS bd;
-MIDDLE_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/geomCoef+6,smx/geomCoef,smy/geomCoef},  RGB(40,40,40), {0,0,0,0});
-
+MIDDLE_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/geomCoef+6,smx/geomCoef,435},  RGB(15,15,15), {0,0,0,0});
+bd = {MIDDLE_SECTION, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE,0,BIND_DEST_BOTTOM_EDGE}};
+bindGeometry(ROOT, bd); 
 /*************************************** MIDDLE_LEFT_SECTION ************************************ */
 
 CAPTION_AREA_SIZE *= 1.5;
@@ -81,7 +82,7 @@ CSSECMAN::setMinMaxInfo(MIDDLE_TOP_SECTION, MINMAXINFO{.ptMinTrackSize={0,17}, .
 
 /***********************************MIDDLE_MIDDLE_SECTION *************************************** */
 
-MIDDLE_MIDDLE_SECTION = createSection(MIDDLE_SECTION, {78,23,440,395+15},  RGB(25,25,25), {0,0,0,0});
+MIDDLE_MIDDLE_SECTION = createSection(MIDDLE_SECTION, {80+130,23,180,395+15},  RGB(15,15,15), {1,0,0,0});
 
 bd = {MIDDLE_MIDDLE_SECTION, {0,0,0,1}, {0,0, 0, BIND_DEST_TOP_EDGE|BIND_DEST_BOTTOM_EDGE}};
 bindGeometry(MIDDLE_TOP_SECTION, 1, bd);
@@ -367,19 +368,28 @@ maxDigit.setMaxBound("9");
 CSSECMAN::addTips(maxDigit.idSection, {0,0,200/geomCoef, 170/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tips3);
 /********************************************************************************** */
 
-//ROOT_RND_NUM_VIEWER = createSection(0, {1,1,400,400},  RGB(20,20,20), {0});
-ROOT_RND_NUM_VIEWER = createSection(0, {200,200,400,400},  RGB(30,30,30), {1,1,1,1,1,1,1,1}, 1, 1, 0);
+//ROOT_RND_NUM_VIEWER = createSection(0, {1,1,400,400},  RGB(20,20,20), {0}); //{78,23,440,395+15}
+ROOT_RND_NUM_VIEWER = createSection(MIDDLE_SECTION, {78,23,130,410},  RGB(30,30,30), {0,0,0,0});
 CSSECMAN::enableDarkEdge(ROOT_RND_NUM_VIEWER);
-CSSECMAN::setMinMaxInfo(ROOT_RND_NUM_VIEWER, MINMAXINFO{.ptMinTrackSize={200,150}});
-CSUIOBJECTS::addTitle(ROOT_RND_NUM_VIEWER, L"Textes Dynamiques",{0}, 16, L"Arial Black", ICON_ROOT);
-CSSYSCOMMAND_SECTION SYS_CMD_RND = CSUIOBJECTS::addSysCommand(ROOT_RND_NUM_VIEWER, {400});
+CSSECMAN::setMinMaxInfo(ROOT_RND_NUM_VIEWER, MINMAXINFO{.ptMinTrackSize={120,150}});
+CSUIOBJECTS::addTitle(ROOT_RND_NUM_VIEWER, L"Textes Dynamiques",{0}, 12, L"Arial Black", ICON_ROOT);
+//CSSYSCOMMAND_SECTION SYS_CMD_RND = CSUIOBJECTS::addSysCommand(ROOT_RND_NUM_VIEWER, {400});
 
-CSSCROLLBAR rnd_vscroll = CSUIOBJECTS::addVScrollBar(&ROOT_RND_NUM_VIEWER, &ROOT_RND_NUM_VIEWER, 0, 10, {0,35});
+CSSCROLLBAR rnd_vscroll = CSUIOBJECTS::addVScrollBar(&ROOT_RND_NUM_VIEWER, &ROOT_RND_NUM_VIEWER, 0, 10, {-5,35});
 
 csGraphics::setGraphicAreaPosition(ROOT_RND_NUM_VIEWER, {10,35});
 csGraphics::setGraphicAreaColor(ROOT_RND_NUM_VIEWER, {30,30,30}, {0});
 csGraphics::setMouseWheelPreference(ROOT_RND_NUM_VIEWER, CS_MOUSEWHEEL_VSCROLL);
 rnd_vscroll.setViewFrameRightMarging(10);
+
+bd = {ROOT_RND_NUM_VIEWER, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE,0}};
+bindGeometry(MIDDLE_LEFT_SECTION, bd);
+bd = {ROOT_RND_NUM_VIEWER, {1,0,0,0}, {BIND_DEST_RIGHT_EDGE,0,0,0}};
+bindGeometry( MIDDLE_MIDDLE_SECTION, bd);
+bd = {ROOT_RND_NUM_VIEWER, {0,0,0,1}, {0,0, 0, BIND_DEST_TOP_EDGE|BIND_DEST_BOTTOM_EDGE}};
+bindGeometry(MIDDLE_TOP_SECTION, 1, bd);
+bd = {ROOT_RND_NUM_VIEWER, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE, 0, BIND_DEST_BOTTOM_EDGE}};
+bindGeometry(ROOT, bd);
 
 CSDYNAMIC_TEXT dtxt;
 dtxt.marg = {10,10,10,10};
@@ -593,21 +603,33 @@ csSetUpdatingFunction(fontSizeInc.idText, setFontSize, 3, &ROOT_RND_NUM_VIEWER, 
 
 /*********************************************************** */
 
-INPUTS_UI = createSection(0, {200,100,600,500},  RGB(40,40,40), {1,1,1,1,1,1,1,1}, 1, 1, 0);
+INPUTS_UI = createSection(MIDDLE_SECTION, {388,23,130,410},  RGB(15,15,15), {1,0,0,1});
 CSSECMAN::enableDarkEdge(INPUTS_UI);
 CSSECMAN::setIcon(INPUTS_UI, ICON_ROOT);
-CSUIOBJECTS::addTitle(INPUTS_UI, L"Entrées",{60,CAPTION_AREA_SIZE/geomCoef}, 16, L"Arial black", ICON_ROOT);
-CSSYSCOMMAND_SECTION SYS_CMD_INPUTS = CSUIOBJECTS::addSysCommand(INPUTS_UI, {600});
-CSSECMAN::setMinMaxInfo(INPUTS_UI, MINMAXINFO{.ptMinTrackSize={175,250}});
+CSUIOBJECTS::addTitle(INPUTS_UI, L"Entrées",{60,CAPTION_AREA_SIZE/1.5/geomCoef}, 12, L"Arial black", ICON_ROOT);
+//CSSYSCOMMAND_SECTION SYS_CMD_INPUTS = CSUIOBJECTS::addSysCommand(INPUTS_UI, {600});
+CSSECMAN::setMinMaxInfo(INPUTS_UI, MINMAXINFO{.ptMinTrackSize={120,250}});
 CSINPUT* inputPtr = inputContextExample(INPUTS_UI);
+
+bd = {INPUTS_UI, {1,0,0,0}, {BIND_DEST_LEFT_EDGE,0,0,0}};
+bindGeometry(RIGHT_SECTION, bd);
+bd = {MIDDLE_MIDDLE_SECTION, {1,0,0,0}, {BIND_DEST_RIGHT_EDGE,0,0,0}};
+bindGeometry(INPUTS_UI, bd);
+bd = {INPUTS_UI, {0,0,0,1}, {0,0, 0, BIND_DEST_TOP_EDGE|BIND_DEST_BOTTOM_EDGE}};
+bindGeometry(MIDDLE_TOP_SECTION, 1, bd);
+bd = {INPUTS_UI, {-1,-1,1,1}, {BIND_DEST_LEFT_EDGE,BIND_DEST_BOTTOM_EDGE, BIND_DEST_LEFT_EDGE, BIND_DEST_BOTTOM_EDGE}};
+bindGeometry(ROOT, bd);
 
 /********************************************************* */
 
 CSSCROLLBAR hscroll1 = CSUIOBJECTS::addHScrollBar(&MIDDLE_MIDDLE_SECTION, &MIDDLE_MIDDLE_SECTION, 0, 10);
-CSSCROLLBAR vscroll1 = CSUIOBJECTS::addVScrollBar(&MIDDLE_MIDDLE_SECTION, &MIDDLE_MIDDLE_SECTION, 0, 10);
+CSSCROLLBAR vscroll1 = CSUIOBJECTS::addVScrollBar(&MIDDLE_MIDDLE_SECTION, &MIDDLE_MIDDLE_SECTION, 0, 10, {0,30});
 
 hscroll1.setViewFrameBottomMarging(10);
 vscroll1.setViewFrameRightMarging(10);
+
+hscroll1.updateClientWhenResizeScrollBar(1); // important *************************
+vscroll1.updateClientWhenResizeScrollBar(1); // important *************************
 
 csGraphics::setGraphicAreaPosition(MIDDLE_MIDDLE_SECTION,{0,0});
 csGraphics::setGraphicAreaColor(MIDDLE_MIDDLE_SECTION,{10,10,10},{0});

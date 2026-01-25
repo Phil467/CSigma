@@ -320,7 +320,7 @@ class CSINPUT
     RECT placeCaret(POINT p);
     void textCharGeometryCorrection(int from);
     RECT getFrontEndCharRect(int idInput, int idChar);
-    void highlightActiveChar(RECT r);
+    void highlightActiveChar(RECT r, bool state=0);
     int getActiveInputCharNumber();
     int getId();
     void blit();

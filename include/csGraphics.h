@@ -48,6 +48,9 @@ long getGraphicAreaYSize(int id);
 POINT getGraphicAreaInPos(int id);
 long getGraphicAreaInXPos(int id);
 long getGraphicAreaInYPos(int id);
+POINT getGraphicAreaPos(int id);
+long getGraphicAreaXPos(int id);
+long getGraphicAreaYPos(int id);
 
 void updateGraphicArea(int id, bool reCreate);
 

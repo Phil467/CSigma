@@ -514,13 +514,25 @@ POINT csGraphics::getGraphicAreaInPos(int id)
 {
     return hdcontextExtInPos[id];
 }
+POINT csGraphics::getGraphicAreaPos(int id)
+{
+    return hdcontextExtOutPos[id];
+}
 long csGraphics::getGraphicAreaInXPos(int id)
 {
     return hdcontextExtInPos[id].x;
 }
+long csGraphics::getGraphicAreaXPos(int id)
+{
+    return hdcontextExtOutPos[id].x;
+}
 long csGraphics::getGraphicAreaInYPos(int id)
 {
     return hdcontextExtInPos[id].y;
+}
+long csGraphics::getGraphicAreaYPos(int id)
+{
+    return hdcontextExtOutPos[id].y;
 }
 
 void csGraphics::setGraphicAreaColor(int id, CSRGBA background, CSRGBA border)

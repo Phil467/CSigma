@@ -35,6 +35,7 @@ class CSSCROLLBAR
         void setViewFrameBottomMarging(int marging);
         void setEdge(int edge);
         void updateViewArea();
+        void updateClientWhenResizeScrollBar(bool update=1);
 
     protected:
 
@@ -57,6 +58,7 @@ class CSSCROLLBAR
     bool *threadBool, bSize;
     int *vEdge, *hEdge;
     RECT* geom;
+    bool *updateClient;
 };
 
 

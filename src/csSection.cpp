@@ -1195,7 +1195,7 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
         }
 
-        if(msg == WM_LBUTTONDOWN || msg == WM_NCLBUTTONDOWN)
+        if(msg == WM_LBUTTONDOWN || msg == WM_LBUTTONDBLCLK || msg == WM_NCLBUTTONDOWN || msg == WM_NCLBUTTONDBLCLK)
         {
             //SetForegroundWindow(SECTION[0]);
             /*HWND topWnd = GetWindow(SECTION[0], GW_HWNDLAST);
@@ -1205,6 +1205,7 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             cout<<SECTION[0]<<" "<<className<<"\n";*/
 
             SetWindowPos(SECTION[0], HWND_TOP, 0,0,0,0, SWP_NOSIZE|SWP_NOMOVE);
+            SetWindowPos(SECTION[id], HWND_TOP, 0,0,0,0, SWP_NOSIZE|SWP_NOMOVE);
 
         }
         /*if(msg == WM_NCLBUTTONDBLCLK && CURSOR_NCHITTEST_POS == CURSOR_NCHITTEST_POS_CAPTION && !SECTIONSTYLE[id])

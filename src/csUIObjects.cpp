@@ -65,7 +65,7 @@ CSSCROLLBAR CSUIOBJECTS::addVScrollBar(int* idp, int* idClient, int* idMask, int
     if(!idc) idc = idp;
 
     RECT g = {
-                (geometry.left ? geometry.left : r.right-thick),
+                /*(geometry.left ? geometry.left : r.right-thick)*/geometry.left+r.right-thick,
                 geometry.top,
                 (geometry.right ? geometry.right : thick), 
                 (geometry.bottom ? geometry.bottom : r.bottom-geometry.top)

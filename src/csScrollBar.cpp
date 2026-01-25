@@ -237,6 +237,7 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
     hEdge = csAlloc(1,0);
     geom = csAlloc<RECT>(1, geometry);
     bSize = 0;
+    updateClient = csAlloc<bool>(1,0);
     
     rcs = new vector<RECT>;
     colors = new vector<vector<CSRGBA>>;
@@ -401,11 +402,11 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
 
     bool*block = csAlloc<bool>(1,0);
 
-    Args.init(27);
+    Args.init(28);
     Args.regArg(rcs, colors, value, value0, hmarg, vmarg, 
                     width, szzoom, orient, tLength, rectSelect, mhId, scval, idc, 
                     scType, idMask, block, oldClientPos, oldClientSize, CX, CY, cloths, 
-                    threadBool, mhId0, hEdge, vEdge, geom);
+                    threadBool, mhId0, hEdge, vEdge, geom, updateClient);
     
     CSSECMAN::addAction(*id, groupMsg, Args);
     //CSSECMAN::addAction(idp, parentResize, 9, idc, id, &hEdge, &vEdge, &CX, &CY, &bSize, orient, &idp);
@@ -508,6 +509,11 @@ void CSSCROLLBAR::setClient(int _idc, int _idMask)
     }
 }
 
+void CSSCROLLBAR::updateClientWhenResizeScrollBar(bool update)
+{
+    *updateClient = update;
+}
+
 void CSSCROLLBAR::updateViewArea()
 {
     if(*orient == CS_SBAR_HORIZONTAL)
@@ -558,6 +564,8 @@ void resize(CSARGS Args)
     int idMask = *(int*)Args[15];
     bool *block = (bool*)Args[16]; // bloque une partie du code pour des receptions venant wm_mouseMouve
     vector<vector<HDC>> cloths = *(vector<vector<HDC>>*)Args[21];
+
+    bool updateClient = *(bool*)Args[27];
 
     SIZE sz={0};
     RECT r = RECTCL[id];
@@ -718,7 +726,7 @@ void resize(CSARGS Args)
     
     bool threadBool = *(bool*)Args[22];
 
-    if(!threadBool) // evite les conflits de mises a jour entre idc et id, et ameliore la fluidite
+    if(!threadBool && updateClient) // evite les conflits de mises a jour entre idc et id, et ameliore la fluidite
     {
         InvalidateRect(SECTION[idc], &bltRect[idc], 1);
         //cout<<"ooooo\n";
