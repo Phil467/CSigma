@@ -111,11 +111,11 @@ int CSMENU::newGroup(const wchar_t* title, const wchar_t* iconPath1, const wchar
         CSSECMAN::removeAction((*idSection)[idSection->size()-1], ID_ACTION);
     }
 
-    CSSECMAN::joinPopup(BUTTON, idPopup[0], {0,0,160,125*3+3}, (POS_BOOL){.bLBottom=1}, 1, 1,0, idSection);
+    CSSECMAN::joinPopup(BUTTON, idPopup[0], {0,0,110,125*2+3}, (POS_BOOL){.bLBottom=1}, 1, 1,0, idSection);
     idSection->push_back(BUTTON);
     int id = idSection->size()-1;
 
-    int lbmId = newlbm(&idPopup[0], &(*idSection)[id], 8*3, (wchar_t*)(wstring(L"Menu-")+to_wstring(lbm.size())+L"-").c_str());
+    int lbmId = newlbm(&idPopup[0], &(*idSection)[id], 8*2, (wchar_t*)(wstring(title) + L" " + to_wstring(lbm.size())).c_str());
     if(lastlbm) lastlbm->hide();
     lbm[lbmId]->show();
     lastlbm = lbm[lbmId];
@@ -169,7 +169,7 @@ void initLbm(CSLISTBOXMIN*& lbm, int nbItem, wchar_t*defltTitle)
     lbm->setDefaultBackgroundColors(RGB(35,35,35), RGB(40,40,40), RGB(34,34,34), RGB(0,0,0));
     lbm->setIconSize(0,{15*geomCoef-6,15*geomCoef-6});
 
-    lbm->setIcon(0, L"resources\\img\\menulogo.bmp",L"resources\\img\\menulogo2.bmp", L"resources\\img\\menulogo2.bmp", L"resources\\img\\menulogo2.bmp");
+    lbm->setIcon(0, L"resources\\img\\uni30.bmp",L"resources\\img\\uni35.bmp", L"resources\\img\\uni35.bmp", L"resources\\img\\uni35.bmp");
     lbm->setMaxTextWidth(120*geomCoef);
     lbm->setDefaultTitle(defltTitle);
     lbm->newItem(0,nbItem,0);

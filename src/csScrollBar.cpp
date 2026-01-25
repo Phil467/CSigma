@@ -65,8 +65,6 @@ void increase(CSARGS Args);
 void longPress2(CSARGS Args);
 void longPress1(CSARGS Args);
 void mouseMoveSetColor(CSARGS Args);
-void clientGesture(CSARGS Args);
-void mouseWheel(CSARGS Args);
 
 extern bool END_CREATE;
 
@@ -507,8 +505,6 @@ void CSSCROLLBAR::setClient(int _idc, int _idMask)
             hdcontextExtSize[*idc] = hdcSize[*idc];
         }
         
-        //CSSECMAN::addAction(*idc, clientGesture, 0);
-        CSSECMAN::addAction(*idc, mouseWheel, 0);
     }
 }
 
@@ -1315,20 +1311,23 @@ void mouseLeave_(CSARGS Args)
     *mhId = -1;
 }
 
+
+/****************************************************************************************************************************** */
+/* Theses functions are part of the CALLBACK Procedure. They are here for csSection is too large*/
+
 extern POINT TIMER_POINT;
 
-void mouseWheel(CSARGS Args)
+void mouseWheel(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, int idc)
 {
-    if(UINT(Args) == WM_MOUSEWHEEL)
+    if(msg == WM_MOUSEWHEEL)
     {
-        int idc = int(Args);
         POINT p = hdcontextExtInPos[idc];
         RECT r = bltRect[idc];
         int delta = 10;
-        if(GET_WHEEL_DELTA_WPARAM(WPARAM(Args))<0)
+        if(GET_WHEEL_DELTA_WPARAM(wParam)<0)
         {
             bool a = 0, b = 0;
-            if(withHScroll[idc] && (GetAsyncKeyState(VK_CONTROL) || mouseWheelPreference[idc] == CS_MOUSEWHEEL_HSCROLL))
+            if(/*withHScroll[idc] && */(GetAsyncKeyState(VK_CONTROL) || mouseWheelPreference[idc] == CS_MOUSEWHEEL_HSCROLL))
             {
                 long px = p.x/hZoom[idc];
                 long cx = (bltRect[idc].right/hZoom[idc]);
@@ -1342,8 +1341,9 @@ void mouseWheel(CSARGS Args)
                     hdcontextExtInPos[idc].x = hdcontextExtSize[idc].cx - bltRect[idc].right;
                 
                 a = 1;
+                InvalidateRect(hwnd, &bltRect[idc], 1);
             }
-            if(withVScroll[idc] && (GetAsyncKeyState(VK_SHIFT) || mouseWheelPreference[idc] == CS_MOUSEWHEEL_VSCROLL))
+            if(/*withVScroll[idc] && */(GetAsyncKeyState(VK_SHIFT) || mouseWheelPreference[idc] == CS_MOUSEWHEEL_VSCROLL))
             {
                 long py = p.y/vZoom[idc];
                 long cy = (bltRect[idc].bottom/vZoom[idc]);
@@ -1357,6 +1357,7 @@ void mouseWheel(CSARGS Args)
                     hdcontextExtInPos[idc].y = hdcontextExtSize[idc].cy - bltRect[idc].bottom;
 
                 b = 1;
+                InvalidateRect(hwnd, &bltRect[idc], 1);
             }
             
             if((!a && !b) && mouseWheelPreference[idc] == CS_MOUSEWHEEL_ZOOM)
@@ -1372,8 +1373,8 @@ void mouseWheel(CSARGS Args)
                     long dx = 1.0*((bltRect[idc].right-bltRect[idc].left-hdcontextExtOutPos[idc].x)/2 - pt.x)*hZoom[idc];
                     hdcontextExtInPos[idc].x = -dx;*/
                     //cout<<" dx = "<<dx<<"\n";
-
-                    PostMessage(SECTION[withHScroll[idc]], WM_SIZE, 0,0);
+                    if(withHScroll[idc])
+                        PostMessage(SECTION[withHScroll[idc]], WM_SIZE, 0,0);
                 }
                 if(withVScroll[idc] && vZoom[idc] <= zoomParams[idc].vmax)
                 {
@@ -1384,7 +1385,8 @@ void mouseWheel(CSARGS Args)
                     long dy = 1.0*((bltRect[idc].bottom-bltRect[idc].top-hdcontextExtOutPos[idc].y)/2 - pt.y)*vZoom[idc];
                     hdcontextExtInPos[idc].y = -dy;*/
 
-                    PostMessage(SECTION[withVScroll[idc]], WM_SIZE, 0,0);
+                    if(withVScroll[idc])
+                        PostMessage(SECTION[withVScroll[idc]], WM_SIZE, 0,0);
                 }
                 InvalidateRect(SECTION[idc], &bltRect[idc], 1);
             }
@@ -1392,7 +1394,7 @@ void mouseWheel(CSARGS Args)
         else
         {
             bool a = 0 , b = 0;
-            if(withHScroll[idc] && (GetAsyncKeyState(VK_CONTROL) || mouseWheelPreference[idc] == CS_MOUSEWHEEL_HSCROLL))
+            if(/*withHScroll[idc] && */(GetAsyncKeyState(VK_CONTROL) || mouseWheelPreference[idc] == CS_MOUSEWHEEL_HSCROLL))
             {
                 long px = p.x/hZoom[idc];
                 long cx = (bltRect[idc].right/hZoom[idc]);
@@ -1405,9 +1407,10 @@ void mouseWheel(CSARGS Args)
                     hdcontextExtInPos[idc].x = 0;
 
                 a = 1;
+                InvalidateRect(hwnd, &bltRect[idc], 1);
             }
 
-            if(withVScroll[idc] && (GetAsyncKeyState(VK_SHIFT) || mouseWheelPreference[idc] == CS_MOUSEWHEEL_VSCROLL))
+            if(/*withVScroll[idc] && */(GetAsyncKeyState(VK_SHIFT) || mouseWheelPreference[idc] == CS_MOUSEWHEEL_VSCROLL))
             {
                 long py = p.y/vZoom[idc];
                 long cy = (bltRect[idc].bottom/vZoom[idc]);
@@ -1420,6 +1423,7 @@ void mouseWheel(CSARGS Args)
                 if(hdcontextExtInPos[idc].y < 0)
                     hdcontextExtInPos[idc].y = 0;
                 b = 1;
+                InvalidateRect(hwnd, &bltRect[idc], 1);
             }
 
             if((!a && !b) && mouseWheelPreference[idc] == CS_MOUSEWHEEL_ZOOM)
@@ -1436,9 +1440,10 @@ void mouseWheel(CSARGS Args)
                     long dx = 1.0*((bltRect[idc].right-bltRect[idc].left-hdcontextExtOutPos[idc].y)/2 - pt.x)*hZoom[idc];
                     hdcontextExtInPos[idc].x = -dx;*/
 
-                    PostMessage(SECTION[withHScroll[idc]], WM_SIZE, 0,0);
+                    if(withHScroll[idc])
+                        PostMessage(SECTION[withHScroll[idc]], WM_SIZE, 0,0);
                 }
-                if(withVScroll[idc] && vZoom[idc] >= zoomParams[idc].vmin)
+                if(/*withVScroll[idc] && */vZoom[idc] >= zoomParams[idc].vmin)
                 {
                     vZoom[idc] -= 0.05;
                     
@@ -1448,7 +1453,9 @@ void mouseWheel(CSARGS Args)
                     long dy = 1.0*((bltRect[idc].bottom-bltRect[idc].top-hdcontextExtOutPos[idc].y)/2 - pt.y)*vZoom[idc];
                     hdcontextExtInPos[idc].y = -dy;*/
                     
-                    PostMessage(SECTION[withVScroll[idc]], WM_SIZE, 0,0);
+                    if(withVScroll[idc])
+                        PostMessage(SECTION[withVScroll[idc]], WM_SIZE, 0,0);
+
                 }
                 InvalidateRect(SECTION[idc], &bltRect[idc], 1);
             }
@@ -1456,14 +1463,13 @@ void mouseWheel(CSARGS Args)
     }
 }
 
-void clientGesture(CSARGS Args)
+void gesture(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, int idc)
 {
-    if(UINT(Args) == WM_GESTURE)
+    if(msg == WM_GESTURE)
     {
-        int idc = (int)Args;
         POINT p = hdcontextExtInPos[idc];
         RECT r = bltRect[idc];
-        HGESTUREINFO hGestureInfo = (HGESTUREINFO)(LPARAM)Args;
+        HGESTUREINFO hGestureInfo = (HGESTUREINFO)lParam;
         GESTUREINFO gi = {0};
         gi.cbSize = sizeof(GESTUREINFO);
 cout<<"gesture\n";

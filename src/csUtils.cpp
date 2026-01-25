@@ -268,7 +268,7 @@ int CSSECMAN::attach(int id, int idp)
 int CSSECMAN::detach(int id)
 {
     attached[id] = 0;
-    PARID[id] = 0;
+    PARID[id] = -1;
     SetParent(SECTION[id], 0);
 }
 

@@ -215,7 +215,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
     DELTAPOS.push_back({0});
     deltaSizeMoveWaitList.push_back({0});
     isWindowInSizeMoveWaitList.push_back(0);
-    PARID.push_back(id);
+    
     RECTPARREFSAVED.push_back({geom.left, geom.top, geom.right+geom.left, geom.bottom+geom.top});
     RECTWNDSAVED.push_back({0});
     BINDTOPAR.push_back(1);
@@ -326,6 +326,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
     HWND hPopup;
     if(id == -1 || rootStyle)
     {
+        PARID.push_back(-1);
         SECTIONSTYLE.push_back(0);
         hPopup = CreateWindowExW(
                      WS_EX_APPWINDOW, wndClass[0]->lpszClassName, L"CSigma Root\0", WS_POPUPWINDOW|WS_BORDER|WS_THICKFRAME|WS_MINIMIZEBOX/*|WS_MAXIMIZEBOX*/,
@@ -336,7 +337,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
     }
     else
     {
-
+        PARID.push_back(id);
         SECTIONSTYLE.push_back(1);
         hPopup = CreateWindowExW(
                      0,
@@ -429,6 +430,9 @@ int getId(HWND hwnd)
 int pid = 0;
 void _blitExtDc(int id);
 extern void __getHiddenWindowPart(int id, RECT r);
+extern void mouseWheel(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, int id); // defined in csScrollBar.cpp
+extern void gesture(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, int id); // csScrollBar.cpp
+
 LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     int id = getId(hwnd);
@@ -633,10 +637,6 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 return hc;
             }
         }
-if(msg == WM_GESTURE)
-    {
-cout<<"gesture\n";
-    }
 
 
         if(msg == WM_LBUTTONDOWN)
@@ -719,8 +719,12 @@ cout<<"gesture\n";
             GetWindowRect(hwnd, &RECTWND[id]);
             RECTPARREF[id] = CSUTILS::rectInParentRef(id);
 
+            // important, before modification by scrollbars
+            bltRect[id] = RECTCL[id];
+
             if(withVScroll[id])
                 PostMessage(SECTION[withVScroll[id]],WM_TIMER,0,0); //autoresize
+            
             if(withHScroll[id])
                 PostMessage(SECTION[withHScroll[id]],WM_TIMER,0,0); //autoresize
 
@@ -987,26 +991,29 @@ cout<<"gesture\n";
         CSUIFX::_autoTransformation(hwnd, msg, wParam, lParam, id);
         CSUIFX::_mouseHover_movePopup(hwnd, msg, wParam, lParam, id);
 
+        mouseWheel(hwnd, msg, wParam, lParam, id);
+        //gesture(hwnd, msg, wParam, lParam, id);
+
         if(msg == WM_GETMINMAXINFO)
         {
             MINMAXINFO *mmi=(MINMAXINFO*)lParam;
             MINMAXINFO MMI = minMaxInfo[id];
-            //std::cout<<HWND(lp);
+            int rightc = PARID[id] < 0 ? GetSystemMetrics(SM_CXSCREEN) : RECTCL[PARID[id]].right;
+            int rightw = PARID[id] < 0 ? GetSystemMetrics(SM_CXSCREEN) : RECTWND[PARID[id]].right;
+            int bottomc = PARID[id] < 0 ? GetSystemMetrics(SM_CYSCREEN) : RECTCL[PARID[id]].bottom;
+            int bottomw = PARID[id] < 0 ? GetSystemMetrics(SM_CYSCREEN) : RECTWND[PARID[id]].bottom;
+            
             if(MMI.ptMaxTrackSize.x > 0)
                 mmi->ptMaxTrackSize.x = MMI.ptMaxTrackSize.x*geomCoef;
             else if(MMI.ptMaxTrackSize.x < 0 )
             {
-                mmi->ptMaxTrackSize.x = RECTCL[PARID[id]].right
-                                    -(RECTWND[PARID[id]].right - RECTWND[id].right)
-                                    + MMI.ptMaxTrackSize.x*geomCoef;
+                mmi->ptMaxTrackSize.x = rightc-(rightw - RECTWND[id].right) + MMI.ptMaxTrackSize.x*geomCoef;
             }
             if(MMI.ptMaxTrackSize.y > 0)
                 mmi->ptMaxTrackSize.y = MMI.ptMaxTrackSize.y*geomCoef;
             else if(MMI.ptMaxTrackSize.y < 0 )
             {
-                mmi->ptMaxTrackSize.y = RECTCL[PARID[id]].bottom
-                                    -(RECTWND[PARID[id]].bottom - RECTWND[id].bottom)
-                                    + MMI.ptMaxTrackSize.y*geomCoef;
+                mmi->ptMaxTrackSize.y = bottomc - (bottomw - RECTWND[id].bottom) + MMI.ptMaxTrackSize.y*geomCoef;
             }
 
             mmi->ptMinTrackSize.x = MMI.ptMinTrackSize.x*geomCoef;

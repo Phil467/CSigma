@@ -38,8 +38,8 @@ int smy = GetSystemMetrics(SM_CYSCREEN);
 
 
 
-//CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", CS_SAVE_APP_STRINGS, CS_SAVE_APP_GEOMETRY) //--------------------------------------------------------------------------------------------------------------------------------
-CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", 0, 0)
+CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", CS_SAVE_APP_STRINGS, CS_SAVE_APP_GEOMETRY) //--------------------------------------------------------------------------------------------------------------------------------
+//CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", 0, 0)
 float geomCoef = 1.5;
 setGeometryCoef(geomCoef);
 
@@ -228,7 +228,7 @@ MENU_ABOUT = menu.getIdButton(aboutMenuId);
 ABOUT_UI = createSection(0, {100,25,600,500},  RGB(40,40,40), {1,1,1,1,1,1,1,1}, 0, 1, 0);
 CSSECMAN::enableDarkEdge(ABOUT_UI);
 CSSECMAN::setIcon(ABOUT_UI, ICON_ROOT);
-CSUIOBJECTS::addTitle(ABOUT_UI, L"À propos",{60,CAPTION_AREA_SIZE/geomCoef}, 18, L"Arial black", ICON_ROOT);
+CSUIOBJECTS::addTitle(ABOUT_UI, L"À propos",{60,CAPTION_AREA_SIZE/geomCoef}, 16, L"Arial black", ICON_ROOT);
 
 ABOUT_UI_CLIENT = createSection(ABOUT_UI, {10/geomCoef,CAPTION_AREA_SIZE/geomCoef,590-10/geomCoef,500-CAPTION_AREA_SIZE/geomCoef-10-20},  RGB(0,0,0), {0}, 1);
 bd = {ABOUT_UI_CLIENT, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE, BIND_DEST_BOTTOM_EDGE,
@@ -371,7 +371,7 @@ CSSECMAN::addTips(maxDigit.idSection, {0,0,200/geomCoef, 170/geomCoef}, (POS_BOO
 ROOT_RND_NUM_VIEWER = createSection(0, {200,200,400,400},  RGB(30,30,30), {1,1,1,1,1,1,1,1}, 1, 1, 0);
 CSSECMAN::enableDarkEdge(ROOT_RND_NUM_VIEWER);
 CSSECMAN::setMinMaxInfo(ROOT_RND_NUM_VIEWER, MINMAXINFO{.ptMinTrackSize={200,150}});
-CSUIOBJECTS::addTitle(ROOT_RND_NUM_VIEWER, L"Nombre Aléatoire",{0}, 16, L"Arial Black", ICON_ROOT);
+CSUIOBJECTS::addTitle(ROOT_RND_NUM_VIEWER, L"Textes Dynamiques",{0}, 16, L"Arial Black", ICON_ROOT);
 CSSYSCOMMAND_SECTION SYS_CMD_RND = CSUIOBJECTS::addSysCommand(ROOT_RND_NUM_VIEWER, {400});
 
 CSSCROLLBAR rnd_vscroll = CSUIOBJECTS::addVScrollBar(&ROOT_RND_NUM_VIEWER, &ROOT_RND_NUM_VIEWER, 0, 10, {0,35});
@@ -386,7 +386,7 @@ dtxt.marg = {10,10,10,10};
 dtxt.updateGASize = 1;
 dtxt.view = 1;
 dtxt.paragraph.push_back(CSTEXT{.Text=makeWString(L"0"), .Font=L"calibri", .FontSize = 14, .Italic=0,
-                                .Bold=FW_BOLD, .Color={100,200,100}});
+                                .Bold=FW_BOLD, .Color={200, 200, 200}});
 dtxt.pSpace.push_back(5);
 csGraphics::setDynamicText(ROOT_RND_NUM_VIEWER, dtxt);
 
@@ -414,7 +414,7 @@ tipsMSG1.view = 1;
 tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Ajouter\0", .Font=L"calibri", .FontSize = 14, .Italic=0,
                                 .Bold=FW_BOLD, .Color={150,150,100}});
 tipsMSG1.pSpace.push_back(5);
-tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Ajouter une donnée à la liste.\0", .Font=L"calibri", .FontSize = 12, .Italic=1,
+tipsMSG1.paragraph.push_back(CSTEXT{.Text=L"Ajouter une donnée à la liste. Cliquer pour ajouter un nombre dans la fenêtre de texte.\0", .Font=L"calibri", .FontSize = 12, .Italic=1,
                                 .Bold=FW_THIN, .Color={150,150,150}});
 tipsMSG1.pSpace.push_back(5);
 CSSECMAN::addTips(BTN_ADD_TO_DATA_LIST, {0,0,200/geomCoef, 150/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG1);
@@ -430,7 +430,7 @@ tipsMSG2.view = 1;
 tipsMSG2.paragraph.push_back(CSTEXT{.Text=L"Supprimer\0", .Font=L"calibri", .FontSize = 14, .Italic=0,
                                 .Bold=FW_BOLD, .Color={150,150,100}});
 tipsMSG2.pSpace.push_back(5);
-tipsMSG2.paragraph.push_back(CSTEXT{.Text=L"Supprimer une donnée à la liste.\0", .Font=L"calibri", .FontSize = 12, .Italic=1,
+tipsMSG2.paragraph.push_back(CSTEXT{.Text=L"Supprimer une donnée à la liste. Cliquer pour supprimer un nombre dans la fenêtre de texte.\0", .Font=L"calibri", .FontSize = 12, .Italic=1,
                                 .Bold=FW_THIN, .Color={150,150,150}});
 tipsMSG2.pSpace.push_back(5);
 CSSECMAN::addTips(BTN_DEL_TO_DATA_LIST, {0,0,200/geomCoef, 150/geomCoef}, (POS_BOOL){.bTRight=1}, 3, 0, tipsMSG2);
@@ -489,8 +489,8 @@ CSSECMAN::addAction(
             csGraphics::addDynamicText(ROOT_RND_NUM_VIEWER, CSTEXT{.Text=makeWString(L"0"), .Font=L"calibri", .FontSize = 14, .Italic=0,
                 .Bold=FW_BOLD, .Color={150, 100, 100}}, 5);
             if(strInc->currentItem > 0)
-                csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, strInc->currentItem-1, {150,150,100});
-            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, strInc->currentItem, {100,200,100});
+                csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, strInc->currentItem-1, {100, 100, 100});
+            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, strInc->currentItem, {200, 200, 200});
             //csGraphics::updateGraphicArea(ROOT_RND_NUM_VIEWER,0);
             SendMessage(sHandle(BNT_RANDOM_NUMBER), WM_LBUTTONUP, 0,0);
 
@@ -517,7 +517,7 @@ CSSECMAN::addAction(
             {
                 strInc->item[i] = L"Nombre " + to_wstring(i+1);
             }
-            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, strInc->currentItem, {100,200,100});
+            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, strInc->currentItem, {200, 200, 200});
             csGraphics::updateGraphicArea(ROOT_RND_NUM_VIEWER,0);
 
             ((void(*)(long, long, void*, void*))Args[2])(strInc->currentItem, strInc->currentItem-1>=0?strInc->currentItem-1:0, Args[1], Args[0]);
@@ -550,8 +550,8 @@ CSSECMAN::addAction(
             int currentItem = strInc->currentItem;
             int prevItem = (strInc->currentItem+1)%strInc->item.size();
 
-            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, prevItem, {150,150,100});
-            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, currentItem, {100,200,100});
+            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, prevItem, {100, 100, 100});
+            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, currentItem, {200, 200, 200});
             csGraphics::updateGraphicArea(ROOT_RND_NUM_VIEWER,0);
 
             ((void(*)(long, long, void*, void*))Args[2])(currentItem, prevItem, Args[1], Args[0]);
@@ -573,8 +573,8 @@ CSSECMAN::addAction(
 
             if(prevItem < 0 ) prevItem = strInc->item.size()-1;
 
-            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, prevItem, {150,150,100});
-            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, currentItem, {100,200,100});
+            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, prevItem, {100, 100, 100});
+            csGraphics::setDynamicTextParagraphColor(ROOT_RND_NUM_VIEWER, currentItem, {200, 200, 200});
             csGraphics::updateGraphicArea(ROOT_RND_NUM_VIEWER,0);
 
             ((void(*)(long, long, void*, void*))Args[2])(currentItem, prevItem, Args[1], Args[0]);
@@ -596,9 +596,10 @@ csSetUpdatingFunction(fontSizeInc.idText, setFontSize, 3, &ROOT_RND_NUM_VIEWER, 
 INPUTS_UI = createSection(0, {200,100,600,500},  RGB(40,40,40), {1,1,1,1,1,1,1,1}, 1, 1, 0);
 CSSECMAN::enableDarkEdge(INPUTS_UI);
 CSSECMAN::setIcon(INPUTS_UI, ICON_ROOT);
-CSUIOBJECTS::addTitle(INPUTS_UI, L"Entrée",{60,CAPTION_AREA_SIZE/geomCoef}, 18, L"Arial black", ICON_ROOT);
+CSUIOBJECTS::addTitle(INPUTS_UI, L"Entrées",{60,CAPTION_AREA_SIZE/geomCoef}, 16, L"Arial black", ICON_ROOT);
 CSSYSCOMMAND_SECTION SYS_CMD_INPUTS = CSUIOBJECTS::addSysCommand(INPUTS_UI, {600});
-int* inputPtr = inputContextExample(INPUTS_UI);
+CSSECMAN::setMinMaxInfo(INPUTS_UI, MINMAXINFO{.ptMinTrackSize={175,250}});
+CSINPUT* inputPtr = inputContextExample(INPUTS_UI);
 
 /********************************************************* */
 

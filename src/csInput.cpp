@@ -17,6 +17,7 @@ extern POINT TIMER_POINT;
 extern vector<SIZE> hdcSize;
 extern vector<COLORREF> backgroundColor;
 extern vector<COLORREF> borderColor;
+extern vector<vector<CSARGS>> GROUPED_EVENTS_ARGS;
 
 typedef CSLINEAR CSL;
 
@@ -49,20 +50,27 @@ void CSINPUT::init(int*idp)
 
     xmarging = 3;
     ymarging = 3;
-    titleFont = CreateFontW(14, 0, 0, 1,0,1, 0,0,0,0,0,0,0, (LPCWSTR)"Arial");
+    titleFont = CreateFontW(14, 0, 0, 1,FW_BOLD,1, 0,0,0,0,0,0,0, (LPCWSTR)"Book Antiqua");
     textFont = CreateFontW(14, 0, 0, 1,0,0, 0,0,0,0,0,0,0, (LPCWSTR)"Arial");
     checkCount = 0;
     startChecking = 0;
     ctxRect = {INT_MAX, INT_MAX, 0, 0};
 }
 
+void CSINPUT::__getEventsGroup()
+{
+    groupMsgPos = GROUPED_EVENTS_ARGS[*parent].size()-1;
+}
+
 void CSINPUT::hide()
 {
-    //HIDEGROUPMSG[*parent][groupId] = 1;
+    CSSECMAN::catchEventsGroup(*parent, groupMsgPos, 0);
+    CSSECMAN::updateSection(*parent);
 }
 void CSINPUT::show()
 {
-    //HIDEGROUPMSG[*parent][groupId] = 0;
+    CSSECMAN::catchEventsGroup(*parent, groupMsgPos, 1);
+    CSSECMAN::updateSection(*parent);
 }
 
 void CSINPUT::newInput(wchar_t*title, wchar_t*defaultText, RECT geometry, int style, int titleRectWidth, int titleRectHeight)
@@ -82,6 +90,7 @@ void CSINPUT::newInput(wchar_t*title, wchar_t*defaultText, RECT geometry, int st
     ipp.titleRectHeight = titleRectHeight;
     ipp.charHeight = (geometry.bottom-2*ymarging)-3;
     
+    ipp.titleFont = CreateFontW(ipp.charHeight, 0, 0, 10,FW_MEDIUM,0, 0,0,0,0,0,0,0, (LPCWSTR)"Book Antiqua");
     ipp.textFont = CreateFontW(ipp.charHeight, 0, 0, 10,FW_MEDIUM,0, 0,0,0,0,0,0,0, (LPCWSTR)"Arial");
 
     //cout<<"how \n";
@@ -162,9 +171,12 @@ void CSINPUT::addChar(wchar_t chr)
 
     SelectBitmap(inp->textDc, inp->textBmp);
     SelectFont(inp->textDc, inp->textFont);
+    //RECT rt = inp->textRect;
+    //drawGdiRectangle(inp->textDc, inp->bkgColor1, inp->borderColor1, {0,0,inp->textDcWidth,inp->charHeight});
 
     SetTextColor(inp->textDc, RGB(inp->textColor1.r,inp->textColor1.g,inp->textColor1.b));
     SetBkColor(inp->textDc,RGB(inp->bkgColor1.r,inp->bkgColor1.g,inp->bkgColor1.b));
+    //SetBkMode(inp->textDc, TRANSPARENT);
 
     wchar_t*str = inp->textChar.toStringW(0,inp->textChar.size()-1);
 
@@ -229,20 +241,22 @@ void CSINPUT::deleteChar(bool frontCaret)
 
         SelectBitmap(inp->textDc, inp->textBmp);
         SelectFont(inp->textDc, inp->textFont);
-
+        //RECT rt = inp->textRect;
+        //drawGdiRectangle(inp->textDc, inp->bkgColor1, inp->borderColor1, {0,0,inp->textDcWidth,inp->charHeight});
+    
         SetTextColor(inp->textDc, RGB(inp->textColor1.r,inp->textColor1.g,inp->textColor1.b));
         SetBkColor(inp->textDc,RGB(inp->bkgColor1.r,inp->bkgColor1.g,inp->bkgColor1.b));
+        //SetBkMode(inp->textDc, TRANSPARENT);
 
         wchar_t*str = inp->textChar.toStringW(0,inp->textChar.size()-1);
         
-        updateActiveTextBkg();
+        //updateActiveTextBkg();
         SetTextCharacterExtra(inp->textDc, inp->charSpacing);
         TextOutW(inp->textDc, 0, 0, str, wcslen(str));
 
 
         free(str);
         //inp->textChar.printAll(L"text : ");
-        //section to view in textRect
         
 
         RECT r = inp->rect;
@@ -268,15 +282,17 @@ void CSINPUT::updateText(int idInput)
     int cx = inp->textRect.right - inp->textRect.left - 4;
     
     RECT r = inp->textRect;
+    //POINT p = {csGraphics::getGraphicAreaInXPos(*parent), csGraphics::getGraphicAreaInYPos(*parent)};
+    POINT p = {0,0};
     int delta = inp->textDcWidth - cx;
     if(delta < 0) 
     {
-        BitBlt(parentDC, r.left+2,r.top,inp->textDcWidth, inp->charHeight, inp->textDc, 0,0, SRCCOPY);
+        BitBlt(parentDC, r.left+2+p.x, r.top+p.y, inp->textDcWidth, inp->charHeight, inp->textDc, 0,0, SRCCOPY);
         inp->showedSectionRect = {0,0,inp->textDcWidth, inp->charHeight};
     }
     else
     {
-        BitBlt(parentDC, r.left+2,r.top,inp->textDcWidth, inp->charHeight, inp->textDc, delta,0, SRCCOPY);
+        BitBlt(parentDC, r.left+2+p.x, r.top+p.y, inp->textDcWidth, inp->charHeight, inp->textDc, delta,0, SRCCOPY);
         inp->showedSectionRect = {delta,0, inp->textDcWidth, inp->charHeight};
     }
 }
@@ -285,21 +301,26 @@ void CSINPUT::highlightActiveChar(RECT r)
 {
     
     CSINPUT::CSINPUT_PARAMS* inp = ip[idActive];
-    if(r.right < inp->textRect.right && r.left > inp->textRect.left)
+    //if(r.right < inp->textRect.right && r.left > inp->textRect.left)
     {
         //r = getFrontEndCharRect(idActive, i);
+        int left = r.left;
+        if(left > inp->textRect.right || left < inp->textRect.left)
+            return;
+
         wchar_t _str[2];
         updateText(idActive);
         updateText(idLastActive);
         SelectFont(parentDC, inp->textFont);
         inp->activeCharRect = r;
+        
         if(inp->caretPos > 1)
         {
             int i = inp->caretPos-1;
             wsprintf(_str, L"%c\0", inp->textChar[i]);
             SetTextColor(parentDC, RGB(inp->activeCharColor.r,inp->activeCharColor.g,inp->activeCharColor.b));
-            SetBkColor(parentDC, RGB(inp->bkgColor2.r,inp->bkgColor2.g,inp->bkgColor2.b));
-            TextOutW(parentDC, r.left-2, r.top, _str, 1);
+            SetBkColor(parentDC, RGB(inp->activeCharBkgColor.r,inp->activeCharBkgColor.g,inp->activeCharBkgColor.b));
+            TextOutW(parentDC, left-2, inp->textRect.top, _str, 1);
             //InvalidateRect(sHandle(*parent), &r, 1);
         }
         if(inp->caretPos < inp->textChar.size())
@@ -307,8 +328,8 @@ void CSINPUT::highlightActiveChar(RECT r)
             int i = inp->caretPos;
             wsprintf(_str, L"%c\0", inp->textChar[i]);
             SetTextColor(parentDC, RGB(inp->activeCharColor.r,inp->activeCharColor.g,inp->activeCharColor.b));
-            SetBkColor(parentDC, RGB(inp->bkgColor2.r,inp->bkgColor2.g,inp->bkgColor2.b));
-            TextOutW(parentDC, r.right-2, r.top, _str, 1);
+            SetBkColor(parentDC, RGB(inp->activeCharBkgColor.r,inp->activeCharBkgColor.g,inp->activeCharBkgColor.b));
+            TextOutW(parentDC, r.right-2, inp->textRect.top, _str, 1);
             //InvalidateRect(sHandle(*parent), &r, 1);
         }
     }
@@ -949,11 +970,11 @@ void CSINPUT::_updateVisual_state1(int idInput, bool noRedrawActiveChar)
     CSRGBA bcol = inp->cntColor1;
     CSRGBA brdcol = inp->cntBorderColor1;
     drawGdiRectangle(inp->cntDc, brdcol, bcol, csRectContextualized(r,r));
-    drawGdiText(inp->cntDc, inp->title, inp->titleFont, inp->titleColor1, csRectContextualized(inp->titleRect,r));
     
     bcol = inp->bkgColor1;
     brdcol = inp->borderColor1;
     drawGdiRectangle(inp->cntDc, brdcol, bcol, csRectContextualized(inp->titleRect,r));
+    drawGdiText(inp->cntDc, inp->title, inp->titleFont, inp->titleColor1, csRectContextualized(inp->titleRect,r));
 
     drawImage(inp->cntDc, inp->incUpImage2, csRectContextualized(inp->upRect, r));
     drawImage(inp->cntDc, inp->incDownImage2, csRectContextualized(inp->downRect, r));
@@ -989,11 +1010,11 @@ void CSINPUT::_updateVisual_state2(int idInput, bool noRedrawActiveChar)
     CSRGBA bcol = inp->cntColor2;
     CSRGBA brdcol = inp->cntBorderColor2;
     drawGdiRectangle(inp->cntDc, brdcol, bcol, csRectContextualized(r,r));
-    drawGdiText(inp->cntDc, inp->title, inp->titleFont, inp->titleColor2, csRectContextualized(inp->titleRect,r));
     
     bcol = inp->bkgColor2;
     brdcol = inp->borderColor2;
     drawGdiRectangle(inp->cntDc, brdcol, bcol, csRectContextualized(inp->titleRect,r));
+    drawGdiText(inp->cntDc, inp->title, inp->titleFont, inp->titleColor2, csRectContextualized(inp->titleRect,r));
 
 
     drawImage(inp->cntDc, inp->incUpImage2, csRectContextualized(inp->upRect, r));
@@ -1064,7 +1085,7 @@ void CSINPUT::mouseMoveEvent(int idInput, POINT p)
 
             idMouseHover = idInput;
 
-            update();
+            //update();
 
             inp->btnUpOn = 0;
             inp->btnDownOn = 0;
@@ -1083,7 +1104,7 @@ void CSINPUT::mouseMoveEvent(int idInput, POINT p)
             inp->cntOn = 0;
             updateVisual_state1(idInput);
 
-            update();
+            //update();
 
             //redraw buttons
             inp->btnUpOn = 1;
@@ -1250,10 +1271,7 @@ void CSINPUT::mouseMoveEvent(int idInput, POINT p)
 void CSINPUT::update()
 {
     RECT r = csGraphics::getViewAreaRect(*parent);
-    if(r.right && r.bottom)
-        InvalidateRect(sHandle(*parent), &r, 1);
-    else
-        update();
+    InvalidateRect(sHandle(*parent), &r, 1);
 }
 
 void CSINPUT::drawGdiRectangle(HDC& dc, CSRGBA col, RECT rect)
@@ -1427,6 +1445,17 @@ void typeString(CSARGS Args)
             psave = p;
             for(int i = 0; i<ipp->getInputsNumber(); i++)
                 ipp->mouseMoveEvent(i, p);
+            
+            // Vérifier périodiquement que le focus est sur la fenêtre enfant et non sur la fenêtre ROOT
+            HWND hwndFocus = GetFocus();
+            HWND hwndTarget = (HWND)Args;
+            HWND hwndRoot = sHandle(0);
+            
+            // Si la fenêtre ROOT a le focus au lieu de la fenêtre enfant, le rediriger
+            if(hwndFocus == hwndRoot && hwndTarget != hwndRoot)
+            {
+                SetFocus(hwndTarget);
+            }
 
             /*ipp->mouseMoveEvent(ipp->checkCount, p);
             
@@ -1468,6 +1497,10 @@ void typeString(CSARGS Args)
         POINT p;
         GetCursorPos(&p);
         ScreenToClient(HWND(Args),&p);
+
+        p.x += csGraphics::getGraphicAreaInXPos(ipp->getId());
+        p.y += csGraphics::getGraphicAreaInYPos(ipp->getId());
+
         int n = ipp->getInputsNumber();
         for(int i=0; i<n; i++)
         {
@@ -1480,9 +1513,44 @@ void typeString(CSARGS Args)
         }
 
         RECT r = ipp->placeCaret(p);  
-        ipp->highlightActiveChar(r);  
- 
-        return; 
+        ipp->highlightActiveChar(r);
+        
+        // Établir le focus de manière fiable pour recevoir WM_CHAR
+        // Le problème était que SetForegroundWindow(sHandle(0)) forçait la fenêtre ROOT
+        // au premier plan, ce qui pouvait voler le focus et empêcher WM_CHAR d'arriver
+        HWND hwndTarget = (HWND)Args;
+        HWND hwndForeground = GetForegroundWindow();
+        
+        // Si la fenêtre cible n'a pas le focus, l'établir correctement
+        if(hwndTarget != hwndForeground)
+        {
+            DWORD dwThreadId = GetCurrentThreadId();
+            DWORD dwForegroundThreadId = hwndForeground ? GetWindowThreadProcessId(hwndForeground, NULL) : 0;
+            
+            // Attacher les threads d'entrée si nécessaire pour permettre le changement de focus
+            // Cela est nécessaire quand le focus est dans un autre thread
+            if(dwThreadId != dwForegroundThreadId && hwndForeground != NULL)
+            {
+                AttachThreadInput(dwForegroundThreadId, dwThreadId, TRUE);
+                SetForegroundWindow(hwndTarget);
+                SetFocus(hwndTarget);
+                AttachThreadInput(dwForegroundThreadId, dwThreadId, FALSE);
+            }
+            else
+            {
+                // Ne pas forcer la fenêtre ROOT au premier plan si ce n'est pas nécessaire
+                // Cela peut interférer avec le focus et empêcher WM_CHAR
+                SetForegroundWindow(hwndTarget);
+                SetFocus(hwndTarget);
+            }
+        }
+        else
+        {
+            // La fenêtre a déjà le focus, s'assurer qu'elle peut recevoir les messages clavier
+            SetFocus(hwndTarget);
+        }
+        
+        //return; 
     }
     if(msg == WM_KEYDOWN)
     {
@@ -1516,20 +1584,65 @@ void typeString(CSARGS Args)
             }
             return;
         }
+        
+        // Traiter aussi les caractères imprimables dans WM_KEYDOWN comme fallback
+        // car WM_CHAR peut ne pas être généré si le focus change
+        // Vérifier d'abord que la fenêtre a le focus
+        HWND hwndFocus = GetFocus();
+        HWND hwndTarget = (HWND)Args;
+        HWND hwndRoot = sHandle(0);
+        
+        // Si la fenêtre ROOT a le focus au lieu de la fenêtre enfant, le rediriger
+        if(hwndFocus == hwndRoot && hwndTarget != hwndRoot)
+        {
+            SetFocus(hwndTarget);
+            hwndFocus = hwndTarget;
+        }
+        
+        // Traiter les caractères imprimables seulement si la fenêtre a le focus
+        if(hwndFocus == hwndTarget || hwndFocus == GetParent(hwndTarget))
+        {
+            BYTE keyboardState[256];
+            GetKeyboardState(keyboardState);
+            
+            // Convertir le code de touche virtuel en caractère Unicode
+            wchar_t buffer[2] = {0};
+            int result = ToUnicode(wp, MapVirtualKey(wp, MAPVK_VK_TO_VSC), keyboardState, buffer, 2, 0);
+            
+            if(result > 0 && buffer[0] >= 32 && buffer[0] != 127) // Caractère imprimable
+            {
+                ipp->addChar(buffer[0]);
+                return;
+            }
+        }
+        
         //return;
     }
     if(msg == WM_CHAR )
     {
-        /*ip->textChar.insertAt(wp,ip->caretPos);
-        ip->caretPos++;*/
-
-        if(wp != 8 && wp != 13)
+        // Vérifier que la fenêtre a toujours le focus
+        HWND hwndFocus = GetFocus();
+        HWND hwndTarget = (HWND)Args;
+        HWND hwndRoot = sHandle(0);
+        
+        // Si la fenêtre ROOT a le focus au lieu de la fenêtre enfant, le rediriger
+        if(hwndFocus == hwndRoot && hwndTarget != hwndRoot)
         {
-            ipp->addChar(wp);
+            SetFocus(hwndTarget);
+            hwndFocus = hwndTarget;
         }
+        
+        // Traiter le caractère seulement si la fenêtre a le focus
+        if(hwndFocus == hwndTarget || hwndFocus == GetParent(hwndTarget))
+        {
+            if(wp != 8 && wp != 13)
+            {
+                ipp->addChar(wp);
+            }
 
-        if((TIMER_POINT.x == pmouse.x && TIMER_POINT.y == pmouse.y))
-            ipp->mouseMoveEvent(ipp->getActive(), psave);
+            if((TIMER_POINT.x == pmouse.x && TIMER_POINT.y == pmouse.y))
+                ipp->mouseMoveEvent(ipp->getActive(), psave);
+        }
         //ip->textChar.printAll(L"text : ");
         //return;
     }
@@ -1630,6 +1743,7 @@ CSINPUT* csNewInputContext(int*id)
     inp->init(id);
 
     addAction(*id, typeString, 1, inp);
+    inp->__getEventsGroup();
     
     return inp;
 }
@@ -1647,17 +1761,18 @@ void templateInput(CSINPUT*& inp, RECT geometry)
 
 extern float geomCoef;
 
-int* inputContextExample(int idp)
+CSINPUT* inputContextExample(int idp)
 {
-    int id = createSection(idp, {5/geomCoef,30/geomCoef,(sRectClient(idp).right-10)/geomCoef, (sRectClient(idp).bottom-30)/geomCoef},  RGB(20,20,20), {0});
+    RECT r = sRectClient(idp);
+    int id = createSection(idp, {5/geomCoef,30/geomCoef,(r.right-10)/geomCoef, (r.bottom-30)/geomCoef},  RGB(20,20,20), {0});
     CSBIND_GEOM_PARAMS bd = {id, {-1,-1,1,1}, {BIND_DEST_RIGHT_EDGE, BIND_DEST_BOTTOM_EDGE,
         BIND_DEST_RIGHT_EDGE, BIND_DEST_BOTTOM_EDGE}};
     bindGeometry(idp, bd);
 
-    CSSCROLLBAR hscrollAbout = CSUIOBJECTS::addHScrollBar(&id, &id, 0, 10);
+    /*CSSCROLLBAR hscrollAbout = CSUIOBJECTS::addHScrollBar(&id, &id, 0, 10);
     CSSCROLLBAR vscrollAbout = CSUIOBJECTS::addVScrollBar(&id, &id, 0, 10);
     hscrollAbout.setViewFrameBottomMarging(20);
-    vscrollAbout.setViewFrameRightMarging(20);
+    vscrollAbout.setViewFrameRightMarging(20);*/
 
     csGraphics::setGraphicAreaSize(id, {GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)});
     csGraphics::setGraphicAreaPosition(id, {0,0});
@@ -1668,14 +1783,14 @@ int* inputContextExample(int idp)
 
     int* idptr = new int(id);
     CSINPUT* inp = csNewInputContext(idptr);
-inp->hide();
 
-    int leftpos = 10, height = 26, topMarg = 10;
-    for(int i=0; i<30; i++)
-        templateInput(inp, {leftpos,topMarg+i*(height+5), (sRectClient(idp).right-55),height});
+//inp->hide();
 
-inp->show();
+    int leftpos = 5, height = 26, topMarg = 10;
+    for(int i=0; i<40; i++)
+        templateInput(inp, {leftpos,topMarg+i*(height+5), (r.right-20),height});
 
-    //addAction(id, typeString, 1, inp);
-    return idptr;
+//inp->show();
+
+    return inp;
 }

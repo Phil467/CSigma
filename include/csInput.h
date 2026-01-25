@@ -65,9 +65,10 @@ class CSINPUT
                 , withItemRollup(false)
                 , withHistoryRollup(false)
                 , incPos(0)
-                , activeCharColor{255,255,255}
+                , activeCharColor{0,0,0}
+                , activeCharBkgColor{220,220,220}
                 , cntColor1{10,10,10}, cntBorderColor1{40,40,40}
-                , bkgColor1{20,20,20}, borderColor1{80,80,80}
+                , bkgColor1{20,20,20}, borderColor1{30,30,30}
                 , textColor1{150,150,150}, titleColor1{150,150,150}
                 , cntColor2{30,30,30}, cntBorderColor2{150,150,150}
                 , bkgColor2{40,40,40}, borderColor2{100,100,100}
@@ -125,6 +126,7 @@ class CSINPUT
                 , withHistoryRollup(other.withHistoryRollup)
                 , incPos(other.incPos)
                 , activeCharColor(other.activeCharColor)
+                , activeCharBkgColor{other.activeCharBkgColor}
                 , cntColor1(other.cntColor1), cntBorderColor1(other.cntBorderColor1)
                 , bkgColor1(other.bkgColor1), borderColor1(other.borderColor1)
                 , textColor1(other.textColor1), titleColor1(other.titleColor1)
@@ -236,7 +238,7 @@ class CSINPUT
             wchar_t* incUpImage4, incDownImage4, undoImage4, redoImage4;*/
             int incPos;
 
-            CSRGBA activeCharColor;
+            CSRGBA activeCharColor, activeCharBkgColor;
 
             CSRGBA cntColor1, cntBorderColor1;// normal
             CSRGBA bkgColor1, borderColor1;
@@ -328,6 +330,7 @@ class CSINPUT
     void show();
     HDC getStackDC();
     void updateStackDC();
+    void __getEventsGroup();
 
     protected:
     CSLINEAR_BIND* CSLINEAR_BIND_PTR(CSLINEAR_BIND lb);
@@ -349,10 +352,12 @@ class CSINPUT
     RECT ctxRect;
     CSLINEAR_BIND* gbpCtx = 0;
 
+    int groupMsgPos;
+
     vector<CSINPUT_PARAMS*> ip;
 };
 
 CSINPUT* csNewInputContext(int*id);
-int* inputContextExample(int idp);
+CSINPUT* inputContextExample(int idp);
 
 #endif // CSINPUT_H
