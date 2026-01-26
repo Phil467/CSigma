@@ -33,7 +33,12 @@ extern vector<int> viewedAreaBottomMarging;
 extern vector<RECT> bltRect;
 extern vector<float> hZoom;
 extern vector<float> vZoom;
+extern vector<float> hZoomOld;
+extern vector<float> vZoomOld;
 extern vector<BYTE> mouseWheelPreference;
+
+extern vector<bool> ZOOMING;
+extern vector<POINT> ZOOMING_POINT;
 
 extern vector<bool> halftoneMode;
 
@@ -149,9 +154,9 @@ void parentResize(CSARGS Args)
     }
 }
 
-CSSCROLLBAR::CSSCROLLBAR(int idp, RECT geometry, int sctype, bool orientation)
+CSSCROLLBAR::CSSCROLLBAR(int idp, int thick, RECT geometry, int sctype, bool orientation)
 {
-    init(idp, geometry, sctype, orientation);
+    init(idp, thick ,geometry, sctype, orientation);
 }
 
 void CSSCROLLBAR::update()
@@ -207,16 +212,13 @@ void CSSCROLLBAR::setEdge(int edge)
         *vEdge = edge;
 }
 
-void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
+void CSSCROLLBAR::init(int _idp, int _thick, RECT geometry, int _sctype, bool orientation)
 {
     idp = _idp;
     id = csAlloc<int>(1,0);
     idc = csAlloc<int>(1,0);
     idMask = csAlloc<int>(1,0);
-    if(orientation == CS_SBAR_HORIZONTAL)
-        width = csAlloc<int>(1,geometry.bottom*geomCoef);
-    else
-        width = csAlloc<int>(1,geometry.right*geomCoef);
+    width = csAlloc<int>(1,_thick*geomCoef);
     orient = csAlloc<bool>(1,orientation);
     scType = csAlloc<int>(1,_sctype);
     tLength = csAlloc<int>(1,0);
@@ -328,10 +330,10 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
     if(orientation == CS_SBAR_HORIZONTAL)
     {
         int edge = *hEdge;
-        int thick = geometry.bottom*geomCoef;
+        int thick = _thick*geomCoef;
         int t2 = thick;
-        //*id = CSSECMAN::createSection(_idp, {edge/geomCoef, (cy - edge - thick)/geomCoef, (cx - 2*edge - thick)/geomCoef, thick/geomCoef},  RGB(200,200,200), {0,0,0,0});
-        *id = CSSECMAN::createSection(_idp, geometry,  RGB(200,200,200), {0,0,0,0});
+        *id = CSSECMAN::createSection(_idp, {edge/geomCoef, (cy - edge - thick)/geomCoef, (cx - 2*edge - thick)/geomCoef, _thick},  RGB(200,200,200), {0,0,0,0});
+        //*id = CSSECMAN::createSection(_idp, geometry,  RGB(200,200,200), {0,0,0,0});
         cursor[*id] = LoadCursor(0,IDC_SIZEWE);
         
         hdStackContext[*id] = CreateCompatibleDC(hdcontext[_idp]);
@@ -364,10 +366,11 @@ void CSSCROLLBAR::init(int _idp, RECT geometry, int _sctype, bool orientation)
     else
     {
         int edge = *vEdge;
-        int thick = geometry.right*geomCoef;
+        int thick = _thick*geomCoef;
         int t2 = thick;
-        //*id = CSSECMAN::createSection(_idp, {(cx - edge - thick)/geomCoef, edge/geomCoef, thick/geomCoef, (cy - 2*edge - thick)/geomCoef},  RGB(200,200,200), {0,0,0,0});
-        *id = CSSECMAN::createSection(_idp, geometry,  RGB(200,200,200), {0,0,0,0});
+        *id = CSSECMAN::createSection(_idp, {(cx - edge - thick)/geomCoef, edge/geomCoef, _thick, (cy - 2*edge - thick)/geomCoef},  RGB(200,200,200), {0,0,0,0});
+        //*id = CSSECMAN::createSection(_idp, geometry,  RGB(200,200,200), {0,0,0,0});
+        RECTCL[*id].right = _thick;
         hdStackContext[*id] = CreateCompatibleDC(hdcontext[_idp]);
         hStackBmp[*id] = CreateCompatibleBitmap(hdcontext[_idp], thick, GetSystemMetrics(SM_CYSCREEN));
         SelectBitmap(hdStackContext[*id], hStackBmp[*id]);
@@ -743,6 +746,7 @@ void autoRepos(CSARGS Args)
 
     int cx = *(int*)Args[19];
     int cy = *(int*)Args[20];
+    RECT rg = *(RECT*)Args[26];
 
     if(RECTCL[idp].right != cx || RECTCL[idp].bottom != cy)
     {
@@ -761,21 +765,34 @@ void autoRepos(CSARGS Args)
             int edge = *(int*)Args[24];
 
             int a = withVScroll[idp] ? thick : 0;
-            MoveWindow(SECTION[id], r.left + edge, cy + edge - thick, 
-                                            cx - r.left - 2*edge - a, thick, 1);
+            int l = cy + edge - thick + rg.top;
+            int b = cx - r.left - 2*edge - a + rg.right;
+
+            if(rg.top > 0) l = rg.top;
+            if(rg.right > 0) b = rg.right;
+
+            MoveWindow(SECTION[id], r.left + edge, l, 
+                                            b, thick, 1);
         }
         else if(orientation == CS_SBAR_VERTICAL)
         {
             int thick = RECTCL[id].right;
             int edge = *(int*)Args[25];
+            int l = cx + edge - thick + rg.left;
+            int b = cy - r.top - 2*edge + rg.bottom;
 
-            MoveWindow(SECTION[id], cx + edge - thick, r.top + edge,  
-                                            thick, cy - r.top - 2*edge, 1);
+            if(rg.left > 0) l = rg.left;
+            if(rg.bottom > 0) b = rg.bottom;
+
+            MoveWindow(SECTION[id], l, r.top + edge,  
+                                            thick, b, 1);
          }
          *(int*)Args[19] = cx;
          *(int*)Args[20] = cy;
     }
 } 
+
+
 void autoRepos_parentContext(CSARGS Args)
 {
     //int idp = int(Args);
@@ -806,7 +823,7 @@ void autoRepos_parentContext(CSARGS Args)
         {
             int thick = RECTCL[idScroll].right;
             int edge = *(int*)Args[3];
-cout<<"rtop = "<<r.top<<"\n";
+
             MoveWindow(SECTION[idScroll], cx - r.left - edge - thick, r.top + edge,  
                                             thick, cy - r.top*- 2*edge, 1);
         }
@@ -1368,31 +1385,25 @@ void mouseWheel(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, int idc)
                 InvalidateRect(hwnd, &bltRect[idc], 1);
             }
             
-            if((!a && !b) && mouseWheelPreference[idc] == CS_MOUSEWHEEL_ZOOM)
+            if(hdStackContext[idc] && (!a && !b) && mouseWheelPreference[idc] == CS_MOUSEWHEEL_ZOOM)
             {//halftoneMode[idc] = 0;
+                // Sauvegarder les anciens zooms avant de les modifier
+                // pour permettre le calcul du zoom vers un point précis
+                hZoomOld[idc] = hZoom[idc];
+                vZoomOld[idc] = vZoom[idc];
+                
+                ZOOMING[idc] = 1;
                 POINT pt = TIMER_POINT;
                 ScreenToClient(SECTION[idc], &pt);
                 if(withHScroll[idc] && hZoom[idc] <= zoomParams[idc].hmax)
                 {
                     hZoom[idc] += 0.05;
-
-                    // zoom to cursor
-                    /*pt.x -= hdcontextExtOutPos[idc].x;
-                    long dx = 1.0*((bltRect[idc].right-bltRect[idc].left-hdcontextExtOutPos[idc].x)/2 - pt.x)*hZoom[idc];
-                    hdcontextExtInPos[idc].x = -dx;*/
-                    //cout<<" dx = "<<dx<<"\n";
                     if(withHScroll[idc])
                         PostMessage(SECTION[withHScroll[idc]], WM_SIZE, 0,0);
                 }
                 if(withVScroll[idc] && vZoom[idc] <= zoomParams[idc].vmax)
                 {
                     vZoom[idc] += 0.05;
-
-                    // zoom to cursor
-                    /*pt.y -= hdcontextExtOutPos[idc].y;
-                    long dy = 1.0*((bltRect[idc].bottom-bltRect[idc].top-hdcontextExtOutPos[idc].y)/2 - pt.y)*vZoom[idc];
-                    hdcontextExtInPos[idc].y = -dy;*/
-
                     if(withVScroll[idc])
                         PostMessage(SECTION[withVScroll[idc]], WM_SIZE, 0,0);
                 }
@@ -1434,36 +1445,27 @@ void mouseWheel(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, int idc)
                 InvalidateRect(hwnd, &bltRect[idc], 1);
             }
 
-            if((!a && !b) && mouseWheelPreference[idc] == CS_MOUSEWHEEL_ZOOM)
+            if(hdStackContext[idc] && (!a && !b) && mouseWheelPreference[idc] == CS_MOUSEWHEEL_ZOOM)
             {//halftoneMode[idc] = 0;
+                // Sauvegarder les anciens zooms avant de les modifier
+                // pour permettre le calcul du zoom vers un point précis
+                hZoomOld[idc] = hZoom[idc];
+                vZoomOld[idc] = vZoom[idc];
+                
+                ZOOMING[idc] = 1;
                 POINT pt = TIMER_POINT;
                 ScreenToClient(SECTION[idc], &pt);
                 if(withHScroll[idc] && hZoom[idc] >= zoomParams[idc].hmin)
                 {
                     hZoom[idc] -= 0.05;
-
-                    // zoom to cursor
-
-                    /*pt.x -= hdcontextExtOutPos[idc].x;
-                    long dx = 1.0*((bltRect[idc].right-bltRect[idc].left-hdcontextExtOutPos[idc].y)/2 - pt.x)*hZoom[idc];
-                    hdcontextExtInPos[idc].x = -dx;*/
-
                     if(withHScroll[idc])
                         PostMessage(SECTION[withHScroll[idc]], WM_SIZE, 0,0);
                 }
                 if(/*withVScroll[idc] && */vZoom[idc] >= zoomParams[idc].vmin)
                 {
                     vZoom[idc] -= 0.05;
-                    
-                    // zoom to cursor
-
-                    /*pt.y -= hdcontextExtOutPos[idc].y;
-                    long dy = 1.0*((bltRect[idc].bottom-bltRect[idc].top-hdcontextExtOutPos[idc].y)/2 - pt.y)*vZoom[idc];
-                    hdcontextExtInPos[idc].y = -dy;*/
-                    
                     if(withVScroll[idc])
                         PostMessage(SECTION[withVScroll[idc]], WM_SIZE, 0,0);
-
                 }
                 InvalidateRect(SECTION[idc], &bltRect[idc], 1);
             }

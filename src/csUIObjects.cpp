@@ -33,14 +33,14 @@ CSSCROLLBAR CSUIOBJECTS::addHScrollBar(int* idp, int* idClient, int* idMask, int
     int*idc = idClient;
     if(!idc) idc = idp;
     
-    RECT g = {
+    /*RECT g = {
                 geometry.left, 
                 (geometry.top ? geometry.top : r.bottom-thick), 
                 (geometry.right ? geometry.right : r.right-geometry.left),
                 (geometry.bottom ? geometry.bottom : thick)
-            };
+            };*/
 
-    CSSCROLLBAR hscroll(*idp, g);
+    CSSCROLLBAR hscroll(*idp, thick, geometry);
 
     if(idMask)
     {
@@ -64,15 +64,15 @@ CSSCROLLBAR CSUIOBJECTS::addVScrollBar(int* idp, int* idClient, int* idMask, int
     int*idc = idClient;
     if(!idc) idc = idp;
 
-    RECT g = {
-                /*(geometry.left ? geometry.left : r.right-thick)*/geometry.left+r.right-thick,
+    /*RECT g = {
+                geometry.left+r.right-thick,
                 geometry.top,
                 (geometry.right ? geometry.right : thick), 
                 (geometry.bottom ? geometry.bottom : r.bottom-geometry.top)
     
-             };
+             };*/
 
-    CSSCROLLBAR vscroll(*idp, g, 1, CS_SBAR_VERTICAL);
+    CSSCROLLBAR vscroll(*idp, thick, geometry, 1, CS_SBAR_VERTICAL);
 
     if(idMask)
     {

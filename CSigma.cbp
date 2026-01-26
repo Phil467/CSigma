@@ -71,8 +71,6 @@
 		<Unit filename="include/csGraphics.h" />
 		<Unit filename="include/csInput.h" />
 		<Unit filename="include/csLIST.h" />
-		<Unit filename="include/csLISTBOX.h" />
-		<Unit filename="include/csListBoxMin.h" />
 		<Unit filename="include/csMenu.h" />
 		<Unit filename="include/csParallelTask/csPARALLEL.h" />
 		<Unit filename="include/csParallelTask/csPARGS.h" />
@@ -85,6 +83,7 @@
 		<Unit filename="include/csTypes.h" />
 		<Unit filename="include/csUIFx.h" />
 		<Unit filename="include/csUIObjects.h" />
+		<Unit filename="include/csUniformListBox.h" />
 		<Unit filename="include/csUtils.h" />
 		<Unit filename="include/readwfile.h" />
 		<Unit filename="main.cpp" />
@@ -93,8 +92,6 @@
 		<Unit filename="src/csGraphics.cpp" />
 		<Unit filename="src/csInput.cpp" />
 		<Unit filename="src/csLIST.cpp" />
-		<Unit filename="src/csLISTBOX.cpp" />
-		<Unit filename="src/csListBoxMin.cpp" />
 		<Unit filename="src/csMenu.cpp" />
 		<Unit filename="src/csScrollBar.cpp" />
 		<Unit filename="src/csSection.cpp" />
@@ -103,6 +100,7 @@
 		<Unit filename="src/csTranslator.cpp" />
 		<Unit filename="src/csUIFx.cpp" />
 		<Unit filename="src/csUIObjects.cpp" />
+		<Unit filename="src/csUniformListBox.cpp" />
 		<Unit filename="src/csUtils.cpp" />
 		<Extensions />
 	</Project>

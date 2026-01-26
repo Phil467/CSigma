@@ -17,8 +17,8 @@ class CSSCROLLBAR
             float before, after;
         }csSB_PROPORTION;
         
-        CSSCROLLBAR(int idp=0, RECT geometry={0}, int sctype = CS_SBAR_SURFACE, bool orientation=CS_SBAR_HORIZONTAL);
-        void init(int idp=0, RECT geometry={0}, int sctype = CS_SBAR_SURFACE, bool orientation=CS_SBAR_HORIZONTAL);
+        CSSCROLLBAR(int idp=0, int thick=10, RECT geometry={0}, int sctype = CS_SBAR_SURFACE, bool orientation=CS_SBAR_HORIZONTAL);
+        void init(int idp=0, int thick=10, RECT geometry={0}, int sctype = CS_SBAR_SURFACE, bool orientation=CS_SBAR_HORIZONTAL);
         virtual ~CSSCROLLBAR();
         void update();
         int getId();

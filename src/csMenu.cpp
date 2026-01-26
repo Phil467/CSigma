@@ -18,10 +18,10 @@ void showHideLbm(CSARGS Args);
 
 extern float geomCoef;
 
-void initLbm(CSLISTBOXMIN*& lbm, int nbItem, wchar_t*defltTitle);
+void initLbm(CSUNIFORMLISTBOX*& lbm, int nbItem, wchar_t*defltTitle);
 void hideMenuContainer(CSPARAARGS pArgs);
 
-CSLISTBOXMIN* lastlbm;
+CSUNIFORMLISTBOX* lastlbm;
 
 CSMENU::CSMENU(int _idp, RECT r, bool _autoResize)
 {
@@ -123,9 +123,6 @@ int CSMENU::newGroup(const wchar_t* title, const wchar_t* iconPath1, const wchar
     ID_ACTION = CSSECMAN::addAction(BUTTON, lastMenuItemRepos, 1, bLastMenuItemRepos);
     CSSECMAN::addAction(BUTTON, showHideLbm, 1, lbm[lbmId]);
 
-    
-    
-
     return id;
 }
 
@@ -134,7 +131,7 @@ extern vector<vector<CSARGS>> GROUPED_EVENTS_ARGS;
 
 int CSMENU::newlbm(int* idp, int* idSec, int nbItem, wchar_t*defltTitle)
 {
-    lbm.push_back(csNewMinimalListBoxPtr(idp, 100, 1000));
+    lbm.push_back(newUniformlListBoxPtr(idp, 100, 1000));
     csLIST<RECT> lr;
     lbmItemRectLock.push_back(lr);
     int l = lbm.size()-1;
@@ -157,7 +154,7 @@ int CSMENU::newlbm(int* idp, int* idSec, int nbItem, wchar_t*defltTitle)
     return l;
 }
 
-void initLbm(CSLISTBOXMIN*& lbm, int nbItem, wchar_t*defltTitle)
+void initLbm(CSUNIFORMLISTBOX*& lbm, int nbItem, wchar_t*defltTitle)
 {
     lbm->setDefaultFont(L"calibri",{12,0});
     lbm->setItemAlign(CS_ALIGN_VERTICAL);
@@ -226,7 +223,7 @@ bool CSMENU::newItem(vector<int> _hierarchy, wchar_t* title, wchar_t*iconPath1, 
         vh.push_back(_hierarchy[k]);
     for(int k=i; k<m; k++)
     {
-        /*lbm.push_back(csNewMinimalListBoxPtr(&idPopup[k], 100, 1000));
+        /*lbm.push_back(newUniformlListBoxPtr(&idPopup[k], 100, 1000));
         lbmItemRectLock.push_back(vector<RECT*>());
         idLast = lbm.size()-1;
         initLbm(lbm[idLast], _hierarchy[k]+1);*/
@@ -242,7 +239,7 @@ bool CSMENU::newItem(vector<int> _hierarchy, wchar_t* title, wchar_t*iconPath1, 
         int j = idPopup.size();
         idPopup.push_back(CSSECMAN::createSection(0, {0,0,200,300},  RGB(15,15,15), {0,0,0,0}, 0, 0, 0));
         SetTimer(SECTION[j], 0, 20, 0);
-        /*lbm.push_back(csNewMinimalListBoxPtr(&idPopup[j], 100, 1000));
+        /*lbm.push_back(newUniformlListBoxPtr(&idPopup[j], 100, 1000));
         lbmItemRectLock.push_back(vector<RECT*>());
         hierarchy.push_back({k,_hierarchy[k]});
         idLast = lbm.size()-1;
@@ -285,7 +282,7 @@ void showHideLbm(CSARGS Args)
     static bool b = 0;
     if((UINT)Args == WM_MOUSEHOVER)
     {
-        CSLISTBOXMIN* lbm = (CSLISTBOXMIN*)Args[0];
+        CSUNIFORMLISTBOX* lbm = (CSUNIFORMLISTBOX*)Args[0];
         lbm->show();
         lbm->update();
         if(lastlbm && lbm != lastlbm) lastlbm->hide();

@@ -465,6 +465,105 @@ void CSSECMAN::bindGeometry(int id, CSBIND_GEOM_PARAMS* bgps, int n)
     }
 }
 
+void CSSECMAN::permute(int id1, int id2)
+{
+    cout<<"in\n";
+    int par1 = PARID[id1];
+    int par2 = PARID[id2];
+
+    RECT& rcl1 = RECTCL[id1], &rw1 = RECTWND[id1], &rp1 = RECTPARREF[id1], &rps1 = RECTPARREFSAVED[id1], &rws1 = RECTWNDSAVED[id1];
+    RECT& rcl2 = RECTCL[id2], &rw2 = RECTWND[id2], &rp2 = RECTPARREF[id2], &rps2 = RECTPARREFSAVED[id2], &rws2 = RECTWNDSAVED[id2];
+
+    cout<<"in 0 \n";
+    RECT r = rcl1; rcl1 = rcl2; rcl2 = r;
+    r = rw1; rw1 = rw2; rw2 = r;
+    r = rp1; rp1 = rp2; rp2 = r;
+    r = rps1; rps1 = rps2; rps2 = r;
+    r = rws1; rws1 = rws2; rws2 = r;
+
+    cout<<"in 1\n";
+    int n = lSizeBind.size();
+    for(int i=0; i<n; i++)
+    {
+        int m = lSizeBind[i].size();
+        for(int j=0; j<m; j++)
+        {
+            if(lSizeBind[i][j].id == id1) 
+            lSizeBind[i][j].id = id2;
+            if(lSizeBind[i][j].id == id2)
+            lSizeBind[i][j].id = id1;
+        }
+    }
+
+    cout<<"in 2\n";
+    n = rSizeBind.size();
+    for(int i=0; i<n; i++)
+    {
+        int m = rSizeBind[i].size();
+        for(int j=0; j<m; j++)
+        {
+            if(rSizeBind[i][j].id == id1) 
+            rSizeBind[i][j].id = id2;
+            if(rSizeBind[i][j].id == id2)
+            rSizeBind[i][j].id = id1;
+        }
+    }
+
+    n = tSizeBind.size();
+    for(int i=0; i<n; i++)
+    {
+        int m = tSizeBind[i].size();
+        for(int j=0; j<m; j++)
+        {
+            if(tSizeBind[i][j].id == id1) 
+            tSizeBind[i][j].id = id2;
+            if(tSizeBind[i][j].id == id2)
+            tSizeBind[i][j].id = id1;
+        }
+    }
+
+    n = bSizeBind.size();
+    for(int i=0; i<n; i++)
+    {
+        int m = bSizeBind[i].size();
+        for(int j=0; j<m; j++)
+        {
+            if(bSizeBind[i][j].id == id1) 
+            bSizeBind[i][j].id = id2;
+            if(bSizeBind[i][j].id == id2)
+            bSizeBind[i][j].id = id1;
+        }
+    }
+    
+    cout<<"in 3\n";
+    vector<BIND_DIM_GEOM_PARAMS> v = bSizeBind[id1];
+    bSizeBind[id1] = bSizeBind[id2];
+    bSizeBind[id2] = v;
+    
+    v = rSizeBind[id1];
+    rSizeBind[id1] = rSizeBind[id2];
+    rSizeBind[id2] = v;
+
+    v = tSizeBind[id1];
+    tSizeBind[id1] = tSizeBind[id2];
+    tSizeBind[id2] = v;
+
+    v = bSizeBind[id1];
+    bSizeBind[id1] = bSizeBind[id2];
+    bSizeBind[id2] = v;
+
+    /*cout<<"in 4\n";
+    CSSECMAN::detach(id1);
+    CSSECMAN::detach(id2);
+    cout<<"in 4\n";
+    CSSECMAN::attach(id2, par1);
+    CSSECMAN::attach(id1, par2);*/
+    MoveWindow(SECTION[id1], rps1.left, rps1.top, rps1.right-rps1.left, rps1.bottom-rps1.top, 1);
+    MoveWindow(SECTION[id2], rps2.left, rps2.top, rps2.right-rps2.left, rps2.bottom-rps2.top, 1);
+
+    cout<<"out\n";
+}
+
 void CSSECMAN::bindGeometry(int id, int n, ...)
 {
     va_list adArgs ;

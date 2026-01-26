@@ -2,7 +2,7 @@
 #define CSMENU_H
 
 #include "csSection.h"
-#include "csListBoxMin.h"
+#include "csUniformListBox.h"
 #include "csStrUtils.h"
 
 class CSMENU
@@ -29,13 +29,13 @@ class CSMENU
         vector<int> *idSection;
         CSTEXT textPar;
         bool* bLastMenuItemRepos;
-        vector<CSLISTBOXMIN*> lbm;
-        vector<CSLISTBOXMIN**> lbmOfHierarchy;
+        vector<CSUNIFORMLISTBOX*> lbm;
+        vector<CSUNIFORMLISTBOX**> lbmOfHierarchy;
         vector<vector<int>> hierarchy;
         vector<csLIST<RECT>> lbmItemRectLock;
         vector<CSPARAARGS*> lpargs;
         int selectedItem;
-        
+
 };
 
 

@@ -128,6 +128,11 @@ vector<int> ICONID;
 
 vector<bool> layeredStyle;
 
+vector<bool> ZOOMING; // savoir si on zoom sur la section
+vector<POINT> ZOOMING_POINT; // permet a une section de transferer une action de zoom a une autre
+vector<float> hZoomOld; // ancien zoom horizontal pour calculer le zoom vers un point
+vector<float> vZoomOld; // ancien zoom vertical pour calculer le zoom vers un point
+
 extern bool __translateTitles();
 extern bool __translateTips();
 
@@ -302,6 +307,11 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
 
     updateTitleSectionBool.push_back(0);
     zoomParams.push_back({0.2, 15, 0.2, 15, 1, 1, 100, {GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)}});
+
+    ZOOMING.push_back(0);
+    ZOOMING_POINT.push_back({-1});
+    hZoomOld.push_back(1.0f); // Initialiser avec le zoom initial
+    vZoomOld.push_back(1.0f); // Initialiser avec le zoom initial
 
     HWND par = id < 0 ? 0 : SECTION[id];
 
@@ -1287,9 +1297,60 @@ void _blitExtDc(int id)
                 SetStretchBltMode(hdStackContext[id], COLORONCOLOR);
 
             _blitEntities(id);
-            StretchBlt(hdStackContext[id],pout.x,pout.y,bltRect[id].right, bltRect[id].bottom,
-                        hdcontextExt[id], pin.x + zoomParams[id].focus.x, pin.y + zoomParams[id].focus.y,
-                        bltRect[id].right/hZoom[id], bltRect[id].bottom/vZoom[id], SRCCOPY);
+
+            int _cx = bltRect[id].right-bltRect[id].left;
+            int _cy = bltRect[id].bottom-bltRect[id].top;
+            float cx = (_cx)/hZoom[id];
+            float cy = (_cy)/vZoom[id];
+
+            POINT pt = pin; // Par défaut, utiliser la position actuelle
+            
+            if(ZOOMING[id])
+            {
+                // Calculer le point de zoom (soit depuis le curseur, soit depuis ZOOMING_POINT)
+                POINT zoomPoint;
+                if(ZOOMING_POINT[id].x == -1 || ZOOMING_POINT[id].y == -1)
+                {
+                    // Utiliser la position du curseur
+                    GetCursorPos(&zoomPoint);
+                    ScreenToClient(sHandle(id), &zoomPoint);
+                }
+                else
+                {
+                    // Utiliser le point spécifié
+                    zoomPoint = ZOOMING_POINT[id];
+                }
+                
+                // Convertir le point de zoom de l'espace écran vers l'espace source
+                // Position relative dans la zone de blit
+                float screenRelX = (float)(zoomPoint.x - bltRect[id].left - pout.x);
+                float screenRelY = (float)(zoomPoint.y - bltRect[id].top - pout.y);
+                
+                // Position du point dans l'espace source avec l'ancien zoom
+                float sourcePointX = screenRelX / hZoomOld[id] + pin.x;
+                float sourcePointY = screenRelY / vZoomOld[id] + pin.y;
+                
+                // Calculer la nouvelle position pin pour que le point reste au même endroit visuel
+                // avec le nouveau zoom
+                pt.x = (long)(sourcePointX - screenRelX / hZoom[id]);
+                pt.y = (long)(sourcePointY - screenRelY / vZoom[id]);
+                
+                // Mettre à jour les anciens zooms pour le prochain changement
+                hZoomOld[id] = hZoom[id];
+                vZoomOld[id] = vZoom[id];
+                
+                ZOOMING[id] = 0;
+            }
+            else
+            {
+                // Mettre à jour les anciens zooms même si on ne zoome pas
+                // (au cas où le zoom aurait changé ailleurs)
+                hZoomOld[id] = hZoom[id];
+                vZoomOld[id] = vZoom[id];
+            }
+
+            StretchBlt(hdStackContext[id],pout.x,pout.y,_cx, _cy, hdcontextExt[id], pt.x, pt.y, cx, cy, SRCCOPY);
+            hdcontextExtInPos[id] = pt;
         }
     }
 
@@ -1845,3 +1906,4 @@ void sizeMoveAll(int _id, bool automatic, SIZE _deltaSize, POINT _deltaPos)
     if(updateAfterResizeMsg[_id])
         InvalidateRect(SECTION[_id], 0, 1);
 }
+

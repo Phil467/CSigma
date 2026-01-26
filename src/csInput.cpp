@@ -1283,6 +1283,12 @@ void CSINPUT::mouseMoveEvent(int idInput, POINT p)
 void CSINPUT::update()
 {
     RECT r = csGraphics::getViewAreaRect(*parent);
+    //r.left -= 10; r.top -= 10; r.right += 10; r.bottom += 10;
+    /*RECT r = ip[idMouseHover]->rect;
+    r.left -= 20; r.top -= 20; r.right += 20; r.bottom += 20;
+    InvalidateRect(sHandle(*parent), &r, 1);
+    r = ip[idLastMouseHover]->rect;
+    r.left -= 20; r.top -= 20; r.right += 20; r.bottom += 20;*/
     InvalidateRect(sHandle(*parent), &r, 1);
 }
 
@@ -1556,21 +1562,49 @@ void typeString(CSARGS Args)
        
     }
 
+    static int count_ = 20;
     if(msg == WM_SIZE)
     {
-        //if(ipp->startGBP == 0 && APP_CREATED)
+        int n = ipp->getInputsNumber();
+        ipp->updateBackground();
+        RECT r = csGraphics::getViewAreaRect(ipp->getId());
+        int _a = r.left + csGraphics::getGraphicAreaInXPos(ipp->getId());
+        int _b = r.top + csGraphics::getGraphicAreaInYPos(ipp->getId());
+        int a = r.right - r.left + csGraphics::getGraphicAreaInXPos(ipp->getId());
+        int b = r.bottom - r.top + csGraphics::getGraphicAreaInYPos(ipp->getId());
+        for(int i = 0; i<n; i++)
         {
-            //ipp->startGBP = 1;
+            RECT r2 = ipp->getInputParams(i)->rect;
+            if(!(r2.left > a || r2.top > b || r2.right < _a || r2.bottom < _b))
+            ipp->updateGeometry(i);
+        }
+        ipp->update();
+
+        count_ = 20;
+        return;
+    }
+
+    if(msg == WM_TIMER && WPARAM(Args) == 0)
+    {
+        
+        if(count_ != 0)
+        count_--;
+
+        if(count_ == 2)
+        {
             int n = ipp->getInputsNumber();
-            ipp->updateBackground();
             for(int i = 0; i<n; i++)
             {
+                RECT r2 = ipp->getInputParams(i)->rect;
                 ipp->updateGeometry(i);
             }
-            ipp->update();
-            //updateGeometryThread(Args);
+            RECT r = {csGraphics::getGraphicAreaXPos(ipp->getId()), 
+                csGraphics::getGraphicAreaYPos(ipp->getId()),
+                csGraphics::getGraphicAreaXSize(ipp->getId()) + csGraphics::getGraphicAreaXPos(ipp->getId()),
+                csGraphics::getGraphicAreaYSize(ipp->getId()) + csGraphics::getGraphicAreaYPos(ipp->getId())};
+            InvalidateRect(sHandle(ipp->getId()), &r, 1);
+            count_ = 0;
         }
-        return;
     }
 
 }
@@ -1664,8 +1698,8 @@ void templateInput(CSINPUT*& inp, RECT geometry)
     inp->newInput((wchar_t*)(wstring(L"input ")+to_wstring(inp->getInputsNumber()+1)).c_str(),L"0",geometry, 0, 50, 10);
     inp->addOpenFolderButton(-1,L"resources/img/Folder.bmp",L"resources/img/Folder2.bmp",0,0);
     inp->addUnrollButton(-1,L"resources/img/Hide.bmp",L"resources/img/Hide2.bmp",0,0);
-    inp->addUndoRedoButtons(-1,L"resources/img/ArrPrev.bmp",L"resources/img/ArrPrev2.bmp",0,0, L"resources/img/ArrNext.bmp",L"resources/img/ArrNext2.bmp",0,0);
-    inp->addIncrementButtons(-1,L"resources/img/ArrUp.bmp",L"resources/img/ArrUp2.bmp",0,0, L"resources/img/ArrDown.bmp",L"resources/img/ArrDown2.bmp",0,0);
+    //inp->addUndoRedoButtons(-1,L"resources/img/ArrPrev.bmp",L"resources/img/ArrPrev2.bmp",0,0, L"resources/img/ArrNext.bmp",L"resources/img/ArrNext2.bmp",0,0);
+    //inp->addIncrementButtons(-1,L"resources/img/ArrUp.bmp",L"resources/img/ArrUp2.bmp",0,0, L"resources/img/ArrDown.bmp",L"resources/img/ArrDown2.bmp",0,0);
     inp->setGBP(-1,0,0,2,0);
 }
 
@@ -1684,9 +1718,9 @@ CSINPUT* inputContextExample(int idp)
     hscrollAbout.setViewFrameBottomMarging(20);
     vscrollAbout.setViewFrameRightMarging(20);*/
 
-    csGraphics::setGraphicAreaSize(idp, {GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)});
-    csGraphics::setGraphicAreaPosition(idp, {2,20});
+    csGraphics::setGraphicAreaPosition(idp, {2,5});
     csGraphics::setGraphicAreaColor(idp, {25,25,25}, {30,30,30});
+    csGraphics::setGraphicAreaSize(idp, {GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)*2.5});
     csGraphics::updateGraphicArea(idp, 1);
     csGraphics::setMouseWheelPreference(idp, CS_MOUSEWHEEL_VSCROLL);
 
@@ -1698,7 +1732,7 @@ CSINPUT* inputContextExample(int idp)
 //inp->hide();
 
     int leftpos = 5, height = 24, topMarg = 10;
-    for(int i=0; i<40; i++)
+    for(int i=0; i<100; i++)
         templateInput(inp, {leftpos,topMarg+i*(height+2), (r.right-15),height});
 
 //inp->show();

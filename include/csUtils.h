@@ -82,6 +82,7 @@ void setTransparent(int id);
 void setTransparency(int id, char level);
 void printRect(RECT r, char* title="rect");
 void setGeometryCoef(float factor);
+void permute(int id1, int id2);
 
 void bindGeometry(int id, int n, ...);
 void bindGeometry_(int id, CSBIND_GEOM_PARAMS*& Args, int& n);

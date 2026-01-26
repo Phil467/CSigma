@@ -329,6 +329,7 @@ void CSUIFX::_mouseHover_clickEffect(HWND hwnd, UINT msg, int id)
     //ReleaseCapture();
 }
 //extern vector<bool> initBool;
+extern int TIPS_POPUP;
 void CSUIFX::_mouseHoverLeave(HWND hwnd, UINT msg, int id)
 {
     if(msg==WM_MOUSEMOVE/* || msg==WM_NCMOUSEMOVE*/ && !CLICK_EFFECT_BOOL)
@@ -409,6 +410,14 @@ void CSUIFX::_mouseHoverLeave(HWND hwnd, UINT msg, int id)
             cp[id]->AutoAlphaFade.Count = 0;
             cp[id]->AutoAlphaFade.Activate = 1;
         }*/
+    }
+
+    else if (msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN)
+    {
+        if(IsWindowVisible(SECTION[TIPS_POPUP]))
+        {
+            ShowWindow(SECTION[TIPS_POPUP], 0);
+        }
     }
 
 }

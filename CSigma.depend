@@ -1,12 +1,12 @@
 # depslib dependency file v1.0
-1769244951 source:d:\projects\csigma\main.cpp
+1769385307 source:d:\projects\csigma\main.cpp
 	"csSection.h"
 	"csUIObjects.h"
 	"csMenu.h"
 	"csStrUtils.h"
 	"csSubClasses.h"
 	"readwfile.h"
-	"csListBoxMin.h"
+	"csUniformListBox.h"
 	"csTranslator.h"
 	"csInput.h"
 
@@ -18,7 +18,7 @@
 	<thread>
 	<functional>
 
-1768749602 d:\projects\csigma\include\csutils.h
+1769352851 d:\projects\csigma\include\csutils.h
 	"csArgs.h"
 	"csUIFx.h"
 	"csTypes.h"
@@ -68,7 +68,7 @@
 	<thread>
 	"csGraphics.h"
 
-1769242517 d:\projects\csigma\include\csgraphics.h
+1769327957 d:\projects\csigma\include\csgraphics.h
 	"csTypes.h"
 	"csUtils.h"
 
@@ -77,7 +77,7 @@
 	"csScrollbar.h"
 	"csSubClasses.h"
 
-1768733364 d:\projects\csigma\include\csscrollbar.h
+1769386560 d:\projects\csigma\include\csscrollbar.h
 	"csUtils.h"
 	"csSection.h"
 
@@ -106,7 +106,7 @@
 
 1748873480 d:\projects\csigma\include\readwfile.h
 
-1759544570 d:\projects\csigma\include\cslistboxmin.h
+1759544570 d:\projects\csigma\include\CSUNIFORMLISTBOX.h
 	"csSection.h"
 	"csUtils.h"
 	"csLIST.h"
@@ -118,7 +118,7 @@
 1759508925 source:d:\projects\csigma\src\csargs.cpp
 	"csTypes.h"
 
-1769242680 source:d:\projects\csigma\src\csgraphics.cpp
+1769327934 source:d:\projects\csigma\src\csgraphics.cpp
 	"csGraphics.h"
 	"math.h"
 
@@ -137,14 +137,14 @@
 	"csUtils.h"
 	"csTypes.h"
 
-1769069104 source:d:\projects\csigma\src\cslistboxmin.cpp
-	"csListBoxMin.h"
+1769356068 source:d:\projects\csigma\src\CSUNIFORMLISTBOX.cpp
+	"CSUNIFORMLISTBOX.h"
 	"readwfile.h"
 
-1769168577 source:d:\projects\csigma\src\csscrollbar.cpp
+1769387732 source:d:\projects\csigma\src\csscrollbar.cpp
 	"csScrollBar.h"
 
-1769188070 source:d:\projects\csigma\src\cssection.cpp
+1769383497 source:d:\projects\csigma\src\cssection.cpp
 	"csSection.h"
 	"csUIFx.h"
 	"csList.h"
@@ -164,10 +164,10 @@
 	"readwfile.h"
 	"csArithmetic/csArithUtils.h"
 
-1768728560 source:d:\projects\csigma\src\csuifx.cpp
+1769370472 source:d:\projects\csigma\src\csuifx.cpp
 	"csUIFx.h"
 
-1768752370 source:d:\projects\csigma\src\csutils.cpp
+1769353775 source:d:\projects\csigma\src\csutils.cpp
 	"csUtils.h"
 	"math.h"
 	"csFilesMan.h"
@@ -211,12 +211,12 @@
 	"readwfile.h"
 	"csLIST.h"
 
-1760654323 d:\projects\csigma\include\csmenu.h
+1769380171 d:\projects\csigma\include\csmenu.h
 	"csSection.h"
-	"csListBoxMin.h"
+	"csUniformListBox.h"
 	"csStrUtils.h"
 
-1760742188 source:d:\projects\csigma\src\csmenu.cpp
+1769381002 source:d:\projects\csigma\src\csmenu.cpp
 	"csMenu.h"
 	"csUtils.h"
 	"csScrollBar.h"
@@ -231,19 +231,35 @@
 	"csScrollbar.h"
 	"csSubClasses.h"
 
-1768772612 source:d:\projects\csigma\src\csuiobjects.cpp
+1769386507 source:d:\projects\csigma\src\csuiobjects.cpp
 	"csUIObjects.h"
 	"readwfile.h"
 	"csArithmetic/csArithUtils.h"
 	"csStrUtils.h"
 
-1769243175 d:\projects\csigma\include\csinput.h
+1769312849 d:\projects\csigma\include\csinput.h
 	"csLIST.h"
 	"csTypes.h"
 
-1769245706 source:d:\projects\csigma\src\csinput.cpp
+1769375071 source:d:\projects\csigma\src\csinput.cpp
 	"csInput.h"
 	"csUtils.h"
 	"csStrUtils.h"
 	"csUIObjects.h"
+
+1769379667 d:\projects\csigma\include\cslistboxmin.h
+	"csSection.h"
+	"csUtils.h"
+	"csLIST.h"
+	"csGraphics.h"
+
+1769381002 d:\projects\csigma\include\csuniformlistbox.h
+	"csSection.h"
+	"csUtils.h"
+	"csLIST.h"
+	"csGraphics.h"
+
+1769381002 source:d:\projects\csigma\src\csuniformlistbox.cpp
+	"CSUNIFORMLISTBOX.h"
+	"readwfile.h"
 

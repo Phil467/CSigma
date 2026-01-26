@@ -6,7 +6,7 @@
 #include "csStrUtils.h"
 #include "csSubClasses.h"
 #include "readwfile.h"
-#include "csListBoxMin.h"
+#include "csUniformListBox.h"
 #include "csTranslator.h"
 #include "csInput.h"
 
@@ -60,11 +60,11 @@ CSUIOBJECTS::createToolTips(RGB(40,40,40));
 CSBIND_GEOM_PARAMS bd;
 MIDDLE_SECTION = createSection(ROOT, {0,CAPTION_AREA_SIZE/geomCoef+6,smx/geomCoef,435},  RGB(15,15,15), {0,0,0,0});
 bd = {MIDDLE_SECTION, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE,0,BIND_DEST_BOTTOM_EDGE}};
-bindGeometry(ROOT, bd); 
+bindGeometry(ROOT, bd);
 /*************************************** MIDDLE_LEFT_SECTION ************************************ */
 
 CAPTION_AREA_SIZE *= 1.5;
-MIDDLE_LEFT_SECTION = createSection(MIDDLE_SECTION, {0,23,77,440-30},  RGB(20,20,20), {0,0,1,0});
+MIDDLE_LEFT_SECTION = createSection(MIDDLE_SECTION, {132,23,77,440-30},  RGB(20,20,20), {0,0,1,0});
 
 bd = {MIDDLE_LEFT_SECTION, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE, 0, BIND_DEST_BOTTOM_EDGE}};
 bindGeometry(ROOT, 1, bd); // C version
@@ -82,7 +82,7 @@ CSSECMAN::setMinMaxInfo(MIDDLE_TOP_SECTION, MINMAXINFO{.ptMinTrackSize={0,17}, .
 
 /***********************************MIDDLE_MIDDLE_SECTION *************************************** */
 
-MIDDLE_MIDDLE_SECTION = createSection(MIDDLE_SECTION, {80+130,23,180,395+15},  RGB(15,15,15), {1,0,0,0});
+MIDDLE_MIDDLE_SECTION = createSection(MIDDLE_SECTION, {80+130,23,180,395+15},  RGB(15,15,15), {0,0,0,0});
 
 bd = {MIDDLE_MIDDLE_SECTION, {0,0,0,1}, {0,0, 0, BIND_DEST_TOP_EDGE|BIND_DEST_BOTTOM_EDGE}};
 bindGeometry(MIDDLE_TOP_SECTION, 1, bd);
@@ -90,12 +90,18 @@ bd = {MIDDLE_MIDDLE_SECTION, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE, 0, BIND_DEST_
 bindGeometry(ROOT, bd);
 bd = {MIDDLE_MIDDLE_SECTION, {0,0,1,0}, {BIND_DEST_RIGHT_EDGE,0,BIND_DEST_RIGHT_EDGE,0}};
 bindGeometry(MIDDLE_SECTION, bd);
-bd = {MIDDLE_MIDDLE_SECTION, {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE|BIND_DEST_LEFT_EDGE,0}};
+bd = {MIDDLE_MIDDLE_SECTION, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE|BIND_DEST_RIGHT_EDGE,0}};
 bindGeometry(MIDDLE_LEFT_SECTION, bd);
 
 /*************************************** RIGHT_SECTION ************************************ */
 
 RIGHT_SECTION = createSection(MIDDLE_SECTION, {442+77,23,70,395+15},  RGB(30,30,30), {1,0,0,0});
+CSSECMAN::enableDarkEdge(RIGHT_SECTION);
+CSSECMAN::setIcon(RIGHT_SECTION, ICON_ROOT);
+int tid = CSUIOBJECTS::addTitle(RIGHT_SECTION, L"Langues",{60,CAPTION_AREA_SIZE/1.5/geomCoef}, 12, L"Arial black", ICON_ROOT);
+CSSECMAN::autoFitToTitle(tid,GetSystemMetrics(SM_CXSCREEN));
+
+//CSSYSCOMMAND_SECTION SYS_CMD_INPUTS = CSUIOBJECTS::addSysCommand(RIGHT_SECTION, {600});
 
 bd = {MIDDLE_MIDDLE_SECTION, {1,0,0,0}, BIND_DEST_RIGHT_EDGE,0,0,0};
 bindGeometry(RIGHT_SECTION, bd);
@@ -369,10 +375,11 @@ CSSECMAN::addTips(maxDigit.idSection, {0,0,200/geomCoef, 170/geomCoef}, (POS_BOO
 /********************************************************************************** */
 
 //ROOT_RND_NUM_VIEWER = createSection(0, {1,1,400,400},  RGB(20,20,20), {0}); //{78,23,440,395+15}
-ROOT_RND_NUM_VIEWER = createSection(MIDDLE_SECTION, {78,23,130,410},  RGB(30,30,30), {0,0,0,0});
+ROOT_RND_NUM_VIEWER = createSection(MIDDLE_SECTION, {0,23,130,410},  RGB(30,30,30), {0,0,1,0});
 CSSECMAN::enableDarkEdge(ROOT_RND_NUM_VIEWER);
 CSSECMAN::setMinMaxInfo(ROOT_RND_NUM_VIEWER, MINMAXINFO{.ptMinTrackSize={120,150}});
-CSUIOBJECTS::addTitle(ROOT_RND_NUM_VIEWER, L"Textes Dynamiques",{0}, 12, L"Arial Black", ICON_ROOT);
+int idtv = CSUIOBJECTS::addTitle(ROOT_RND_NUM_VIEWER, L"Textes Dynamiques",{0}, 12, L"Arial Black", ICON_ROOT);
+CSSECMAN::autoFitToTitle(idtv,GetSystemMetrics(SM_CXSCREEN));
 //CSSYSCOMMAND_SECTION SYS_CMD_RND = CSUIOBJECTS::addSysCommand(ROOT_RND_NUM_VIEWER, {400});
 
 CSSCROLLBAR rnd_vscroll = CSUIOBJECTS::addVScrollBar(&ROOT_RND_NUM_VIEWER, &ROOT_RND_NUM_VIEWER, 0, 10, {-5,35});
@@ -382,10 +389,10 @@ csGraphics::setGraphicAreaColor(ROOT_RND_NUM_VIEWER, {30,30,30}, {0});
 csGraphics::setMouseWheelPreference(ROOT_RND_NUM_VIEWER, CS_MOUSEWHEEL_VSCROLL);
 rnd_vscroll.setViewFrameRightMarging(10);
 
-bd = {ROOT_RND_NUM_VIEWER, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE,0}};
-bindGeometry(MIDDLE_LEFT_SECTION, bd);
-bd = {ROOT_RND_NUM_VIEWER, {1,0,0,0}, {BIND_DEST_RIGHT_EDGE,0,0,0}};
-bindGeometry( MIDDLE_MIDDLE_SECTION, bd);
+bd = {MIDDLE_LEFT_SECTION, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE,0}};
+bindGeometry(ROOT_RND_NUM_VIEWER, bd);
+bd = {MIDDLE_MIDDLE_SECTION, {0,0,1,0}, {0,0,BIND_DEST_LEFT_EDGE|BIND_DEST_RIGHT_EDGE,0}};
+bindGeometry( ROOT_RND_NUM_VIEWER, bd);
 bd = {ROOT_RND_NUM_VIEWER, {0,0,0,1}, {0,0, 0, BIND_DEST_TOP_EDGE|BIND_DEST_BOTTOM_EDGE}};
 bindGeometry(MIDDLE_TOP_SECTION, 1, bd);
 bd = {ROOT_RND_NUM_VIEWER, {0,-1,0,1}, {0,BIND_DEST_BOTTOM_EDGE, 0, BIND_DEST_BOTTOM_EDGE}};
@@ -454,7 +461,7 @@ activeNum.setMaxBound("9");
 
 CS_STRING_INCREMENTER_PARAMS* strInc = CSUIOBJECTS::stringIncrementer(MIDDLE_LEFT_SECTION, {5,5+total*9,65,h}, L"Nombre 1\0", 1, 1,
                                                         {0,0,1,0}, {0,0,BIND_DEST_RIGHT_EDGE,0});
-                                                    
+
 
 void getRandomData(CSARGS Args);
 BNT_RANDOM_NUMBER = CSUIOBJECTS::darkTextButton01(MIDDLE_LEFT_SECTION, L"Nombre aléatoire\0", {5,5+total*5,65,h});
@@ -474,11 +481,11 @@ void(*autoScrollText)(long, long, void*, void*)  = [](long currentItem, long pre
     long _py = 0;
     if(prevItem >= 0 && prevItem < strInc->item.size())
         _py = csGraphics::getDynamicTextParagraphPos(ROOT_RND_NUM_VIEWER, currentItem);
-    else 
+    else
         _py = py + 20 < cy ? py + 20 : cy;
 
     long dpy = _py - py;
-    if(dpy >= vcy) return; 
+    if(dpy >= vcy) return;
 
     if(_py - gpy + vpy > vcy || py - gpy + vpy < 0)
         rnd_vscroll->setPositionRatio(1.0*_py/cy);
@@ -493,8 +500,8 @@ CSSECMAN::addAction(
             CS_STRING_INCREMENTER_PARAMS* strInc = (CS_STRING_INCREMENTER_PARAMS*)Args[0];
             strInc->newItem((wstring(L"Nombre ")+to_wstring(strInc->item.size()+1)).c_str());
             strInc->currentItem = strInc->item.size()-1;
-            
-            SendMessage(sHandle(strInc->idUp), WM_LBUTTONUP, 0,0); 
+
+            SendMessage(sHandle(strInc->idUp), WM_LBUTTONUP, 0,0);
 
             csGraphics::addDynamicText(ROOT_RND_NUM_VIEWER, CSTEXT{.Text=makeWString(L"0"), .Font=L"calibri", .FontSize = 14, .Italic=0,
                 .Bold=FW_BOLD, .Color={150, 100, 100}}, 5);
@@ -519,10 +526,10 @@ CSSECMAN::addAction(
             CS_STRING_INCREMENTER_PARAMS* strInc = (CS_STRING_INCREMENTER_PARAMS*)Args[0];
 
             if(!strInc->item.size()) return;
-            
+
             if(!strInc->removeItem(strInc->currentItem)) return;
             csGraphics::removeDynamicTextParagraph(ROOT_RND_NUM_VIEWER, strInc->currentItem);
-            
+
             for(int i=0; i<strInc->item.size(); i++)
             {
                 strInc->item[i] = L"Nombre " + to_wstring(i+1);
@@ -565,7 +572,7 @@ CSSECMAN::addAction(
             csGraphics::updateGraphicArea(ROOT_RND_NUM_VIEWER,0);
 
             ((void(*)(long, long, void*, void*))Args[2])(currentItem, prevItem, Args[1], Args[0]);
-            
+
         }
     },
     3, strInc, &rnd_vscroll, autoScrollText
@@ -604,10 +611,6 @@ csSetUpdatingFunction(fontSizeInc.idText, setFontSize, 3, &ROOT_RND_NUM_VIEWER, 
 /*********************************************************** */
 
 INPUTS_UI = createSection(MIDDLE_SECTION, {388,23,130,410},  RGB(15,15,15), {1,0,0,1});
-CSSECMAN::enableDarkEdge(INPUTS_UI);
-CSSECMAN::setIcon(INPUTS_UI, ICON_ROOT);
-CSUIOBJECTS::addTitle(INPUTS_UI, L"Entrées",{60,CAPTION_AREA_SIZE/1.5/geomCoef}, 12, L"Arial black", ICON_ROOT);
-//CSSYSCOMMAND_SECTION SYS_CMD_INPUTS = CSUIOBJECTS::addSysCommand(INPUTS_UI, {600});
 CSSECMAN::setMinMaxInfo(INPUTS_UI, MINMAXINFO{.ptMinTrackSize={120,250}});
 CSINPUT* inputPtr = inputContextExample(INPUTS_UI);
 
@@ -682,14 +685,16 @@ CSSCROLLBAR vscroll2 = CSUIOBJECTS::addVScrollBar(&RIGHT_SECTION, &RIGHT_SECTION
 
 hscroll2.setViewFrameBottomMarging(10);
 vscroll2.setViewFrameRightMarging(10);
+csGraphics::setGraphicAreaPosition(RIGHT_SECTION, {2,20});
 csGraphics::setGraphicAreaColor(RIGHT_SECTION, {30,30,30}, {0});
 csGraphics::setMouseWheelPreference(RIGHT_SECTION, CS_MOUSEWHEEL_VSCROLL);
 
 //*******************************  Translation Section **************************** */
 CSUIOBJECTS::CS_ABSTRACT_PROGRESSBAR progressbar(BOTTOM_SECTION, {0,0, 300/geomCoef, (sRectClient(BOTTOM_SECTION).bottom/geomCoef)});
 
-CSLISTBOXMIN* languageListBox = csNewMinimalListBoxPtr(&RIGHT_SECTION, 100, 220);
+CSUNIFORMLISTBOX* languageListBox = newUniformlListBoxPtr(&RIGHT_SECTION, 100, 220);
 languageListBox->setDefaultFont(L"calibri",{12,0});
+languageListBox->setDefaultTitleColors(RGB(125,125,125),RGB(200,200,200),RGB(0,0,0),RGB(20,20,20));
 languageListBox->setItemAlign(CS_ALIGN_VERTICAL);
 languageListBox->setOffset({0,0});
 languageListBox->setDefaultSize({150*geomCoef, 15*geomCoef});
@@ -711,7 +716,7 @@ for(int i=0; i<langCount; i++)
 languageListBox->setActiveItem(CSLANGMAN::getLanguageCodeId(CSLANGMAN::getTargetLanguageCode()));
 languageListBox->create();
 
-void checkInstalledLanguages(CSLISTBOXMIN*& languageListBox);
+void checkInstalledLanguages(CSUNIFORMLISTBOX*& languageListBox);
 checkInstalledLanguages(languageListBox);
 
 hscroll2.update();
@@ -754,7 +759,7 @@ vscroll3.setViewFrameRightMarging(10);
 csGraphics::setMouseWheelPreference(IMAGE_LIST_SECTION, CS_MOUSEWHEEL_VSCROLL);
 
 
-CSLISTBOXMIN* lbm1 = csNewMinimalListBoxPtr(&IMAGE_LIST_SECTION, 100, 50);
+CSUNIFORMLISTBOX* lbm1 = newUniformlListBoxPtr(&IMAGE_LIST_SECTION, 100, 50);
 lbm1->setDefaultFont(L"calibri",{12,0});
 lbm1->setItemAlign(CS_ALIGN_VERTICAL);
 lbm1->setOffset({0,0});
@@ -776,6 +781,9 @@ lbm1->create();
 hscroll3.update();
 hscroll3.setPositionRatio(0);
 vscroll3.setPositionRatio(0);
+
+
+//CSSECMAN::permute(ROOT_RND_NUM_VIEWER, MIDDLE_LEFT_SECTION);
 
 CSIGMA_MAIN_END() //--------------------------------------------------------------------------------------------------------------------------------------
 
@@ -879,7 +887,7 @@ void setFontSize(CSARGS Args)
 
 void appTranslateStrings(CSARGS Args)
 {
-    CSLISTBOXMIN* lbm = (CSLISTBOXMIN*)Args[3];
+    CSUNIFORMLISTBOX* lbm = (CSUNIFORMLISTBOX*)Args[3];
     int i = *lbm->getActiveItem();
     static int lastTargetLanguageId = -1;
 
@@ -922,11 +930,11 @@ void startTranslation(CSARGS Args)
 COLORREF sectionColor1 = RGB(160,160,220), sectionColor2 = RGB(160,160,230), sectionColor3 = RGB(160,160,220);
 COLORREF dColor1 = RGB(30,40,30), dColor2 = RGB(30,50,30), dColor3 = RGB(160,220,160);
 
-void checkInstalledLanguages(CSLISTBOXMIN*& lbm)
+void checkInstalledLanguages(CSUNIFORMLISTBOX*& lbm)
 {
     thread t(
 
-        [](CSLISTBOXMIN* lbm)
+        [](CSUNIFORMLISTBOX* lbm)
         {
             int n = 0;
             COLORREF color , highlightColor, selectionColor;
