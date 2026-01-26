@@ -36,9 +36,10 @@ CSINPUT::CSINPUT(int*idp)
 void CSINPUT::updateStackDC()
 {
     csGraphics::releaseGraphicContext(stackDC);
-    parentDC = csGraphics::getGraphicContext(*parent);
+    parentDC = csGraphics::getGraphicAreaContext(*parent);
+    SIZE sz = csGraphics::getGraphicAreaSize(*parent);
     stackDC = csGraphics::createCompatibleGraphicContext(parentDC,
-    hdcSize[*parent], backgroundColor[*parent], borderColor[*parent]);
+                            sz, backgroundColor[*parent], borderColor[*parent]);
 }
 
 void CSINPUT::init(int*idp)
@@ -903,7 +904,7 @@ void CSINPUT::updateGeometry(int idInput)
     updateVisual_state1(idInput, 1);
 }
 
-/*void CSINPUT::updateBackground()
+/*void CSINPUT::updateVisibleBackground()
 {
     //parentDC = csCTX(*parent).redrawDwgSurface();
 }*/
@@ -912,10 +913,17 @@ int CSINPUT::getId()
 {
     return *parent;
 }
+void CSINPUT::updateVisibleBackground()
+{
+    parentDC = csGraphics::getGraphicAreaContext(*parent);
+    RECT rv = csGraphics::getGraphicAreaContextVisiblePart(*parent);
+    BitBlt(parentDC, rv.left, rv.top, rv.right-rv.left, rv.bottom-rv.top, stackDC.dc, 0,0,SRCCOPY);
+}
 void CSINPUT::updateBackground()
 {
-    parentDC = csGraphics::getGraphicContext(*parent);
-    BitBlt(parentDC, 0, 0, hdcSize[*parent].cx, hdcSize[*parent].cy, stackDC.dc, 0,0,SRCCOPY);
+    parentDC = csGraphics::getGraphicAreaContext(*parent);
+    BitBlt(parentDC, 0, 0, stackDC.sz.cx, stackDC.sz.cy, stackDC.dc, 0,0,SRCCOPY);
+    RECT rv = csGraphics::getGraphicAreaContextVisiblePart(*parent);
 }
 
 void CSINPUT::updateActiveTextBkg()
@@ -943,7 +951,7 @@ void CSINPUT::createContext(int idInput)
         DeleteDC(ipp->cntDc);
         DeleteBitmap(ipp->cntBmp);
     }
-    parentDC = csGraphics::getGraphicContext(*parent);
+    parentDC = csGraphics::getGraphicAreaContext(*parent);
     ipp->cntDc = CreateCompatibleDC(parentDC);
     //std::cout<<ipp->rsize.cx<<" "<<ipp->rsize.cy<<"\n";
     ipp->cntBmp = CreateCompatibleBitmap(parentDC, ipp->rsize.cx, ipp->rsize.cy);
@@ -1004,7 +1012,6 @@ void CSINPUT::updateVisual_state1(int idInput, bool noRedrawActiveChar)
     CSINPUT::CSINPUT_PARAMS* inp = ip[idInput];
     RECT r = inp->rect;
     SIZE s = inp->rsize;
-    //BitBlt(stackDC.dc, r.left, r.top, s.cx, s.cy, inp->cntDc, 0,0,SRCCOPY);
     BitBlt(parentDC, r.left, r.top, s.cx, s.cy, inp->cntDc, 0,0,SRCCOPY);
     updateText(idInput);
     if(!noRedrawActiveChar)
@@ -1043,7 +1050,7 @@ void CSINPUT::updateVisual_state2(int idInput, bool noRedrawActiveChar)
     CSINPUT::CSINPUT_PARAMS* inp = ip[idInput];
     RECT r = inp->rect;
     SIZE s = inp->rsize;
-    //BitBlt(stackDC.dc, r.left, r.top, s.cx, s.cy, inp->cntDc, 0,0,SRCCOPY);
+    //BitBlt(parentDC, rv.left, rv.top, stackDC.sz.cx, stackDC.sz.cy, stackDC.dc, 0,0,SRCCOPY);
     BitBlt(parentDC, r.left, r.top, s.cx, s.cy, inp->cntDc, 0,0,SRCCOPY);
     updateText(idInput);
     if(!noRedrawActiveChar)
@@ -1566,16 +1573,12 @@ void typeString(CSARGS Args)
     if(msg == WM_SIZE)
     {
         int n = ipp->getInputsNumber();
-        ipp->updateBackground();
-        RECT r = csGraphics::getViewAreaRect(ipp->getId());
-        int _a = r.left + csGraphics::getGraphicAreaInXPos(ipp->getId());
-        int _b = r.top + csGraphics::getGraphicAreaInYPos(ipp->getId());
-        int a = r.right - r.left + csGraphics::getGraphicAreaInXPos(ipp->getId());
-        int b = r.bottom - r.top + csGraphics::getGraphicAreaInYPos(ipp->getId());
+        ipp->updateVisibleBackground();
+        RECT r = csGraphics::getGraphicAreaContextVisiblePart(ipp->getId());
         for(int i = 0; i<n; i++)
         {
             RECT r2 = ipp->getInputParams(i)->rect;
-            if(!(r2.left > a || r2.top > b || r2.right < _a || r2.bottom < _b))
+            if(!(r2.left > r.right || r2.top > r.bottom || r2.right < r.left || r2.bottom < r.top))
             ipp->updateGeometry(i);
         }
         ipp->update();
@@ -1593,16 +1596,13 @@ void typeString(CSARGS Args)
         if(count_ == 2)
         {
             int n = ipp->getInputsNumber();
+            ipp->updateBackground();
             for(int i = 0; i<n; i++)
             {
                 RECT r2 = ipp->getInputParams(i)->rect;
                 ipp->updateGeometry(i);
             }
-            RECT r = {csGraphics::getGraphicAreaXPos(ipp->getId()), 
-                csGraphics::getGraphicAreaYPos(ipp->getId()),
-                csGraphics::getGraphicAreaXSize(ipp->getId()) + csGraphics::getGraphicAreaXPos(ipp->getId()),
-                csGraphics::getGraphicAreaYSize(ipp->getId()) + csGraphics::getGraphicAreaYPos(ipp->getId())};
-            InvalidateRect(sHandle(ipp->getId()), &r, 1);
+            ipp->update();
             count_ = 0;
         }
     }
@@ -1639,7 +1639,7 @@ void updateGeometryThread(CSARGS Args)
 
                     //ip->updateStackDC();
                     int n = ip->getInputsNumber();
-                    ip->updateBackground();
+                    ip->updateVisibleBackground();
                     for(int i = 0; i<n; i++)
                     {
                         ip->_updateGeometry(i++);
@@ -1663,7 +1663,7 @@ void updateGeometryThread(CSARGS Args)
 
                         //if(b == 0) // ends if the cursor is in the client area
                         {
-                            //ip->updateBackground();
+                            //ip->updateVisibleBackground();
                             int n = ip->getInputsNumber();
                             for(int i = 0; i<n; i++)
                             {

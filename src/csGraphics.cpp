@@ -485,7 +485,17 @@ void csGraphics::setGraphicAreaSize(int id, SIZE size)
 {
     hdcontextExtSize[id] = size;
 }
-HDC csGraphics::getGraphicContext(int id)
+RECT csGraphics::getGraphicAreaContextVisiblePart(int id)
+{
+    RECT r = csGraphics::getViewAreaRect(id);
+    int _a = r.left + csGraphics::getGraphicAreaInXPos(id);
+    int _b = r.top + csGraphics::getGraphicAreaInYPos(id);
+    int a = r.right - r.left + csGraphics::getGraphicAreaInXPos(id);
+    int b = r.bottom - r.top + csGraphics::getGraphicAreaInYPos(id);
+
+    return {_a, _b, a, b};
+}
+HDC csGraphics::getGraphicAreaContext(int id)
 {
     return hdcontextExt[id];
 }

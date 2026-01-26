@@ -41,7 +41,7 @@ void setGraphicAreaXSize(int id, long cx);
 void setGraphicAreaYSize(int id, long cy);
 void setGraphicAreaColor(int id, CSRGBA background, CSRGBA border);
 
-HDC getGraphicContext(int id);
+HDC getGraphicAreaContext(int id);
 SIZE getGraphicAreaSize(int id);
 long getGraphicAreaXSize(int id);
 long getGraphicAreaYSize(int id);
@@ -51,6 +51,7 @@ long getGraphicAreaInYPos(int id);
 POINT getGraphicAreaPos(int id);
 long getGraphicAreaXPos(int id);
 long getGraphicAreaYPos(int id);
+RECT getGraphicAreaContextVisiblePart(int id);
 
 void updateGraphicArea(int id, bool reCreate);
 

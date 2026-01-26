@@ -309,6 +309,7 @@ class CSINPUT
     void _updateVisual_state1(int idInput, bool noRedrawActiveChar=0);
     void _updateVisual_state2(int idInput, bool noRedrawActiveChar=0);
     void updateAll();
+    void updateVisibleBackground();
     void updateBackground();
     void addChar(wchar_t chr);
     void deleteChar(bool frontCaret);
