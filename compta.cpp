@@ -246,11 +246,10 @@ static int g_payrollBandRateIds[kMaxPayrollBandUiRows];
 
 void calculate(CSARGS Args);
 void onRegionDependentFieldsRefresh(CSARGS Args);
-
 void scrollingClientFunction(CSARGS Args);
 void addExpensesFunction(CSARGS Args);
 void goToDateFunction(CSARGS Args);
-
+static long double parseNumericWide(const wstring& text);
 long double getValue(CSINPUT* input, int id);
 wchar_t* getStrNumericFormat(long double value, wchar_t* unit);
 
@@ -364,6 +363,104 @@ static long double payrollMarginalQpip(long double income, const vector<SocialSe
     return sum;
 }
 
+void calculate(CSARGS Args)
+{
+    CSINPUT* inputExpenses = (CSINPUT*)Args[0];
+    CSINPUT* accountingInput = (CSINPUT*)Args[1];
+    CS_STRING_INCREMENTER_PARAMS* regionPickerParams = (CS_STRING_INCREMENTER_PARAMS*)Args[2];
+    if(UINT(Args) == WM_LBUTTONDOWN)
+    {
+        long double totalExpenses = 0;
+        for(int i=0; i<inputExpenses->getInputsNumber(); i++)
+        {
+            CSINPUT::CSINPUT_ENTITY_COLORS colors = inputExpenses->getTitleColors(i);
+            if(colors.normal.r == 100 && colors.normal.g == 255 && colors.normal.b == 100)
+            {
+                wstring text = inputExpenses->getText(i);
+                long double value = parseNumericWide(text);
+                if(inputExpenses->getNoNameButtonState(i))
+                {
+                    long double njs = getValue(accountingInput, WEEKLY_WORKING_DAYS_ID);
+                    long double npj = getValue(accountingInput, DAILY_SERVICES_ID);
+                    if(njs < 1e-12L)
+                        njs = 1e-12L;
+                    value *= 52.0L * njs * npj;
+                }
+                totalExpenses += value;
+            }
+        }
+
+        long double cp = getValue(accountingInput, CP_ID);
+        long double npj = getValue(accountingInput, DAILY_SERVICES_ID);
+        long double njs = getValue(accountingInput, WEEKLY_WORKING_DAYS_ID);
+        if(njs < 1e-12L)
+            njs = 1e-12L;
+        if(npj < 0.0L)
+            npj = 0.0L;
+
+        const long double weeksPerYear = 52.0L;
+        const long double daysPerYear = weeksPerYear * njs;
+        const long double caa = cp * npj * njs * weeksPerYear;
+        const long double caj = caa / daysPerYear;
+        const long double cah = caa / weeksPerYear;
+        const long double cam = caa / 12.0L;
+
+        const long double chA = totalExpenses;
+        const long double chJ = chA / daysPerYear;
+        const long double chH = chA / weeksPerYear;
+        const long double chM = chA / 12.0L;
+
+        const long double taxableIncome = std::max(0.0L, caa - chA);
+
+        long provinceIndex = 8;
+        if(regionPickerParams)
+            provinceIndex = regionPickerParams->currentItem;
+
+        const long double federalTax = marginalIncomeTaxFromBrackets(taxableIncome, g_federalTaxBrackets);
+        const vector<TaxBracketRow>* provBrackets = provincialBracketsForRegion(provinceIndex);
+        const long double provincialTax = marginalIncomeTaxFromBrackets(taxableIncome, *provBrackets);
+
+        const vector<SocialSecurityContributionRow>* payrollRows = socialContributionsForRegion(provinceIndex);
+        const long double rrqContribution = payrollMarginalPension(taxableIncome, *payrollRows);
+        const long double eiContribution = payrollMarginalEi(taxableIncome, *payrollRows);
+        const long double qpipContribution = payrollMarginalQpip(taxableIncome, *payrollRows);
+
+        const long double totalTaxEstimate = federalTax + provincialTax + rrqContribution + eiContribution + qpipContribution;
+        const long double mna = caa - chA - totalTaxEstimate;
+        const long double mnj = mna / daysPerYear;
+        const long double mnh = mna / weeksPerYear;
+        const long double mnm = mna / 12.0L;
+
+        auto setMoney = [accountingInput](int fieldId, long double amount)
+        {
+            wchar_t* s = getStrNumericFormat(amount, L"$");
+            accountingInput->setEditable(fieldId, true);
+            accountingInput->setText(fieldId, s, true);
+            accountingInput->setEditable(fieldId, false);
+            free(s);
+        };
+
+        setMoney(ANNUAL_EXPENSES_FIELD_ID, chA);
+        setMoney(CAA_ID, caa);
+        setMoney(CAJ_ID, caj);
+        setMoney(CAH_ID, cah);
+        setMoney(CAM_ID, cam);
+        setMoney(CH_J_ID, chJ);
+        setMoney(CH_H_ID, chH);
+        setMoney(CH_M_ID, chM);
+        setMoney(ESTIMATED_FEDERAL_TAX_FIELD_ID, federalTax);
+        setMoney(ESTIMATED_PROVINCIAL_TAX_FIELD_ID, provincialTax);
+        setMoney(ESTIMATED_RRQ_CONTRIB_FIELD_ID, rrqContribution);
+        setMoney(ESTIMATED_EI_CONTRIB_FIELD_ID, eiContribution);
+        setMoney(ESTIMATED_QPIP_CONTRIB_FIELD_ID, qpipContribution);
+        setMoney(ESTIMATED_TOTAL_TAX_FIELD_ID, totalTaxEstimate);
+        setMoney(MNA_ID, mna);
+        setMoney(MNJ_ID, mnj);
+        setMoney(MNH_ID, mnh);
+        setMoney(MNM_ID, mnm);
+    }
+}
+
 static void refreshRegionTaxAndPayrollUi(CSINPUT* accountingInput, long provinceIndex)
 {
     const vector<TaxBracketRow>* prov = provincialBracketsForRegion(provinceIndex);
@@ -440,7 +537,9 @@ void onRegionDependentFieldsRefresh(CSARGS Args)
 {
     CSINPUT* accountingInput = (CSINPUT*)Args[0];
     CS_STRING_INCREMENTER_PARAMS* rp = (CS_STRING_INCREMENTER_PARAMS*)Args[1];
+    int idCalculateButton = *(int*)Args[2];
     refreshRegionTaxAndPayrollUi(accountingInput, rp->currentItem);
+    PostMessage(sHandle(idCalculateButton), WM_LBUTTONDOWN, 0, 0);
 }
 
 
@@ -872,7 +971,7 @@ for(int i = 0; i < nextFieldId; i++)
 stackTopY += (9)*(rowHeight+2);
 
 refreshRegionTaxAndPayrollUi(accountingInput, regionPicker->currentItem);
-csSetUpdatingFunction(regionPicker->idText, onRegionDependentFieldsRefresh, 2, accountingInput, regionPicker);
+csSetUpdatingFunction(regionPicker->idText, onRegionDependentFieldsRefresh, 3, accountingInput, regionPicker, &secCalculateButton);
 
 accountingInput->newInput(L" Données du Projet",L" ",{inputLeftX,stackTopY+0*(rowHeight+2), (r.right-15),rowHeight}, 0, (r.right-15)-30, 10);
 accountingInput->addUnrollButton(-1,L"comptaResources/hide.bmp",L"comptaResources/hide1.bmp",L"comptaResources/hide1.bmp",L"comptaResources/hide1.bmp");
@@ -1312,7 +1411,7 @@ CSIGMA_MAIN_END()
 
 
 
-/******************************************************************************************************************************************* */
+/****************************************************************** Utilities ************************************************************************* */
 
 
 
@@ -1498,103 +1597,5 @@ static long double parseNumericWide(const wstring& text)
 long double getValue(CSINPUT* input, int id)
 {
     return parseNumericWide(input->getText(id));
-}
-
-void calculate(CSARGS Args)
-{
-    CSINPUT* inputExpenses = (CSINPUT*)Args[0];
-    CSINPUT* accountingInput = (CSINPUT*)Args[1];
-    CS_STRING_INCREMENTER_PARAMS* regionPickerParams = (CS_STRING_INCREMENTER_PARAMS*)Args[2];
-    if(UINT(Args) == WM_LBUTTONDOWN)
-    {
-        long double totalExpenses = 0;
-        for(int i=0; i<inputExpenses->getInputsNumber(); i++)
-        {
-            CSINPUT::CSINPUT_ENTITY_COLORS colors = inputExpenses->getTitleColors(i);
-            if(colors.normal.r == 100 && colors.normal.g == 255 && colors.normal.b == 100)
-            {
-                wstring text = inputExpenses->getText(i);
-                long double value = parseNumericWide(text);
-                if(inputExpenses->getNoNameButtonState(i))
-                {
-                    long double njs = getValue(accountingInput, WEEKLY_WORKING_DAYS_ID);
-                    long double npj = getValue(accountingInput, DAILY_SERVICES_ID);
-                    if(njs < 1e-12L)
-                        njs = 1e-12L;
-                    value *= 52.0L * njs * npj;
-                }
-                totalExpenses += value;
-            }
-        }
-
-        long double cp = getValue(accountingInput, CP_ID);
-        long double npj = getValue(accountingInput, DAILY_SERVICES_ID);
-        long double njs = getValue(accountingInput, WEEKLY_WORKING_DAYS_ID);
-        if(njs < 1e-12L)
-            njs = 1e-12L;
-        if(npj < 0.0L)
-            npj = 0.0L;
-
-        const long double weeksPerYear = 52.0L;
-        const long double daysPerYear = weeksPerYear * njs;
-        const long double caa = cp * npj * njs * weeksPerYear;
-        const long double caj = caa / daysPerYear;
-        const long double cah = caa / weeksPerYear;
-        const long double cam = caa / 12.0L;
-
-        const long double chA = totalExpenses;
-        const long double chJ = chA / daysPerYear;
-        const long double chH = chA / weeksPerYear;
-        const long double chM = chA / 12.0L;
-
-        const long double taxableIncome = std::max(0.0L, caa - chA);
-
-        long provinceIndex = 8;
-        if(regionPickerParams)
-            provinceIndex = regionPickerParams->currentItem;
-
-        const long double federalTax = marginalIncomeTaxFromBrackets(taxableIncome, g_federalTaxBrackets);
-        const vector<TaxBracketRow>* provBrackets = provincialBracketsForRegion(provinceIndex);
-        const long double provincialTax = marginalIncomeTaxFromBrackets(taxableIncome, *provBrackets);
-
-        const vector<SocialSecurityContributionRow>* payrollRows = socialContributionsForRegion(provinceIndex);
-        const long double rrqContribution = payrollMarginalPension(taxableIncome, *payrollRows);
-        const long double eiContribution = payrollMarginalEi(taxableIncome, *payrollRows);
-        const long double qpipContribution = payrollMarginalQpip(taxableIncome, *payrollRows);
-
-        const long double totalTaxEstimate = federalTax + provincialTax + rrqContribution + eiContribution + qpipContribution;
-        const long double mna = caa - chA - totalTaxEstimate;
-        const long double mnj = mna / daysPerYear;
-        const long double mnh = mna / weeksPerYear;
-        const long double mnm = mna / 12.0L;
-
-        auto setMoney = [accountingInput](int fieldId, long double amount)
-        {
-            wchar_t* s = getStrNumericFormat(amount, L"$");
-            accountingInput->setEditable(fieldId, true);
-            accountingInput->setText(fieldId, s, true);
-            accountingInput->setEditable(fieldId, false);
-            free(s);
-        };
-
-        setMoney(ANNUAL_EXPENSES_FIELD_ID, chA);
-        setMoney(CAA_ID, caa);
-        setMoney(CAJ_ID, caj);
-        setMoney(CAH_ID, cah);
-        setMoney(CAM_ID, cam);
-        setMoney(CH_J_ID, chJ);
-        setMoney(CH_H_ID, chH);
-        setMoney(CH_M_ID, chM);
-        setMoney(ESTIMATED_FEDERAL_TAX_FIELD_ID, federalTax);
-        setMoney(ESTIMATED_PROVINCIAL_TAX_FIELD_ID, provincialTax);
-        setMoney(ESTIMATED_RRQ_CONTRIB_FIELD_ID, rrqContribution);
-        setMoney(ESTIMATED_EI_CONTRIB_FIELD_ID, eiContribution);
-        setMoney(ESTIMATED_QPIP_CONTRIB_FIELD_ID, qpipContribution);
-        setMoney(ESTIMATED_TOTAL_TAX_FIELD_ID, totalTaxEstimate);
-        setMoney(MNA_ID, mna);
-        setMoney(MNJ_ID, mnj);
-        setMoney(MNH_ID, mnh);
-        setMoney(MNM_ID, mnm);
-    }
 }
 
