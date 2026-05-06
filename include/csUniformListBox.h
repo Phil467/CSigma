@@ -44,8 +44,8 @@ class CSUNIFORMLISTBOX
             HDC ic1, ic2, ic3, ic4;
             wchar_t* path1, *path2, *path3, *path4;
         }ICON;
-        CSUNIFORMLISTBOX(int* idp = 0, int gridStyle=CS_RDBTN_GRID_HV, int gridWidth = 1);
-        void init(int* idp = 0, int gridStyle=CS_RDBTN_GRID_HV, int gridWidth = 1);
+        CSUNIFORMLISTBOX(int* idp = 0, int gridWidth = 1, bool gridOrientation=CS_ALIGN_HORIZONTAL, bool translate=0);
+        void init(int* idp = 0, int gridWidth = 1, bool gridOrientation=CS_ALIGN_HORIZONTAL, bool _translate=0);
         void setIconSize(int idi, SIZE size);
         void newIcon(wchar_t*path1, wchar_t*path2=0,wchar_t*path3=0,wchar_t*path4=0);
         void setIcon(int idi, wchar_t*path1, wchar_t*path2=0,wchar_t*path3=0,wchar_t*path4=0);
@@ -74,7 +74,7 @@ class CSUNIFORMLISTBOX
         void setDefaultBackgroundColors(COLORREF color, COLORREF highlightColor, COLORREF selectionColor, COLORREF disableColor);
         void setDefaultSize(SIZE size);
         void setMaxTextWidth(int _maxTextWidth);
-        void setItemAlign(bool align);
+        void setGridOrientation(bool orientation);
         void zebraStyle(CSRGBA zcol, float zFactor);
         void newItem(wchar_t*title=0, int n=1, unsigned iconId=0);
         void newFilePath(wchar_t*filter=L"All Files\0*.*\0", unsigned iconId=0);
@@ -147,7 +147,7 @@ class CSUNIFORMLISTBOX
     COLORREF dfltColor1, dfltColor2, dfltColor3, dfltColor4;
     COLORREF dfltBkgCol1, dfltBkgCol2, dfltBkgCol3, dfltBkgCol4;
     SIZE dfltSz, *pdfltSz;
-    int gridStyle;
+    bool gridOrientation;
     int textOrientation;
     int TextPos;
     SIZE marging, *pmarging;
@@ -171,7 +171,7 @@ class CSUNIFORMLISTBOX
     int *smoothReposCount;
     float zebFact;
     CSRGBA zebColor;
-    bool itemAlign;
+    bool translate;
 
     CSLBM_ITEM rbItem;
 
@@ -186,7 +186,7 @@ class CSUNIFORMLISTBOX
     CSPARAARGS* extFuncArgs;
 };
 
-CSUNIFORMLISTBOX* newUniformlListBoxPtr(int* idp=0, int gridStyle=CS_RDBTN_GRID_HV, int gridWidth=1);
+CSUNIFORMLISTBOX* newUniformlListBoxPtr(int* idp=0, int gridWidth=1, bool gridOrientation=CS_ALIGN_HORIZONTAL, bool translate=0);
 void organize2(int parent, int n, SIZE imgSize,
                 RECT*pos,POINT*posImg,POINT*posTitle, HDC* dcs0, HFONT* font, COLORREF* color0, COLORREF* bkgcol0, wchar_t**title, HDC hdc,
                 int cxmax, int cymax);

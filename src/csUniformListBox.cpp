@@ -26,6 +26,9 @@ extern float geomCoef;
 extern vector<float> hZoom;
 extern vector<float> vZoom;
 
+extern CSAPP_STRINGS appStrings, appStringsLoaded;
+extern bool loadStrings;
+
 void autoReposition(CSARGS Args);
 void _mouseMove(CSARGS Args);
 void mouseClick(CSARGS Args);
@@ -37,19 +40,19 @@ void makeCutPaste(CSARGS Args);
 
 using namespace CSSTRUTILS;
 
-CSUNIFORMLISTBOX* newUniformlListBoxPtr(int* idp, int gridStyle, int _gridWidth)
+CSUNIFORMLISTBOX* newUniformlListBoxPtr(int* idp, int _gridWidth, bool gridOrientation, bool translate)
 {
-    CSUNIFORMLISTBOX rb(idp, gridStyle, _gridWidth);
-    rbList.insertEnd(csAlloc<CSUNIFORMLISTBOX>(1, rb));
+    CSUNIFORMLISTBOX rb(idp, _gridWidth, gridOrientation);
+    rbList.placeBack(csAlloc<CSUNIFORMLISTBOX>(1, rb));
     return rbList[rbList.size()-1];
 }
 
-CSUNIFORMLISTBOX::CSUNIFORMLISTBOX(int* idp, int gridStyle, int _gridWidth)
+CSUNIFORMLISTBOX::CSUNIFORMLISTBOX(int* idp, int _gridWidth, bool gridOrientation, bool translate)
 {
-    init(idp, gridStyle, _gridWidth);
+    init(idp, _gridWidth, gridOrientation, translate);
 }
 
-void CSUNIFORMLISTBOX::init(int* idp, int _gridStyle, int _gridWidth)
+void CSUNIFORMLISTBOX::init(int* idp, int _gridWidth, bool _gridOrientation, bool _translate)
 {
     title.init(1);
     pos.init(1);
@@ -99,6 +102,8 @@ void CSUNIFORMLISTBOX::init(int* idp, int _gridStyle, int _gridWidth)
 
     maxTextWidth = 40;
 
+    translate = _translate;
+
     fontSize = {15,0};
     dfltFont = CreateFontW(getAdjustedFontSizeX(fontSize.cx),getAdjustedFontSizeY(fontSize.cy),
     0, 0, 0,0,0, 0,0,0,0,0,0, (LPCWSTR)"Calibri");
@@ -123,8 +128,8 @@ void CSUNIFORMLISTBOX::init(int* idp, int _gridStyle, int _gridWidth)
     imgdc2 = createGraphicContextResizedFromFileW(L"resources\\img\\combo_12.bmp", {15,15});
     imgdc3 = createGraphicContextResizedFromFileW(L"resources\\img\\combo_1.bmp", {15,15});
     imgdc4 = createGraphicContextResizedFromFileW(L"resources\\img\\combo_1.bmp", {15,15});
-    icons.insertEnd({imgdc1.dc, imgdc2.dc, imgdc3.dc, imgdc4.dc});
-    gridStyle = _gridStyle;
+    icons.placeBack({imgdc1.dc, imgdc2.dc, imgdc3.dc, imgdc4.dc});
+    gridOrientation = _gridOrientation;
     textOrientation = CS_RDBTN_TEXT_H;
     TextPos = CS_RDBTN_TEXT_AFTER;
     gridWidth = _gridWidth;
@@ -238,7 +243,7 @@ void CSUNIFORMLISTBOX::setIcon(int idi, wchar_t*path1, wchar_t*path2,wchar_t*pat
 
 void CSUNIFORMLISTBOX::newIcon(wchar_t*path1, wchar_t*path2,wchar_t*path3,wchar_t*path4)
 {
-    icons.insertEnd({0});
+    icons.placeBack({0});
     setIcon(icons.size()-1, path1, path2, path3, path4);
 }
 
@@ -442,6 +447,7 @@ void CSUNIFORMLISTBOX::setDefaultTitleColors(COLORREF color, COLORREF highlightC
     dfltColor4 = disableColor;
     defcol = {color&0xff, color>>8&0xff, color>>16&0xff};
 }
+
 void CSUNIFORMLISTBOX::setDefaultBackgroundColors(COLORREF color, COLORREF highlightColor, COLORREF selectionColor, COLORREF disableColor)
 {
     dfltBkgCol1 = color;
@@ -479,9 +485,9 @@ void CSUNIFORMLISTBOX::setOffset(SIZE _offset)
     offset = _offset;
 }
 
-void CSUNIFORMLISTBOX::setItemAlign(bool align)
+void CSUNIFORMLISTBOX::setGridOrientation(bool orientation)
 {
-    itemAlign = align;
+    gridOrientation = orientation;
 }
 
 int* CSUNIFORMLISTBOX::getActiveItem()
@@ -502,6 +508,7 @@ int CSUNIFORMLISTBOX::getSize()
 {
     return *n;
 }
+
 
 void CSUNIFORMLISTBOX::setActiveItem(int id)
 {
@@ -652,31 +659,31 @@ void CSUNIFORMLISTBOX::pasteItem(int id)
 
     unActivateItem(*lastMouseClickid);
 
-    bkgcol0.insertAt(rbItem.bkgcol0, id);
-    bkgcol1.insertAt(rbItem.bkgcol1, id);
-    bkgcol2.insertAt(rbItem.bkgcol2, id);
-    bkgcol3.insertAt(rbItem.bkgcol3, id);
-    bkgcol4.insertAt(rbItem.bkgcol4, id);
+    bkgcol0.placeAt(rbItem.bkgcol0, id);
+    bkgcol1.placeAt(rbItem.bkgcol1, id);
+    bkgcol2.placeAt(rbItem.bkgcol2, id);
+    bkgcol3.placeAt(rbItem.bkgcol3, id);
+    bkgcol4.placeAt(rbItem.bkgcol4, id);
 
-    color0.insertAt(rbItem.color0, id);
-    color1.insertAt(rbItem.color1, id);
-    color2.insertAt(rbItem.color2, id);
-    color3.insertAt(rbItem.color3, id);
-    color4.insertAt(rbItem.color4, id);
+    color0.placeAt(rbItem.color0, id);
+    color1.placeAt(rbItem.color1, id);
+    color2.placeAt(rbItem.color2, id);
+    color3.placeAt(rbItem.color3, id);
+    color4.placeAt(rbItem.color4, id);
 
-    dcs0.insertAt(rbItem.dcs0, id);
-    dcs1.insertAt(rbItem.dcs1, id);
-    dcs2.insertAt(rbItem.dcs2, id);
-    dcs3.insertAt(rbItem.dcs3, id);
-    dcs4.insertAt(rbItem.dcs4, id);
+    dcs0.placeAt(rbItem.dcs0, id);
+    dcs1.placeAt(rbItem.dcs1, id);
+    dcs2.placeAt(rbItem.dcs2, id);
+    dcs3.placeAt(rbItem.dcs3, id);
+    dcs4.placeAt(rbItem.dcs4, id);
 
-    font.insertAt(rbItem.font, id);
-    titleReal.insertAt(rbItem.titleReal, id);
-    title.insertAt(rbItem.title, id);
+    font.placeAt(rbItem.font, id);
+    titleReal.placeAt(rbItem.titleReal, id);
+    title.placeAt(rbItem.title, id);
 
-    posTitle.insertAt(rbItem.posTitle, id);
-    pos.insertAt(rbItem.pos, id);
-    posImg.insertAt(rbItem.posImg, id);
+    posTitle.placeAt(rbItem.posTitle, id);
+    pos.placeAt(rbItem.pos, id);
+    posImg.placeAt(rbItem.posImg, id);
 
     setActiveItem(id);
 
@@ -691,31 +698,31 @@ void CSUNIFORMLISTBOX::duplicate(int src, int _pos)
 
     unActivateItem(*lastMouseClickid);
 
-    bkgcol0.insertAt(bkgcol0[src], _pos);
-    bkgcol1.insertAt(bkgcol1[src], _pos);
-    bkgcol2.insertAt(bkgcol2[src], _pos);
-    bkgcol3.insertAt(bkgcol3[src], _pos);
-    bkgcol4.insertAt(bkgcol4[src], _pos);
+    bkgcol0.placeAt(bkgcol0[src], _pos);
+    bkgcol1.placeAt(bkgcol1[src], _pos);
+    bkgcol2.placeAt(bkgcol2[src], _pos);
+    bkgcol3.placeAt(bkgcol3[src], _pos);
+    bkgcol4.placeAt(bkgcol4[src], _pos);
 
-    color0.insertAt(color0[src], _pos);
-    color1.insertAt(color1[src], _pos);
-    color2.insertAt(color2[src], _pos);
-    color3.insertAt(color3[src], _pos);
-    color4.insertAt(color4[src], _pos);
+    color0.placeAt(color0[src], _pos);
+    color1.placeAt(color1[src], _pos);
+    color2.placeAt(color2[src], _pos);
+    color3.placeAt(color3[src], _pos);
+    color4.placeAt(color4[src], _pos);
 
-    dcs0.insertAt(dcs0[src], _pos);
-    dcs1.insertAt(dcs1[src], _pos);
-    dcs2.insertAt(dcs2[src], _pos);
-    dcs3.insertAt(dcs3[src], _pos);
-    dcs4.insertAt(dcs4[src], _pos);
+    dcs0.placeAt(dcs0[src], _pos);
+    dcs1.placeAt(dcs1[src], _pos);
+    dcs2.placeAt(dcs2[src], _pos);
+    dcs3.placeAt(dcs3[src], _pos);
+    dcs4.placeAt(dcs4[src], _pos);
 
-    font.insertAt(font[src], _pos);
-    titleReal.insertAt(titleReal[src], _pos);
-    title.insertAt(title[src], _pos);
+    font.placeAt(font[src], _pos);
+    titleReal.placeAt(titleReal[src], _pos);
+    title.placeAt(title[src], _pos);
 
-    posTitle.insertAt(posTitle[src], _pos);
-    pos.insertAt(pos[src], _pos);
-    posImg.insertAt(posImg[src], _pos);
+    posTitle.placeAt(posTitle[src], _pos);
+    pos.placeAt(pos[src], _pos);
+    posImg.placeAt(posImg[src], _pos);
 
 
     if(zebFact > 0.0)
@@ -892,8 +899,8 @@ void CSUNIFORMLISTBOX::_pasteFilePath(int id)
             int l;
             wchar_t* str = csAlloc<wchar_t>(l=wcslen(filePath[i])+1);
             wcscpy_s(str, l, filePath[i]);
-            filePath.insertEnd(str);
-            filePathID.insertEnd(id);
+            filePath.placeBack(str);
+            filePathID.placeBack(id);
         }
     }
 }
@@ -937,7 +944,7 @@ void CSUNIFORMLISTBOX::newFilePath(wchar_t* filter, unsigned iconId)
         wchar_t* p = szFile + n + 1;
         if (*p == '\0')
         {
-            filePath.insertEnd(makeWString(szFile));
+            filePath.placeBack(makeWString(szFile));
             csLIST<wchar_t> chlist = filePath.toListW(filePath.size()-1);
             int i = chlist.findLast('\\');
             if(i > -1)
@@ -954,8 +961,8 @@ void CSUNIFORMLISTBOX::newFilePath(wchar_t* filter, unsigned iconId)
             while (*p)
             {
                 std::wstring fullPath = folder + L"\\" + p;
-                filePath.insertEnd(makeWString(fullPath.c_str()));
-                filePathID.insertEnd(title.size());
+                filePath.placeBack(makeWString(fullPath.c_str()));
+                filePathID.placeBack(title.size());
                 newItem(p,1,iconId);
                 p += wcslen(p) + 1;
             }
@@ -973,25 +980,28 @@ void CSUNIFORMLISTBOX::newItem(wchar_t*_title,int n, unsigned iconId)
             str = defaultItemTitle();
         }
 
-        titleReal.insertEnd(str);
+        if(loadStrings) str = *appStrings.asd[appStrings.count++].viewedText;
+        
+        titleReal.placeBack(str);
+        if(translate) appStrings.newString(&titleReal[titleReal.size()-1]);
 
         LPSIZE sz;
-        title.insertEnd(truncateHorizontalTextW(str, dfltFont, maxTextWidth, sz));
+        title.placeBack(truncateHorizontalTextW(str, dfltFont, maxTextWidth, sz));
         free(sz);
 
-        pos.insertEnd({0});
-        posImg.insertEnd({0});
-        posTitle.insertEnd({0});
-        color0.insertEnd(dfltColor1);
-        color1.insertEnd(dfltColor1);
-        color2.insertEnd(dfltColor2);
-        color3.insertEnd(dfltColor3);
-        color4.insertEnd(dfltColor4);
+        pos.placeBack({0});
+        posImg.placeBack({0});
+        posTitle.placeBack({0});
+        color0.placeBack(dfltColor1);
+        color1.placeBack(dfltColor1);
+        color2.placeBack(dfltColor2);
+        color3.placeBack(dfltColor3);
+        color4.placeBack(dfltColor4);
         if(zebFact == 0.0)
         {
-            bkgcol0.insertEnd(dfltBkgCol1);
-            bkgcol1.insertEnd(dfltBkgCol1);
-            bkgcol4.insertEnd(dfltBkgCol4);
+            bkgcol0.placeBack(dfltBkgCol1);
+            bkgcol1.placeBack(dfltBkgCol1);
+            bkgcol4.placeBack(dfltBkgCol4);
         }
         else
         {
@@ -1000,29 +1010,29 @@ void CSUNIFORMLISTBOX::newItem(wchar_t*_title,int n, unsigned iconId)
                 COLORREF col = RGB((defcol.r*(1-zebFact) + zebColor.r*zebFact),
                                    (defcol.g*(1-zebFact) + zebColor.g*zebFact),
                                    (defcol.b*(1-zebFact) + zebColor.b*zebFact));
-                bkgcol0.insertEnd(col);
-                bkgcol1.insertEnd(col);
+                bkgcol0.placeBack(col);
+                bkgcol1.placeBack(col);
                 float zf = zebFact/2;
-                bkgcol4.insertEnd(RGB((defcol.r*(1-zf) + zebColor.r*zf),
+                bkgcol4.placeBack(RGB((defcol.r*(1-zf) + zebColor.r*zf),
                                    (defcol.g*(1-zf) + zebColor.g*zf),
                                    (defcol.b*(1-zf) + zebColor.b*zf)));
             }
             else
             {
-                bkgcol0.insertEnd(dfltBkgCol1);
-                bkgcol1.insertEnd(dfltBkgCol1);
-                bkgcol4.insertEnd(dfltBkgCol4);
+                bkgcol0.placeBack(dfltBkgCol1);
+                bkgcol1.placeBack(dfltBkgCol1);
+                bkgcol4.placeBack(dfltBkgCol4);
             }
         }
-        bkgcol2.insertEnd(dfltBkgCol2);
-        bkgcol3.insertEnd(dfltBkgCol3);
-        font.insertEnd(dfltFont);
+        bkgcol2.placeBack(dfltBkgCol2);
+        bkgcol3.placeBack(dfltBkgCol3);
+        font.placeBack(dfltFont);
         
-        dcs0.insertEnd(icons[iconId].ic1);
-        dcs1.insertEnd(icons[iconId].ic1);
-        dcs2.insertEnd(icons[iconId].ic2);
-        dcs3.insertEnd(icons[iconId].ic3);
-        dcs4.insertEnd(icons[iconId].ic4);
+        dcs0.placeBack(icons[iconId].ic1);
+        dcs1.placeBack(icons[iconId].ic1);
+        dcs2.placeBack(icons[iconId].ic2);
+        dcs3.placeBack(icons[iconId].ic3);
+        dcs4.placeBack(icons[iconId].ic4);
 
         unActivateItem(*lastMouseClickid);
         setActiveItem(title.size()-1);
@@ -1054,7 +1064,7 @@ void CSUNIFORMLISTBOX::organize()
             else
                 yof = offset.cy;*/
             int a, b;
-            if(!itemAlign)
+            if(!gridOrientation)
             {   a = (dfltSz.cx + xof)*j; b = (dfltSz.cy + yof)*k; }
             else
             {   a = (dfltSz.cx + xof)*k; b = (dfltSz.cy + yof)*j;   }
@@ -1194,36 +1204,35 @@ void CSUNIFORMLISTBOX::animate()
     pdfltSz = csAlloc(1,dfltSz);
     poffset = csAlloc(1,offset);
     pgridWidth = csAlloc(1,gridWidth);
-    bool* pItemAlign = csAlloc(1,itemAlign);
     int* pcxmax = csAlloc(1, cxmax);
     int* pcymax = csAlloc(1, cymax);
 
     args.clear();
     args.setArgNumber(45);
-    args.regArg(dcs0.getTable(), dcs1.getTable(),dcs2.getTable(),dcs3.getTable(),
-                 color0.getTable(), color1.getTable(),color2.getTable(),color3.getTable(),
-                 bkgcol0.getTable(), bkgcol1.getTable(),bkgcol2.getTable(),bkgcol3.getTable(),
-                 pos.getTable(), posImg.getTable(), posTitle.getTable(),
-                 font.getTable(), title.getTable(), pimgSize,
+    args.regArg(dcs0.getData(), dcs1.getData(),dcs2.getData(),dcs3.getData(),
+                 color0.getData(), color1.getData(),color2.getData(),color3.getData(),
+                 bkgcol0.getData(), bkgcol1.getData(),bkgcol2.getData(),bkgcol3.getData(),
+                 pos.getData(), posImg.getData(), posTitle.getData(),
+                 font.getData(), title.getData(), pimgSize,
         lastMouseOverid, lastMouseClickid, n, &colorTracking, cntActivate, phdc,
         vkCtrlCount, vkCtrlCountControl, vkCtrlPoint, vkCtrlGdcPos, pmarging, pdfltSz,
         poffset, pgridWidth, smoothRepos, smoothReposCount,
         cutPasteViewer, cutPasteStart, cutPasteDone, cutPasteDone0,copyPasteKeyDownState,click_message, pcxmax, pcymax,
-        pItemAlign, extFunc, extFuncArgs);
+        &gridOrientation, extFunc, extFuncArgs);
     
 
     if(!animated)
     {
-        groupMsgPos = CSSECMAN::addAction(*parent, catchEvents, 45, dcs0.getTable(), dcs1.getTable(),dcs2.getTable(),dcs3.getTable(),
-                 color0.getTable(), color1.getTable(),color2.getTable(),color3.getTable(),
-                 bkgcol0.getTable(), bkgcol1.getTable(),bkgcol2.getTable(),bkgcol3.getTable(),
-                 pos.getTable(), posImg.getTable(), posTitle.getTable(),
-                 font.getTable(), title.getTable(), pimgSize,
+        groupMsgPos = CSSECMAN::addAction(*parent, catchEvents, 45, dcs0.getData(), dcs1.getData(),dcs2.getData(),dcs3.getData(),
+                 color0.getData(), color1.getData(),color2.getData(),color3.getData(),
+                 bkgcol0.getData(), bkgcol1.getData(),bkgcol2.getData(),bkgcol3.getData(),
+                 pos.getData(), posImg.getData(), posTitle.getData(),
+                 font.getData(), title.getData(), pimgSize,
         lastMouseOverid, lastMouseClickid, n, &colorTracking, cntActivate, phdc,
         vkCtrlCount, vkCtrlCountControl, vkCtrlPoint, vkCtrlGdcPos, pmarging, pdfltSz,
         poffset, pgridWidth, smoothRepos, smoothReposCount,
         cutPasteViewer, cutPasteStart, cutPasteDone, cutPasteDone0,copyPasteKeyDownState,click_message, pcxmax, pcymax,
-        pItemAlign, extFunc, extFuncArgs);
+        &gridOrientation, extFunc, extFuncArgs);
         
         animated = 1;
     }
@@ -1270,8 +1279,8 @@ void CSUNIFORMLISTBOX::update()
     if(*cntActivate)
     {
         organize2(*parent, pos.size(), imgSize,
-            pos.getTable(),posImg.getTable(),posTitle.getTable(),
-            dcs1.getTable(), font.getTable(), color1.getTable(),bkgcol1.getTable(), title.getTable(), hdc, cxmax, cymax);
+            pos.getData(),posImg.getData(),posTitle.getData(),
+            dcs1.getData(), font.getData(), color1.getData(),bkgcol1.getData(), title.getData(), hdc, cxmax, cymax);
 
         if(font.size())
         {
@@ -1288,8 +1297,8 @@ void CSUNIFORMLISTBOX::update()
     else
     {
         organize2(*parent, pos.size(), imgSize,
-            pos.getTable(),posImg.getTable(),posTitle.getTable(),
-            dcs4.getTable(), font.getTable(), color4.getTable(),bkgcol4.getTable(), title.getTable(), hdc, cxmax, cymax);
+            pos.getData(),posImg.getData(),posTitle.getData(),
+            dcs4.getData(), font.getData(), color4.getData(),bkgcol4.getData(), title.getData(), hdc, cxmax, cymax);
     }
     //InvalidateRect(SECTION[*parent], 0,1);
     //SendMessage(SECTION[*parent],WM_ERASEBKGND,0,0);
@@ -1368,7 +1377,7 @@ void _mouseMove(CSARGS Args)
         SIZE dfltSz = *(SIZE*)Args[29];
         SIZE offset = *(SIZE*)Args[30];
         int width = *(int*)Args[31];
-        bool itemAlign = *(int*)Args[42];
+        bool gridOrientation = *(bool*)Args[42];
 
         POINT p={0,0}, pvk;
         GetCursorPos(&p);
@@ -1403,7 +1412,7 @@ void _mouseMove(CSARGS Args)
                     return;
                     
                 int i = k*width + j;
-                if(itemAlign) 
+                if(gridOrientation) 
                 {
                     i = j*width + k;
                     if(k >= width) return;
@@ -1413,7 +1422,7 @@ void _mouseMove(CSARGS Args)
                     i = k*width + j;
                     if(j >= width) return;
                 } 
-                
+                //cout << "listbox -> item i: " << i << " width: " << width << endl;
 
                 if(i>=0 && i<n) // new modif
                 {
@@ -1432,6 +1441,7 @@ void _mouseMove(CSARGS Args)
                     }
                     if(*lastMouseOverid != i)
                     {
+                        //std::cout<<"\n lastMouseOverid = "<<lastId<<" , i = "<<i<<"   ----------\n";
                         ((void(*)(int,int,int,int,SIZE, RECT*,POINT*,POINT*, HDC*, HFONT*, COLORREF*, COLORREF*, wchar_t**, HDC, int, int))((void*)Args[21]))(
                             id,lastId, i,n, imgSize, pos, posImg, posTitle, dcs0, font, color0, bkgcol0, title, parentdc, cxmax, cymax);
                         //*lastMouseOverid = i;
@@ -1542,6 +1552,7 @@ void mouseClick(CSARGS Args)
         *smoothReposCount = 0;
 
         startCutPaste(Args);
+
     }
 }
 

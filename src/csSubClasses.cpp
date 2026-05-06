@@ -167,6 +167,11 @@ WNDPROC OldRichEditProc;
 
 void _showRichEditAction(CSARGS Args);
 
+RECT getRichEditMarging(int idEdit)
+{
+    return richEditMarging[idEdit];
+}
+
 int csCreateRichEdit(int idpar, RECT marging, const wchar_t* defaultText, int style, int hMenuId)
 {
 

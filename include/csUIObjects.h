@@ -7,9 +7,10 @@
 
 namespace CSUIOBJECTS
 {
-    CSSCROLLBAR addHScrollBar(int* idp, int* idClient=0, int* idMask=0, int thick=10, RECT geometry={0}, int autoHideIntensity=5);
-    CSSCROLLBAR addVScrollBar(int* idp, int* idClient=0, int* idMask=0, int thick=10, RECT geometry={0}, int autoHideIntensity=5);
+    CSSCROLLBAR addHScrollBar(int* idp, int* idClient=0, int* idMask=0, int thick=10, RECT geometry={0}, int autoHideIntensity=5, wchar_t* iconPrefixPath=L"resources/img/");
+    CSSCROLLBAR addVScrollBar(int* idp, int* idClient=0, int* idMask=0, int thick=10, RECT geometry={0}, int autoHideIntensity=5, wchar_t* iconPrefixPath=L"resources/img/");
     CSSYSCOMMAND_SECTION addSysCommand(int& id, POINT pos);
+    CSSYSCOMMAND_SECTION addSysCommand(int& id, POINT pos, const char* iconPrefixPath);
     //int addTitle(int& id, wchar_t*title, SIZE size={0}, char*iconPath=0, int fontSize = 16, wchar_t*fontName = L"Bauhaus 93");
     int addTitle(int& id, wchar_t*title, SIZE size, int fontSize = 16, wchar_t*fontName = L"Bauhaus 93", int iconId=-1, int alphaLevel=0);
 
@@ -25,7 +26,7 @@ CS_NUMERIC_INCREMENTER_PARAMS numericIncrementerExt1(int idp, RECT r, wchar_t* v
                                                     , COEFS4 bindCoefs={0,0,1,0}, FLAGS4 bindFlags={0,0,BIND_DEST_RIGHT_EDGE,0});
 CS_NUMERIC_INCREMENTER_PARAMS numericIncrementerExt2(int idp, RECT r, wchar_t* value, wchar_t* step, short format);
 
-CS_STRING_INCREMENTER_PARAMS* stringIncrementer(int idp, RECT r, wchar_t* value, long step, bool loopStyle, COEFS4 bindCoefs, FLAGS4 bindFlags);
+CS_STRING_INCREMENTER_PARAMS* stringIncrementer(int idp, RECT r, wchar_t* value, long step, bool loopStyle, COEFS4 bindCoefs, FLAGS4 bindFlags, const char* iconPrefixPath="resources/img/");
 
 void createToolTips(COLORREF color);
 

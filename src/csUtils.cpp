@@ -15,6 +15,7 @@ extern vector<RECT> RECTPARREFSAVED;
 extern vector<RECT> RECTCL;
 extern vector<SIZE> DELTASIZE;
 extern vector<POINT> DELTAPOS;
+extern int ID_NCHITTEST;
 extern vector<HWND> SECTION;
 extern vector<HDC> hdcontext;
 extern vector<bool> SECTIONSTYLE;
@@ -32,6 +33,7 @@ extern vector<SIZE> hdcSize;
 extern vector<HDC> hdStackContext;
 extern vector<HBITMAP> hStackBmp;
 extern vector<int> BORDERTHICK;
+extern vector<int> borderSize;
 extern vector<COLORREF> borderColor;
 extern vector<CSTIMER_PARAMS> TIMER_PARAMS;
 extern vector<CSLOCKED_MODE> lockedMode;
@@ -87,7 +89,12 @@ extern wchar_t* targetLanguageCode;
 extern wchar_t* appTitleFilePath;
 extern wchar_t* appTipsFilePath;
 
+extern CSAPP_STRINGS appStrings;
+extern bool loadStrings;
+
 int MAX_TRANSLATION_TEXT_LENGTH_REQUESTED;
+
+int CXSCREEN, CYSCREEN;
 
 LRESULT CALLBACK MouseHookProc(int nCode, WPARAM wParam, LPARAM lParam);
 HHOOK setHook();
@@ -111,8 +118,12 @@ extern vector<bool> setTitleInit;
 
 bool END_CREATE = 0;
 
+extern int TIPS_POPUP;
+
 void CSSECMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _sourceLanguage, const wchar_t* _targetLanguage, bool saveAppStrings, bool saveAppGeometry, void(*forceEventFunc)(CSARGS), CSARGS *forceEventArgs)
 {
+    TIPS_POPUP = 0;
+
     _hInstance = hInstance;
     sourceLanguageCode = (wchar_t*)_sourceLanguage;
     targetLanguageCode = (wchar_t*)_targetLanguage;
@@ -135,10 +146,7 @@ void CSSECMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _sourceLang
     CSFILESMAN::setSaveAppGeometry(saveAppGeometry);
     CSFILESMAN::setSaveAppTips(saveAppStrings);
 
-    xdimFact = 1.0*GetSystemMetrics(SM_CXSCREEN)/(1920);
-    ydimFact = 1.0*GetSystemMetrics(SM_CYSCREEN)/(1080);
     
-
     hReditLib = LoadLibraryW(L"riched20.dll");
 
     HMODULE hShcore = LoadLibraryW(L"Shcore.dll");
@@ -150,12 +158,18 @@ void CSSECMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _sourceLang
 
         if(PSetProcessDpiAwareness)
         {
-            cout<<L" Activation de la gestion avancee du rendu.. \n";
+            std::wcout << L" Activation de la gestion avancee du rendu.. \n";
             PSetProcessDpiAwareness(PROCESS_PER_MONITOR_DPI_AWARE);
             //PSetProcessDpiAwareness(DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
         }
         FreeLibrary(hShcore);
     }
+
+    CXSCREEN = GetSystemMetrics(SM_CXSCREEN);
+    CYSCREEN = GetSystemMetrics(SM_CYSCREEN);
+    
+    xdimFact = 1.0*GetSystemMetrics(SM_CXSCREEN)/(1920);
+    ydimFact = 1.0*GetSystemMetrics(SM_CYSCREEN)/(1080);
 
     if(forceEventFunc)
     {
@@ -165,12 +179,15 @@ void CSSECMAN::_CSIGMA_APP_INIT_(HINSTANCE hInstance, const wchar_t* _sourceLang
 }
 
 extern bool CLICK_EFFECT_BOOL;
-
+extern bool APP_CREATED;
 int CSSECMAN::_CSIGMA_APP_RUN_()
 {
     END_CREATE = 1;
 
     HHOOK mhook = setHook();
+
+    cout << "CXSCREEN: " << CXSCREEN << endl;
+    cout << "CYSCREEN: " << CYSCREEN << endl;
 
     while (GetMessage(&Messages, nullptr, 0, 0))
     {
@@ -334,6 +351,49 @@ bool CSSECMAN::removeLastAction(int id)
     GROUPED_EVENTS_ARGS[id].erase(GROUPED_EVENTS_ARGS[id].begin()+idAction);
     GROUPED_EVENTS_FUNC[id].erase(GROUPED_EVENTS_FUNC[id].begin()+idAction);
 
+    return 1;
+}
+
+int CSSECMAN::addEventSpy(void(*f)(CSARGS), CSARGS& args)
+{
+    forceMsgFunc.push_back(f);
+    forceMsgArgs.push_back(args);
+    return forceMsgFunc.size()-1;
+}
+
+int CSSECMAN::addEventSpy(void(*f)(CSARGS), int nbArgs, ...)
+{
+    CSARGS args(nbArgs);
+    va_list adArgs;
+    va_start (adArgs, nbArgs);
+    for (int i=0 ; i<nbArgs ; i++)
+    {
+        args.setArg(i,va_arg (adArgs, void*));
+    }
+    va_end(adArgs);
+    forceMsgFunc.push_back(f);
+    forceMsgArgs.push_back(args);
+    return forceMsgFunc.size()-1;
+}
+
+int CSSECMAN::removeEventSpy(int idEventSpy)
+{
+    if(idEventSpy < forceMsgArgs.size())
+    {
+        forceMsgArgs[idEventSpy].clear();
+        forceMsgArgs.erase(forceMsgArgs.begin()+idEventSpy);
+        forceMsgFunc.erase(forceMsgFunc.begin()+idEventSpy);
+        return 1;
+    }
+    return 0;
+}
+
+bool CSSECMAN::removeLastEventSpy()
+{
+    int idEventSpy = forceMsgArgs.size()-1;
+    forceMsgArgs[idEventSpy].clear();
+    forceMsgArgs.erase(forceMsgArgs.begin()+idEventSpy);
+    forceMsgFunc.erase(forceMsgFunc.begin()+idEventSpy);
     return 1;
 }
 
@@ -609,10 +669,19 @@ void CSSECMAN::setBorderColorAndThick(int id, COLORREF color, int thick)
     BORDERTHICK[id] = thick;
 }
 
-void CSSECMAN::setTitle(int id, CSTEXT title, bool textOnly)
+void CSSECMAN::setTitle(int id, CSTEXT title, bool textOnly, wchar_t* _translationContext, wchar_t* _guideExpression)
 {
     if(title.Text)
     {
+        
+        bool firstTimeTitle = 1;
+        
+        if(TITLE[id].Text) 
+        {
+            firstTimeTitle = 0;
+            //appStrings.removeString(&TITLE[id].Text);
+        }
+        
         if(TITLEFILE.size())
         {
             if(!setTitleInit[id])
@@ -643,6 +712,7 @@ void CSSECMAN::setTitle(int id, CSTEXT title, bool textOnly)
             wchar_t* t = TITLE[id].Text;
             if(!textOnly)
                 TITLE[id] = title;
+            
             TITLE[id].Text = CSSTRUTILS::makeWString(title.Text);
             if(setTitleInit[id]) free(t);
             
@@ -654,6 +724,16 @@ void CSSECMAN::setTitle(int id, CSTEXT title, bool textOnly)
             }
             setTitleInit[id] = 1;
 
+        }
+
+        if(loadStrings) 
+        {
+            if(TITLE[id].Text) free(TITLE[id].Text);
+            TITLE[id].Text = *appStrings.asd[appStrings.count++].viewedText;
+        }
+        else 
+        {
+            if(TITLE[id].Text) appStrings.newString(&TITLE[id].Text, _translationContext, _guideExpression);
         }
         
         if(!hdStackContext[id])
@@ -844,7 +924,12 @@ void CSSECMAN::setAsMinButton(int id, int& id_minimize)
         {
             int idMin = *(int*)Args[0];
             if(!attached[idMin])
+            {
                 SendMessage(SECTION[idMin], WM_SYSCOMMAND, SC_MINIMIZE, 0);
+                int n = SECTION.size();
+                for(int i=0; i<n; i++)
+                    SendMessage(SECTION[i], WM_CATCH_ROOT_MINIMIZED, 0, 0);
+            }
             else
                 ShowWindow(SECTION[idMin], 0);
         }
@@ -913,6 +998,12 @@ void CSSECMAN::setAsMaxButton(int& id, int& id_maximize)
                 SetWindowPos(hwnd, 0, r.left, r.top, r.right, r.bottom, SWP_NOZORDER);
 
                 isMaximized[id] = 1;
+
+                int n = SECTION.size();
+                for(int i=0; i<n; i++)
+                    SendMessage(SECTION[i], WM_CATCH_ROOT_MAXIMIZED, 0, 0);
+                    
+                
             }
             else
             {
@@ -927,6 +1018,10 @@ void CSSECMAN::setAsMaxButton(int& id, int& id_maximize)
 
 // redessiner la partie cachee pour eviter le noir
                 __getHiddenWindowPart(id, RECTRESTORE[id]);
+
+                int n = SECTION.size();
+                for(int i=0; i<n; i++)
+                    SendMessage(SECTION[i], WM_CATCH_ROOT_RESTORED, 0, 0);
             }
 
             __setAllRects();
@@ -986,7 +1081,6 @@ void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay
     TIPS_POPUP_PARAMS tpp;
     tpp.Ids.push_back(idPopup);
     tpp.Ids_src = idsSrc;
-    tpp.Geometry.push_back({0,0,rTips.right*geomCoef, rTips.bottom*geomCoef});
     tpp.Bpos.push_back(pb);
     if(withTips)
     {
@@ -996,7 +1090,12 @@ void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay
             for(int i=0; i<n; i++)
             {
                 //wcout<<TIPSFILE[id][TipsPopupParams[id].tips.size()][i]<<L"\n";
-                tips.paragraph[i].Text = CSSTRUTILS::makeWString(TIPSFILE[id][TipsPopupParams[id].text.size()][i]);
+                if(loadStrings) tips.paragraph[i].Text = *appStrings.asd[appStrings.count++].viewedText;
+                else 
+                {
+                    tips.paragraph[i].Text = CSSTRUTILS::makeWString(TIPSFILE[id][TipsPopupParams[id].text.size()][i]);
+                    appStrings.newString(&tips.paragraph[i].Text);
+                }
             }
         }
         else
@@ -1004,7 +1103,12 @@ void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay
             int n = tips.paragraph.size();
             for(int i=0; i<n; i++)
             {
-                tips.paragraph[i].Text = CSSTRUTILS::makeWString(tips.paragraph[i].Text);
+                if(loadStrings) tips.paragraph[i].Text = *appStrings.asd[appStrings.count++].viewedText;
+                else 
+                {
+                    tips.paragraph[i].Text = CSSTRUTILS::makeWString(tips.paragraph[i].Text);
+                    appStrings.newString(&tips.paragraph[i].Text);
+                }
             }
         }
     
@@ -1017,6 +1121,13 @@ void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay
         }
     }
 
+    if(tips.bindNone()) tips.bind = {{0,0,0},{0,0,0},{0,1,0},{0,1,0}};
+
+    SIZE sz = csGraphics::updateDynamicTextVisual(TIPS_POPUP, &tips);
+    rTips.right += sz.cx + 10;
+    rTips.bottom += sz.cy + 10;
+    //cout<<sz.cx<<" "<<sz.cy<<"\n";
+    tpp.Geometry.push_back({0,0,rTips.right/*geomCoef*/, rTips.bottom/*geomCoef*/});
     tpp.text.push_back(tips);
     tpp.Lock = locked;
     tpp.Delay = delay;
@@ -1036,7 +1147,8 @@ void CSSECMAN::joinPopup(int id, int idPopup, RECT rTips, POS_BOOL pb, int delay
     {
         int c = backgroundColor[TIPS_POPUP];
         csGraphics::setGraphicAreaPosition(TIPS_POPUP,{0,0});
-        csGraphics::setGraphicAreaColor(TIPS_POPUP,{GetRValue(c),GetGValue(c),GetBValue(c)},{0});
+        CSRGBA col = {GetRValue(c),GetGValue(c),GetBValue(c)};
+        csGraphics::setGraphicAreaColor(TIPS_POPUP,col,col);
         csGraphics::setGraphicAreaSize(TIPS_POPUP,{rTips.right, rTips.bottom});
         csGraphics::updateGraphicArea(TIPS_POPUP, 1);
         /*CSSCROLLBAR hscroll1 = CSUIOBJECTS::addHScrollBar(&MIDDLE_BOTTOM_SECTION, &MIDDLE_BOTTOM_SECTION, 0, 20);
@@ -1209,6 +1321,24 @@ void CSSECMAN::setVisible(int id, int showType)
     ShowWindow(SECTION[id], showType);
 }
 
+SIZE CSSECMAN::getCurrentDeltaSize()
+{
+    return DELTASIZE[ID_NCHITTEST];
+}
+POINT CSSECMAN::getCurrentDeltaPos()
+{
+    return DELTAPOS[ID_NCHITTEST];
+}
+
+int CSSECMAN::getCurrentResizingSectionId()
+{
+    return ID_NCHITTEST;
+}
+
+int CSSECMAN::getCurrentSizingArea()
+{
+    return CURSOR_NCHITTEST_POS;
+}
 /*********************************************************************************************************** */
 
 void _manageTimers(CSARGS Args)
@@ -1294,12 +1424,59 @@ void CSSECMAN::updateAfterResizing(int id)
     updateAfterResizeMsg[id] = 1;
 }
 
+int CSSECMAN::getCxScreen()
+{
+    return GetSystemMetrics(SM_CXSCREEN);
+}
+
+int CSSECMAN::getCyScreen()
+{
+    return GetSystemMetrics(SM_CYSCREEN);
+}
+
+float CSSECMAN::getDisplayScale()
+{
+    UINT dpi = 96;
+
+    HMODULE hUser32 = GetModuleHandleW(L"user32.dll");
+    if(hUser32)
+    {
+        typedef UINT (WINAPI* GetDpiForSystemProc)();
+        GetDpiForSystemProc PGetDpiForSystem = (GetDpiForSystemProc)GetProcAddress(hUser32, "GetDpiForSystem");
+        if(PGetDpiForSystem)
+        {
+            dpi = PGetDpiForSystem();
+        }
+    }
+
+    if(dpi == 96)
+    {
+        HDC hdcScreen = GetDC(nullptr);
+        if(hdcScreen)
+        {
+            dpi = GetDeviceCaps(hdcScreen, LOGPIXELSX);
+            ReleaseDC(nullptr, hdcScreen);
+        }
+    }
+
+    return (dpi / 96.0f);
+}
+
+int  CSSECMAN::getBorderSize(int id)
+{
+    return borderSize[id];
+}
+
+void  CSSECMAN::setBorderSize(int id, int size)
+{
+    borderSize[id] = size;
+}
 /**************************************************************************************************************** */
 
 int  CSUTILS::getAdjustedFontSizeXY(int size)
 {
-    return ceil(size*GetSystemMetrics(SM_CXSCREEN)*GetSystemMetrics(SM_CYSCREEN)/(1366.0*768));
-    //return xSize;
+    //return ceil(size*GetSystemMetrics(SM_CXSCREEN)*GetSystemMetrics(SM_CYSCREEN)/(1366.0*768));
+    return size*geomCoef;
 }
 
 RECT  CSUTILS::r(int x, int y, int cx, int cy, int id)
@@ -1343,14 +1520,16 @@ int  CSUTILS::getAdjustedFontSizeX(int xbaseFontSize)
    //cout<<ceil(xbaseFontSize*GetSystemMetrics(SM_CXSCREEN)/1366.0)<< " "<< adaptedSize<<"\n";
     //return ceil(xbaseFontSize*GetSystemMetrics(SM_CXSCREEN)/1366.0);
     //return ceil(xbaseFontSize*xdimFact*geomCoef*0.7);
-    return ceil(xbaseFontSize*xdimFact*geomCoef);
+    //return ceil(xbaseFontSize*xdimFact*geomCoef);
+    return xbaseFontSize*geomCoef;
     //return adaptedSize;
 }
 int  CSUTILS::getAdjustedFontSizeY(int ySize)
 {
     //return ceil(geomCoef*ySize*GetSystemMetrics(SM_CYSCREEN)/768.0);
     //return ceil(ySize*ydimFact*geomCoef*0.7);
-    return ceil(ySize*ydimFact*geomCoef);
+    //return ceil(ySize*ydimFact*geomCoef);
+    return ySize*geomCoef;
     //return ySize;
 }
 
@@ -1511,6 +1690,7 @@ LPSIZE CSUTILS::textExtent(int id, HFONT font, char*text)
     LPSIZE lps=(LPSIZE)malloc(sizeof(LPSIZE));
     HDC dc= hdcontext[id];
     SelectFont(dc, font);
+    
     GetTextExtentPoint32A(dc, (LPCSTR)text, strlen((LPCSTR)text), lps);
     return lps;
 }
@@ -1520,6 +1700,7 @@ LPSIZE CSUTILS::textExtentW(int id, HFONT font, wchar_t* text)
     LPSIZE lps=(LPSIZE)malloc(sizeof(LPSIZE));
     HDC dc= hdcontext[id];
     SelectFont(dc, font);
+    //SetTextCharacterExtra(dc, 1);
     GetTextExtentPoint32W(dc, (LPCWSTR)text, wcslen(text), lps);
     return lps;
 }
@@ -1757,3 +1938,4 @@ bool CSUTILS::pathExists(const wchar_t* path)
     DWORD attributes = GetFileAttributesW(path);
     return (attributes != INVALID_FILE_ATTRIBUTES);
 }
+

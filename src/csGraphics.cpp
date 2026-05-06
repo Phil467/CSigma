@@ -1,5 +1,6 @@
 #include "csGraphics.h"
 #include "math.h"
+#include "windows.h"
 
 extern int CAPTION_AREA_SIZE;
 extern vector<RECT> RECTWND;
@@ -778,6 +779,7 @@ void csGraphics::setDynamicText(int id, CSDYNAMIC_TEXT dst)
             dst.pPos.push_back(0);
         }
     }
+    //if(dst.bindNone()) 
     dynSimpleText[id] = dst;
     bltUpdate[id] = 1;
     //dynSimpleText[id].view = 1;
@@ -860,7 +862,7 @@ long csGraphics::getViewAreaBottom(int id)
 }
 
 extern float geomCoef;
-void viewDynamicText(int id, vector<CSTEXT> paragraph, vector<int> pSpace, vector<int>& pPos, RECT marg, bool updateGASize)
+void viewDynamicText2(int id, vector<CSTEXT> paragraph, vector<int> pSpace, vector<int>& pPos, RECT marg, bool updateGASize)
 {
     int n = paragraph.size();
     if(!n) return;
@@ -902,7 +904,7 @@ void viewDynamicText(int id, vector<CSTEXT> paragraph, vector<int> pSpace, vecto
         csGraphics::updateGraphicArea(id, 1);
         SendMessage(SECTION[id], WM_SIZE, 0, 0);
     }
-    BitBlt(dc.dc, 0,0, sz.cx, sz.cy, hdcontextExt[id], marg.left, marg.top, SRCCOPY);
+    //BitBlt(dc.dc, 0,0, sz.cx, sz.cy, hdcontextExt[id], marg.left, marg.top, SRCCOPY);
 
     int d = 0;
     for(int i=0; i<n; i++)
@@ -912,21 +914,220 @@ void viewDynamicText(int id, vector<CSTEXT> paragraph, vector<int> pSpace, vecto
         SetBkMode(dc.dc,TRANSPARENT);
         SetTextColor(dc.dc, RGB(paragraph[i].Color.r, paragraph[i].Color.g, paragraph[i].Color.b));
 
-        int ls = lines[i].size();
+        /*int ls = lines[i].size();
         for(int j=0; j<ls; j++)
         {
             TextOutW(dc.dc,0,d,(LPCWSTR)lines[i][j],wcslen(lines[i][j]));
             free(lines[i][j]);
             d += h0[i];
         }
+        lines[i].clear();*/
+        RECT rr = {marg.left,marg.top+d,sz.cx,sz.cy};
+        d += DrawTextW(hdcontextExt[id], paragraph[i].Text, wcslen(paragraph[i].Text), &rr, DT_WORDBREAK);
         d += pSpace[i]*geomCoef;
-        lines[i].clear();
         DeleteFont(hf[i]);
 
     }
-    DeleteBitmap(dc.hbmp);
+    //DeleteBitmap(dc.hbmp);
     //BitBlt(hdcontextExt[id],marg.left, marg.top, sz.cx, sz.cy, dc.dc, 0,0, SRCCOPY);
-    BitBlt(hdcontextExt[id],marg.left, marg.top, sz.cx, sz.cy, dc.dc, 0,0, SRCCOPY);
-    DeleteDC(dc.dc);
+    //DeleteDC(dc.dc);
 }
 
+
+
+void viewDynamicText(int id, vector<CSTEXT> paragraph, vector<int> pSpace, vector<int>& pPos, RECT marg, CSLINEAR_BIND lb={{0,0,0},{0,0,0},{0,1,0},{0,1,0}}, bool updateGASize=1)
+{
+    int n = paragraph.size();
+    if(!n) return;
+
+    int len = (bltRect[id].right-bltRect[id].left)/hZoom[id];
+    if(len > hdcontextExtSize[id].cx) len = hdcontextExtSize[id].cx;
+
+    int cx = bltRect[id].right-bltRect[id].left;
+    int cy = bltRect[id].bottom-bltRect[id].top;
+    
+    SIZE sz = {(cx-lb.r.x-marg.right-marg.left)*lb.r.a+lb.r.b, (cy-lb.b.x-marg.bottom-marg.top)*lb.b.a+lb.b.b};
+    marg.left += (cx-lb.l.x-marg.left-marg.right)*lb.l.a + lb.l.b;
+    marg.top += (cy-lb.t.x-marg.top-marg.bottom)*lb.t.a + lb.t.b;
+
+    HDC& dc = hdcontextExt[id];
+
+    if(updateGASize)
+    {
+        csGraphics::setGraphicAreaXSize(id, sz.cx);
+            
+        csGraphics::setGraphicAreaYSize(id, sz.cy);
+        csGraphics::updateGraphicArea(id, 1);
+        SendMessage(SECTION[id], WM_SIZE, 0, 0);
+    }
+
+    int d = 0;
+    for(int i=0; i<n; i++)
+    {
+        pPos[i] = d;
+        HFONT hf = CreateFontW(CSUTILS::getAdjustedFontSizeX(paragraph[i].FontSize.cx),0,0,paragraph[i].Underline,
+                                    paragraph[i].Bold, paragraph[i].Italic,FALSE,FALSE,DEFAULT_CHARSET,
+                                    OUT_DEFAULT_PRECIS, CLIP_MASK, CLEARTYPE_QUALITY, DEFAULT_PITCH, paragraph[i].Font);
+        SelectFont(dc, hf);
+        SetBkMode(dc,TRANSPARENT);
+        SetTextColor(dc, RGB(paragraph[i].Color.r, paragraph[i].Color.g, paragraph[i].Color.b));
+
+        RECT rr = {marg.left,marg.top+d,sz.cx,sz.cy};
+        d += DrawTextW(dc, paragraph[i].Text, wcslen(paragraph[i].Text), &rr, DT_WORDBREAK);
+        d += pSpace[i]*geomCoef;
+        DeleteFont(hf);
+
+    }
+
+    //wcout<<d<<" "<<sz.cy<<"\n";
+
+    if(d > sz.cy-marg.top)
+    {
+        sz.cy = d+ marg.top;
+        //if(updateGASize)
+        {
+            //if(updateGASize)
+                csGraphics::setGraphicAreaXSize(id, sz.cx);
+                
+            csGraphics::setGraphicAreaYSize(id, d+marg.top);
+            csGraphics::updateGraphicArea(id, 1);
+            SendMessage(SECTION[id], WM_SIZE, 0, 0);
+        }
+        d = 0;
+        for(int i=0; i<n; i++)
+        {
+            //pPos[i] = d;
+            HFONT hf = CreateFontW(CSUTILS::getAdjustedFontSizeX(paragraph[i].FontSize.cx),0,0,paragraph[i].Underline,
+                                        paragraph[i].Bold, paragraph[i].Italic,FALSE,FALSE,DEFAULT_CHARSET,
+                                        OUT_DEFAULT_PRECIS, CLIP_MASK, CLEARTYPE_QUALITY, DEFAULT_PITCH, paragraph[i].Font);
+            SelectFont(dc, hf);
+            SetBkMode(dc,TRANSPARENT);
+            SetTextColor(dc, RGB(paragraph[i].Color.r, paragraph[i].Color.g, paragraph[i].Color.b));
+
+            RECT rr = {marg.left,marg.top+d,sz.cx,sz.cy};
+            d += DrawTextW(dc, paragraph[i].Text, wcslen(paragraph[i].Text), &rr, DT_WORDBREAK|DT_EXPANDTABS|DT_RTLREADING);
+            d += pSpace[i]*geomCoef;
+            DeleteFont(hf);
+        }
+        //InvalidateRect(SECTION[id],0,1);
+    }
+
+}
+
+void viewDynamicText(int id)
+{
+    CSGRAPHIC_CONTEXT& gc = dynSimpleText[id].gContext;
+    CSLINEAR_BIND& lb = dynSimpleText[id].bind;
+    BitBlt(hdcontextExt[id], lb.l.b,lb.t.b, gc.sz.cx, gc.sz.cy, dynSimpleText[id].gContext.dc, 0, 0, SRCCOPY);
+    cout<<gc.sz.cx<<" "<<gc.sz.cy<<"\n";
+    InvalidateRect(SECTION[id],0,1);
+}
+
+
+SIZE csGraphics::updateDynamicTextVisual(int id, CSDYNAMIC_TEXT* dt)
+{
+    vector<CSTEXT>& paragraph = dt->paragraph;
+    vector<int>& pSpace = dt->pSpace;
+    vector<int>& pPos = dt->pPos;
+    RECT marg = dt->marg;
+    CSLINEAR_BIND& lb = dt->bind;
+    CSGRAPHIC_CONTEXT& gc = dt->gContext;
+
+    int n = paragraph.size();
+    if(!n) return {0};
+
+
+    int cx = bltRect[id].right-bltRect[id].left;
+    int cy = bltRect[id].bottom-bltRect[id].top;
+
+    
+    SIZE sz = {(cx-lb.r.x)*lb.r.a+lb.r.b, (cy-lb.b.x)*lb.b.a+lb.b.b};
+    marg.left += (cx-lb.l.x)*lb.l.a + lb.l.b;
+    marg.top += (cy-lb.t.x)*lb.t.a + lb.t.b;
+
+    HDC dc = hdcontextExt[id] != NULL ? hdcontextExt[id] : hdcontext[id];
+
+    int d = 0;
+    for(int i=0; i<n; i++)
+    {
+        pPos[i] = d;
+        HFONT hf = CreateFontW(CSUTILS::getAdjustedFontSizeX(paragraph[i].FontSize.cx),0,0,paragraph[i].Underline,
+                                    paragraph[i].Bold, paragraph[i].Italic,FALSE,FALSE,DEFAULT_CHARSET,
+                                    OUT_DEFAULT_PRECIS, CLIP_MASK, CLEARTYPE_QUALITY, DEFAULT_PITCH, paragraph[i].Font);
+        SelectFont(dc, hf);
+        SetBkMode(dc,TRANSPARENT);
+        SetTextColor(dc, RGB(paragraph[i].Color.r, paragraph[i].Color.g, paragraph[i].Color.b));
+
+        RECT rr = {marg.left,marg.top+d,sz.cx,sz.cy};
+        d += DrawTextW(dc, paragraph[i].Text, wcslen(paragraph[i].Text), &rr, DT_WORDBREAK|DT_RTLREADING);
+        d += pSpace[i]*geomCoef;
+        DeleteFont(hf);
+
+    }
+    sz.cy = d + marg.top;
+
+    if(hdcontextExt[id] && dt->updateGASize)
+    {
+        csGraphics::setGraphicAreaYSize(id, sz.cy);
+        csGraphics::updateGraphicArea(id, 1);
+        dc = hdcontextExt[id];
+    }
+
+    if(gc.dc) csGraphics::releaseGraphicContext(gc);
+    gc = csGraphics::createGraphicContext(sz);
+
+    BitBlt(gc.dc, 0,0, sz.cx, sz.cy, dc, lb.l.b, lb.t.b, SRCCOPY);
+
+    //if(d > sz.cy-marg.top)
+    {
+        d = 0;
+        for(int i=0; i<n; i++)
+        {
+            d = pPos[i];
+            HFONT hf = CreateFontW(CSUTILS::getAdjustedFontSizeX(paragraph[i].FontSize.cx),0,0,paragraph[i].Underline,
+                                        paragraph[i].Bold, paragraph[i].Italic,FALSE,FALSE,DEFAULT_CHARSET,
+                                        OUT_DEFAULT_PRECIS, CLIP_MASK, CLEARTYPE_QUALITY, DEFAULT_PITCH, paragraph[i].Font);
+            SelectFont(gc.dc, hf);
+            SetBkMode(gc.dc,TRANSPARENT);
+            SetTextColor(gc.dc, RGB(paragraph[i].Color.r, paragraph[i].Color.g, paragraph[i].Color.b));
+
+            RECT rr = {marg.left,marg.top+d,sz.cx,sz.cy};
+            DrawTextW(gc.dc, paragraph[i].Text, wcslen(paragraph[i].Text), &rr, DT_WORDBREAK|DT_RTLREADING);
+            DeleteFont(hf);
+        }
+        //InvalidateRect(SECTION[id],0,1);
+    }
+    
+    
+    return sz;
+}
+
+extern vector<bool> updateWhenGetResizingBool;
+extern HWND HWND_NCHITTEST;
+
+void csGraphics::updateWhenGetResizing(int id)
+{
+    updateWhenGetResizingBool[id] = 1;
+}
+
+void updateFrequency(HWND hwnd, UINT msg, int id)
+{
+    static int updateFrequencyCount = 0;
+    bool b = updateWhenGetResizingBool[id];
+    if(msg == WM_SIZE && b && HWND_NCHITTEST != hwnd)
+    {
+        updateFrequencyCount = 1;
+        PostMessage(hwnd, WM_TIMER, 0, 0);
+    }
+
+    if(msg == WM_TIMER && b && HWND_NCHITTEST != hwnd)
+    {
+    
+        if(updateFrequencyCount == 1)
+        {
+            updateFrequencyCount = 0;
+            //InvalidateRect(hwnd, &bltRect[id], 1);
+            InvalidateRect(hwnd, 0, 1);
+        }
+    }
+}

@@ -7,45 +7,45 @@
 
 template<> void csLIST<char*>::moveCharPtr(int from, int to)
 {
-    char*data = csAlloc<char>(strlen((const char*)DataTab[from])+1);
-    sprintf(data,"%s",DataTab[from]);
+    char*data = csAlloc<char>(strlen((const char*)Array[from])+1);
+    sprintf(data,"%s",Array[from]);
 
     if(from < to)
     {
         for(int i=from+1; i<=to; i++) 
         {
             int j = i-1;
-            DataTab[j] = (char*)realloc(DataTab[j], strlen((const char*)DataTab[i])+1);
-            sprintf(DataTab[j],"%s",DataTab[i]);
+            Array[j] = (char*)realloc(Array[j], strlen((const char*)Array[i])+1);
+            sprintf(Array[j],"%s",Array[i]);
         }
-        free(DataTab[to]);
-        DataTab[to] = data;
+        free(Array[to]);
+        Array[to] = data;
     }
     else if(from > to)
     {
         for(int i=from-1; i>=to; i--) 
         {
             int j = i+1;
-            DataTab[j] = (char*)realloc(DataTab[j], strlen((const char*)DataTab[i])+1);
-            sprintf(DataTab[j],"%s",DataTab[i]);
+            Array[j] = (char*)realloc(Array[j], strlen((const char*)Array[i])+1);
+            sprintf(Array[j],"%s",Array[i]);
         }
-        free(DataTab[to]);
-        DataTab[to] = data;
+        free(Array[to]);
+        Array[to] = data;
     }
 }
 
 template<> void csLIST<csLIST<POINT> >::duplicatePointList(int from, int to)
 {
-    if(tabSize)
+    if(arraySize)
     {
-        int n = DataTab[from].size();
+        int n = Array[from].size();
         csLIST<POINT> data;
         data.full(n, {0,0});
         for(int i=0; i<n; i++)
         {
-            data[i] = DataTab[from][i];
+            data[i] = Array[from][i];
         }
-        insertAt(data, to);
+        placeAt(data, to);
     }
 }
 
@@ -55,30 +55,30 @@ template<> char* csLIST<char>::toString(int from, int to)
     if(from < to)
     {
         int end = to + 1;
-        if(to >= tabSize)
-            end = tabSize;
+        if(to >= arraySize)
+            end = arraySize;
         ret = (char*)malloc(end - from+1);
         sprintf(ret,"\0");
         char c[2];
         int j=0;
         for(int i=from; i<end; i++, j++)
         {
-            ret[j] = DataTab[i];
+            ret[j] = Array[i];
         }
         ret[j] = '\0';
     }
     else
     {
         int end = from + 1;
-        if(from >= tabSize)
-            end = tabSize;
+        if(from >= arraySize)
+            end = arraySize;
         ret = (char*)malloc(end - to+1);
         sprintf(ret,"\0");
         char c[2];
         int j=0;
         for(int i=end-1; i>=to; i--, j++)
         {
-            ret[j] = DataTab[i];
+            ret[j] = Array[i];
         }
         ret[j] = '\0';
     }
@@ -91,30 +91,30 @@ template<> wchar_t* csLIST<wchar_t>::toStringW(int from, int to)
     if(from < to)
     {
         int end = to + 1;
-        if(to >= tabSize)
-            end = tabSize;
+        if(to >= arraySize)
+            end = arraySize;
         ret = (wchar_t*)malloc((end - from+1)*sizeof(wchar_t));
         wsprintf(ret,L"\0");
         wchar_t c[2];
         int j=0;
         for(int i=from; i<end; i++, j++)
         {
-            ret[j] = DataTab[i];
+            ret[j] = Array[i];
         }
         ret[j] = '\0';
     }
     else
     {
         int end = from + 1;
-        if(from >= tabSize)
-            end = tabSize;
+        if(from >= arraySize)
+            end = arraySize;
         ret = (wchar_t*)malloc((end - to+1)*sizeof(wchar_t));
         wsprintf(ret,L"\0");
         wchar_t c[2];
         int j=0;
         for(int i=end-1; i>=to; i--, j++)
         {
-            ret[j] = DataTab[i];
+            ret[j] = Array[i];
         }
         ret[j] = '\0';
     }
@@ -123,33 +123,33 @@ template<> wchar_t* csLIST<wchar_t>::toStringW(int from, int to)
 
 template<> void csLIST<char>::endString()
 {
-    if(tabSize >= memSize)
+    if(arraySize >= memSize)
     {
         memSize += inc;
-        DataTab = (char*)realloc(DataTab, memSize*sizeof(char));
+        Array = (char*)realloc(Array, memSize*sizeof(char));
     }
-    DataTab[tabSize] = '\0';
+    Array[arraySize] = '\0';
 }
 
 template<> void csLIST<wchar_t>::endStringW()
 {
-    if(tabSize >= memSize)
+    if(arraySize >= memSize)
     {
         memSize += inc;
-        DataTab = (wchar_t*)realloc(DataTab, memSize*sizeof(wchar_t));
+        Array = (wchar_t*)realloc(Array, memSize*sizeof(wchar_t));
     }
-    DataTab[tabSize] = '\0';
+    Array[arraySize] = '\0';
 }
 
 
 template<> csLIST<char> csLIST<char*>::toList(int id)
 {
-    int len = strlen(DataTab[id]);
+    int len = strlen(Array[id]);
     csLIST<char> list;
     list.initForce(len);
     for(int i=0; i<len; i++)
     {
-        list[i] = DataTab[id][i];
+        list[i] = Array[id][i];
 
     }
     list[len] = '\0';
@@ -157,12 +157,12 @@ template<> csLIST<char> csLIST<char*>::toList(int id)
 }
 template<> csLIST<wchar_t> csLIST<wchar_t*>::toListW(int id)
 {
-    int len = wcslen(DataTab[id]);
+    int len = wcslen(Array[id]);
     csLIST<wchar_t> list;
     list.initForce(len);
     for(int i=0; i<len; i++)
     {
-        list[i] = DataTab[id][i];
+        list[i] = Array[id][i];
     }
     list[len] = '\0'; // sans crainte car espace additionnel de 2 (variable _inc);
     return list;
@@ -175,16 +175,16 @@ template<class T> csLIST<T> csLIST<T>::breakList(int from, int to)
     int begin, end; 
     if(from < to)
     {
-        end = (to < tabSize) ? to+1 : tabSize;
+        end = (to < arraySize) ? to+1 : arraySize;
         begin = (from < 0) ? 0 : from;
     }
     else
     {
-        end = (from < tabSize) ? from+1 : tabSize;
+        end = (from < arraySize) ? from+1 : arraySize;
         begin = (to < 0) ? 0 : to;
     }
     int len = end-begin;
-    ret.insertTablePartAt(0, DataTab, begin, len);
+    ret.placeTablePartAt(0, Array, begin, len);
     deleteTableAt(begin, len);
 
     return ret;
@@ -193,9 +193,9 @@ template<class T> csLIST<T> csLIST<T>::breakList(int from, int to)
 /*template<class T> int csLIST<T>::find(T data)
 {
     int id = -1;
-    for(int i=0; i<tabSize; i++)
+    for(int i=0; i<arraySize; i++)
     {
-        if(DataTab[i] == data)
+        if(Array[i] == data)
         {
             id = data;
             break;

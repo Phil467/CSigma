@@ -1,6 +1,8 @@
 #include "csSection.h"
 #include "csUIFx.h"
 #include "csList.h"
+#include "windows.h"
+#include "wingdi.h"
 
 #include<mutex>
 
@@ -23,6 +25,7 @@ extern bool saveAppTips;
 vector<csLIST<wchar_t**>> registeredStrings;
 vector<bool> allowTranslation;
 
+vector<int> borderSize;
 vector<HWND> SECTION;
 vector<HWND> PAR;
 vector<int> PARID;
@@ -75,6 +78,7 @@ vector<CSRGBA> hdcontextExtBrdColor;
 vector<vector<CSGRAPHIC_CONTEXT>> imageGradients;
 vector<vector<CSGRAPHIC_ENTITY>> entity;
 vector<CSENTITY_ID_MAP> entityMap;
+vector<vector<CSRULER_ENTITY>> ruler;
 vector<bool> bltUpdate;
 vector<bool> attached;
 vector<MINMAXINFO> minMaxInfo;
@@ -117,7 +121,7 @@ vector<vector<CSARGS>> GROUPED_EVENTS_ARGS;
 
 vector<CSDYNAMIC_TEXT> dynSimpleText;
 vector<CSZOOM_PARAMS> zoomParams;
-vector<bool> updateAfterResizeMsg;
+vector<bool> updateAfterResizeMsg, updateWhenGetResizingBool;
 vector<CSAPP_ICON> appIcon;
 extern vector<bool> updateTitleSectionBool;
 
@@ -136,11 +140,16 @@ vector<float> vZoomOld; // ancien zoom vertical pour calculer le zoom vers un po
 extern bool __translateTitles();
 extern bool __translateTips();
 
+CSAPP_STRINGS appStrings;
+bool loadStrings = 0;
+
 bool APP_CREATED = 0;
 
 HINSTANCE _hInstance;
 HWND hwndBtnDown;
 int CURSOR_NCHITTEST_POS = 0;
+HWND HWND_NCHITTEST = 0;
+int ID_NCHITTEST = 0;
 bool EXECUTE_SIZEMOVE_WAIT_LIST_SIGNAL = 0;
 POINT TIMER_POINT, LBD_POINT;
 TASKBAR_INFO taskbarInfo;
@@ -153,10 +162,10 @@ int CAPTION_AREA_SIZE = GetSystemMetrics(SM_CYCAPTION);
 UINT LAST_TASKBAR_POS = 0;
 int HIDDEN_WINDOW_PART[4];
 
-void geometryBinding(int& id);
-void sizeMoveWaitListExecute(int id);
-void sizeMoveAll(int _id, bool automatic=1, SIZE _deltaSize= {0}, POINT _deltaPos= {0});
-void _blitDynamicText(int id);
+inline void geometryBinding(int& id);
+inline void sizeMoveWaitListExecute(int id);
+inline void sizeMoveAll(int _id, bool automatic=1, SIZE _deltaSize= {0}, POINT _deltaPos= {0});
+inline void _blitDynamicText(int id);
 
 using namespace CSSECMAN;
 using namespace CSUTILS;
@@ -168,8 +177,10 @@ int SMX, SMY;
 
 int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE edgeResize, bool show, bool rootStyle, bool attach)
 {
+
     int i = SECTION.size();
     RECT geom = r(_geom.left*geomCoef, _geom.top*geomCoef, _geom.right*geomCoef, _geom.bottom*geomCoef, i);
+    //RECT geom = r(_geom.left*geomCoef*xdimFact, _geom.top*geomCoef*ydimFact, _geom.right*geomCoef*xdimFact, _geom.bottom*geomCoef*ydimFact, i);
 
     if(i == 1)
     {
@@ -205,6 +216,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
     csLIST<wchar_t**> regStr;
     registeredStrings.push_back(regStr);
     //CSSECMAN::printRect(geom);
+    borderSize.push_back(8);
     RESIZE_EDGE.push_back(edgeResize);
     RECTPARREF.push_back({0});
     RECTCL.push_back({0,0,geom.right, geom.bottom});
@@ -260,6 +272,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
     cursor.push_back(LoadCursor(0,IDC_ARROW));
     entity.push_back(newVector<CSGRAPHIC_ENTITY>());
     entityMap.push_back({newVector<long>(),0,0});
+    ruler.push_back(newVector<CSRULER_ENTITY>());
     bltUpdate.push_back(0);
     minMaxInfo.push_back({{0,0},{0,0},{0,0}});
     sectionMouseHook.push_back(newVector<int>());
@@ -299,6 +312,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
     autoSizeComplete.push_back(0);
 
     updateAfterResizeMsg.push_back(0);
+    updateWhenGetResizingBool.push_back(0);
 
     dynSimpleText.push_back({newVector<CSTEXT>(),newVector<int>(),newVector<int>(),0});
 
@@ -318,23 +332,36 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
     PAR.push_back(par);
     //cout<<par<<"par\n";
 
-    if(id == -1)
+    if(id < 0)
     {
-        WNDCLASSEXW* wc = (WNDCLASSEXW*)malloc(sizeof(WNDCLASSEXW));
-        wc->hCursor = LoadCursor (NULL, IDC_ARROW);
+        WNDCLASSEXW* wc = new WNDCLASSEXW{};
+        wc->cbSize = sizeof(WNDCLASSEXW);
+        wc->style = CS_DBLCLKS;
         wc->lpfnWndProc = sectionProc;
+        wc->cbClsExtra = 0;
+        wc->cbWndExtra = 0;
         wc->hInstance = _hInstance;
-        wc->lpszClassName = L"CSigmaWindow\0";
-        wc->style = CS_DBLCLKS;                 /* Catch double-clicks */
-        //wc->hbrBackground = CreateSolidBrush(color);
-        wc->cbSize = sizeof(WNDCLASSEX);
-        RegisterClassExW(wc);
+        wc->hIcon = 0;
+        wc->hCursor = LoadCursor(NULL, IDC_ARROW);
+        wc->hbrBackground = CreateSolidBrush(0);
+        wc->lpszMenuName = 0;
+        wc->lpszClassName = L"CSigmaWindow";
+        wc->hIconSm = 0;
+        
+        if(!RegisterClassExW(wc))
+        {
+            DWORD err = GetLastError();
+            if(err != ERROR_CLASS_ALREADY_EXISTS)
+            {
+                cout << "RegisterClassExW failed, err=" << err << endl;
+            }
+        }
         wndClass.push_back(wc);
 
     }
-
+    
     HWND hPopup;
-    if(id == -1 || rootStyle)
+    if(id < 0 || rootStyle)
     {
         PARID.push_back(-1);
         SECTIONSTYLE.push_back(0);
@@ -343,7 +370,6 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
                      geom.left, geom.top, geom.right, geom.bottom,
                      par, 0, _hInstance, nullptr
                  );
-
     }
     else
     {
@@ -357,8 +383,8 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
                      geom.left, geom.top, geom.right, geom.bottom,
                      par, 0, _hInstance, NULL
                  );
-
     }
+    
     if(attach && par != 0)
     {
         SetParent(hPopup, par);
@@ -370,7 +396,6 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
     }
 
     RegisterTouchWindow(hPopup, TWF_WANTPALM);
-
 
     InvalidateRect(hPopup,0,1);
     if(show)
@@ -410,7 +435,7 @@ int CSSECMAN::createSection(int id, RECT _geom, COLORREF color, CSRESIZE_EDGE ed
     SetWindowLongPtr(hPopup, GWL_STYLE, style);
     SetWindowPos(hPopup, NULL, 0, 0, 0, 0,
              SWP_FRAMECHANGED | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE);*/
-
+             
     //if(SECTIONSTYLE[i])
     {
         GetWindowRect(SECTION[i], &RECTWND[i]);
@@ -438,10 +463,11 @@ int getId(HWND hwnd)
 
 
 int pid = 0;
-void _blitExtDc(int id);
+inline void _blitExtDc(int id);
 extern void __getHiddenWindowPart(int id, RECT r);
 extern void mouseWheel(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, int id); // defined in csScrollBar.cpp
 extern void gesture(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, int id); // csScrollBar.cpp
+extern void updateFrequency(HWND hwnd, UINT msg, int id); // csGraphics.cpp
 
 LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -461,7 +487,7 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         static bool bact = 0;
 
-        /*if(msg == WM_GETMINMAXINFO)
+        if(msg == WM_GETMINMAXINFO)
         {
             MINMAXINFO* mmi = (MINMAXINFO*)lParam;
 
@@ -481,7 +507,7 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 }
             }
 
-        }*/
+        }
 
         /*if(msg == WM_ACTIVATEAPP && id == 0)
         //if(msg == WM_APPCOMMAND)
@@ -529,12 +555,15 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         if (msg == WM_NCHITTEST)
         {
+            HWND_NCHITTEST = hwnd;
+            ID_NCHITTEST = id;
+
             POINT pt = { GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam) };
             ScreenToClient(hwnd, &pt);
 
             RECT rc;
             GetClientRect(hwnd, &rc);
-            const int BORDER_SIZE = 8;
+            const int BORDER_SIZE = borderSize[id];
 
             bool left = pt.x < BORDER_SIZE;
             bool right = pt.x > rc.right - BORDER_SIZE;
@@ -636,6 +665,7 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 }
             }
 
+
         }
         else if(msg == WM_SETCURSOR)
         {
@@ -722,6 +752,10 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 geometryBinding(id);
                 sizeMoveWaitListExecute(id);
             }
+            int n = SECTION.size();
+            for(int i=0; i<n; i++)
+                PostMessageW(SECTION[i], WM_CATCH_SIZEMOVE_INIT, wParam, lParam);
+
         }
         if(msg == WM_SIZE)
         {
@@ -825,6 +859,10 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
                 __getHiddenWindowPart(id, RECTWND[id]);
             }
+
+            int n = SECTION.size();
+            for(int i=0; i<n; i++)
+                PostMessageW(SECTION[i], WM_CATCH_SIZEMOVE_EXIT, wParam, lParam);
             //cout<<"++---------------exit-----------------------\n";
             /*if(!test)
             {
@@ -848,20 +886,7 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }*/
 
         }
-        else if(msg ==  WM_NCLBUTTONUP) // USE EXITSIZEMOVE
-        {
-            rwsave = {0};
-            hwndBtnDown = 0;
-            return DefWindowProc(hwnd, msg, wParam, lParam);
-        }
-
-        else if(msg == WM_NCLBUTTONDOWN)
-        {
-            rwsave = RECTWND[id];
-            hwndBtnDown = hwnd;
-            //cout<<"54656";
-            return DefWindowProc(hwnd, msg, wParam, lParam);
-        }
+        
 
         else if(msg == WM_DESTROY)
         {
@@ -914,10 +939,12 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
                     RECTPARREF[id] = CSUTILS::rectInParentRef(id);
                     RECTWNDSAVED[id] = rsv;
                     DELTAPOS[id] = {RECTWND[id].left-RECTWNDSAVED[id].left, RECTWND[id].top-RECTWNDSAVED[id].top};
-                    DELTASIZE[id] = {RECTWND[id].right-RECTWNDSAVED[id].right, RECTWND[id].bottom-RECTWNDSAVED[id].bottom};
+                    //DELTASIZE[id] = {RECTWND[id].right-RECTWNDSAVED[id].right, RECTWND[id].bottom-RECTWNDSAVED[id].bottom};
                     //DELTAPOS[id] = {RECTWND[id].left-RECTWNDSAVED[id].left, RECTWND[id].top-RECTWNDSAVED[id].top};
+                    if(!SECTIONSTYLE[id] && RECTWND[id].top==0 && DELTAPOS[id].y != 0) DELTAPOS[id].y  -= GetSystemMetrics(SM_CYEDGE); //correction bug
                     printRect(rsv, " Saved 2 : ");
                     printRect(RECTWND[id], " Now : ");
+                    
                     sizeMoveAll(id);
                 }
                 //THREAD_END[id] = 0;
@@ -1003,6 +1030,8 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
 
         mouseWheel(hwnd, msg, wParam, lParam, id);
         //gesture(hwnd, msg, wParam, lParam, id);
+
+        updateFrequency(hwnd, msg, id);
 
         if(msg == WM_GETMINMAXINFO)
         {
@@ -1218,6 +1247,21 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
             SetWindowPos(SECTION[id], HWND_TOP, 0,0,0,0, SWP_NOSIZE|SWP_NOMOVE);
 
         }
+        
+        if(msg ==  WM_NCLBUTTONUP) // USE EXITSIZEMOVE
+        {
+            rwsave = {0};
+            hwndBtnDown = 0;
+            return DefWindowProc(hwnd, msg, wParam, lParam);
+        }
+
+        else if(msg == WM_NCLBUTTONDOWN)
+        {
+            rwsave = RECTWND[id];
+            hwndBtnDown = hwnd;
+            //cout<<"54656";
+            return DefWindowProc(hwnd, msg, wParam, lParam);
+        }
         /*if(msg == WM_NCLBUTTONDBLCLK && CURSOR_NCHITTEST_POS == CURSOR_NCHITTEST_POS_CAPTION && !SECTIONSTYLE[id])
         {
             // L'utilisateur commence a déplacer ou redimensionner
@@ -1275,9 +1319,10 @@ LRESULT CALLBACK sectionProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
-void _blitImage(int id, int i);
-void _blitEntities(int id);
-void _blitExtDc(int id)
+inline void _blitImage(int id, int i);
+inline void _blitEntities(int id);
+inline void _blitRuler(int id, int i);
+inline void _blitExtDc(int id)
 {
     if(hdcontextExt[id])
     {
@@ -1286,6 +1331,12 @@ void _blitExtDc(int id)
 
         if(!withHScroll[id] && !withVScroll[id])
         {
+            int n = ruler[id].size();
+            if(n > 0)
+            {
+                for(int i=0; i<n; i++)
+                    _blitRuler(id, i);
+            }
             _blitEntities(id);
             BitBlt(hdStackContext[id],pout.x,pout.y,RECTCL[id].right, RECTCL[id].bottom, hdcontextExt[id], pin.x,pin.y, SRCCOPY);
         }
@@ -1367,7 +1418,7 @@ void _blitExtDc(int id)
     }
 }
 
-void _blitEntities(int id)
+inline void _blitEntities(int id)
 {
     if(bltUpdate[id])
     {
@@ -1379,13 +1430,17 @@ void _blitEntities(int id)
             {
                 _blitImage(id, idt);
             }
+            /*if(entity[id][i].type == CSG_ENTITY_RULER) // bug
+            {
+                _blitRuler(id, idt);
+            }*/
         }
         _blitDynamicText(id);
         bltUpdate[id] = 0;
     }
 }
 
-void _blitImage(int id, int i)
+inline void _blitImage(int id, int i)
 {
     CSLOADED_IMAGE li = loadedImage[id][i];
     if(li.show)
@@ -1403,17 +1458,30 @@ void _blitImage(int id, int i)
     }
 }
 
-extern void viewDynamicText(int id, vector<CSTEXT> paragraph, vector<int> pSpace, vector<int>& pPos, RECT marg, bool updateGASize);
-void _blitDynamicText(int id)
+inline void _blitRuler(int id, int i)
+{
+    CSRULER_ENTITY& ru = ruler[id][i];
+    if(*ru.show)
+    {
+        BitBlt(hdStackContext[id], ru.position->x, ru.position->y, ru.gContext->sz.cx, ru.gContext->sz.cy,
+        ru.gContext->dc, *ru.inPositionX, *ru.inPositionY, SRCCOPY);
+    }
+}
+
+extern void viewDynamicText(int id, vector<CSTEXT> paragraph, vector<int> pSpace, vector<int>& pPos, RECT marg, CSLINEAR_BIND lb, bool updateGASize);
+extern void viewDynamicText(int id);
+inline void _blitDynamicText(int id)
 {
     if(dynSimpleText[id].view)
     {
-        viewDynamicText(id, dynSimpleText[id].paragraph, dynSimpleText[id].pSpace, dynSimpleText[id].pPos, dynSimpleText[id].marg, dynSimpleText[id].updateGASize);
+        /*viewDynamicText(id, dynSimpleText[id].paragraph, dynSimpleText[id].pSpace, dynSimpleText[id].pPos, 
+            dynSimpleText[id].marg, dynSimpleText[id].bind, dynSimpleText[id].updateGASize);*/
+        viewDynamicText(id);
 
     }
 }
 
-void lockSizeMove(std::vector<std::vector<BIND_DIM_GEOM_PARAMS>> sizeBind, int id)
+inline void lockSizeMove(std::vector<std::vector<BIND_DIM_GEOM_PARAMS>> sizeBind, int id)
 {
     int n = sizeBind[id].size();
     for(int i=0; i<n; i++)
@@ -1423,7 +1491,7 @@ void lockSizeMove(std::vector<std::vector<BIND_DIM_GEOM_PARAMS>> sizeBind, int i
             lockSizeMoveId[iid] = id;
     }
 }
-/*void unlockSizeMove(std::vector<std::vector<BIND_DIM_GEOM_PARAMS>> sizeBind, int id)
+/*inline void unlockSizeMove(std::vector<std::vector<BIND_DIM_GEOM_PARAMS>> sizeBind, int id)
 {
     int n = sizeBind[id].size();
     for(int i=0; i<n; i++)
@@ -1433,7 +1501,7 @@ void lockSizeMove(std::vector<std::vector<BIND_DIM_GEOM_PARAMS>> sizeBind, int i
             lockSizeMoveId[iid] = -1;
     }
 }*/
-void unlockSizeMove(int id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n)
+inline void unlockSizeMove(int id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n)
 {
     for(int i=0; i<n; i++)
     {
@@ -1442,7 +1510,7 @@ void unlockSizeMove(int id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n)
     }
 }
 
-void setSizeMoveWaitList(std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int id)
+inline void setSizeMoveWaitList(std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int id)
 {
     int n = sizeBind.size();
     for(int i=0; i<n; i++)
@@ -1454,7 +1522,7 @@ void setSizeMoveWaitList(std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int id)
         }
     }
 }
-void unSetSizeMoveWaitList(std::vector<BIND_DIM_GEOM_PARAMS> sizeBind)
+inline void unSetSizeMoveWaitList(std::vector<BIND_DIM_GEOM_PARAMS> sizeBind)
 {
     int n = sizeBind.size();
     for(int i=0; i<n; i++)
@@ -1464,8 +1532,8 @@ void unSetSizeMoveWaitList(std::vector<BIND_DIM_GEOM_PARAMS> sizeBind)
         deltaSizeMoveWaitList[iid] = {0,0,0,0};
     }
 }
-void geometryBinding(int& _id);
-void sendGeometryBindingToDest(std::vector<std::vector<BIND_DIM_GEOM_PARAMS>> sizeBind, int id)
+inline void geometryBinding(int& _id);
+inline void sendGeometryBindingToDest(std::vector<std::vector<BIND_DIM_GEOM_PARAMS>> sizeBind, int id)
 {
     int n = sizeBind[id].size();
     for(int i=0; i<n; i++)
@@ -1505,7 +1573,7 @@ int getRightParam(int id, int iLoop, char edge, BIND_DIM_GEOM_PARAMS& bd)
     }
 }
 
-void sizeMoveCore(int id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n, int delta)
+inline void sizeMoveCore(int id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n, int delta)
 {
     if(delta)
         for(int i=0; i<n; i++)
@@ -1611,12 +1679,12 @@ void sizeMoveCore(int id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n, int
 
 }
 
-void delay(int del = 10)
+inline void delay(int del = 10)
 {
     std::this_thread::sleep_for(std::chrono::microseconds(del));
 }
 
-void endThread(int*id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n, int& additionalIter)
+inline void endThread(int*id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n, int& additionalIter)
 {
     if(enterSizeMove[*id] == 0)
     {
@@ -1638,7 +1706,7 @@ void endThread(int*id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n, int& a
     }
 }
 
-void endSizeMove(int id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n)
+inline void endSizeMove(int id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n)
 {
     for(int i=0; i<n; i++)
     {
@@ -1660,7 +1728,7 @@ void endSizeMove(int id, std::vector<BIND_DIM_GEOM_PARAMS> sizeBind, int n)
 
 int delayVal = 500;
 
-void geometryBinding(int& _id)
+inline void geometryBinding(int& _id)
 {
     if(SECTION[_id] == hwndBtnDown)
     {
@@ -1787,7 +1855,7 @@ void geometryBinding(int& _id)
 
 }
 
-void sizeMoveWaitListExecute(int id)
+inline void sizeMoveWaitListExecute(int id)
 {
     int *_id = csAlloc(1,id);
     thread t(
@@ -1812,7 +1880,7 @@ void sizeMoveWaitListExecute(int id)
 
                     if(cx > -1 && cy > -1)
                     {
-                        SetWindowPos(SECTION[i], 0, x, y, cx, cy,  SWP_NOZORDER);
+                        SetWindowPos(SECTION[i], 0, x, y, cx, cy,  SWP_NOZORDER|SWP_NOACTIVATE);
                     }
                 }
                 //delay(10);
@@ -1835,7 +1903,7 @@ void sizeMoveWaitListExecute(int id)
     t.detach();
 }
 
-void sizeMoveAll(int _id, bool automatic, SIZE _deltaSize, POINT _deltaPos)
+inline void sizeMoveAll(int _id, bool automatic, SIZE _deltaSize, POINT _deltaPos)
 {
     lockSizeMove(lSizeBind, _id);
     sendGeometryBindingToDest(lSizeBind, _id);

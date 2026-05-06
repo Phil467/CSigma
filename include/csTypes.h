@@ -15,6 +15,11 @@
 #include <csArithmetic/csARITHMETIC.h>
 
 #define WM_TRANSLATED (WM_USER + 2)
+#define WM_CATCH_SIZEMOVE_INIT (WM_USER + 3)
+#define WM_CATCH_SIZEMOVE_EXIT (WM_USER + 4)
+#define WM_CATCH_ROOT_MAXIMIZED (WM_USER + 5)
+#define WM_CATCH_ROOT_MINIMIZED (WM_USER + 6)
+#define WM_CATCH_ROOT_RESTORED (WM_USER + 7)
 
 #define AUTO_TRANSF_LENGTH   1
 #define AUTO_TRANSF_RECT   2
@@ -24,6 +29,7 @@
 #define CSG_ENTITY_MESH 12
 #define CSG_ENTITY_POLYLINE 13
 #define CSG_ENTITY_POINT 14
+#define CSG_ENTITY_RULER 15
 
 #define INPUT_FORMAT_INTERGER 1
 #define INPUT_FORMAT_POSITIVE_INTERGER 2
@@ -142,6 +148,7 @@ typedef struct
     HDC dc;
     HBITMAP hbmp;
     BITMAP bm;
+
 } CSGRAPHIC_CONTEXT_EXT;
 
 typedef struct
@@ -150,6 +157,17 @@ typedef struct
     HBITMAP hbmp;
     SIZE sz;
 } CSGRAPHIC_CONTEXT;
+
+
+typedef struct
+{
+    bool* show;
+    POINT* position;
+    LONG* inPositionX;
+    LONG* inPositionY;
+    CSGRAPHIC_CONTEXT* gContext;
+} CSRULER_ENTITY;
+
 
 typedef struct
 {
@@ -269,6 +287,39 @@ typedef struct CSSYSCOMMAND_SECTION
     int SYSCOMMAND_SECTION, SYS_MIN, SYS_MAX, SYS_CLOSE;
 };
 
+
+typedef struct 
+{
+    int x;
+    float a;
+    int b;
+
+    bool isNull()
+    {
+        return (x==0 && a == 0.0f && b == 0);
+    }
+}CSLINEAR;
+
+typedef struct CSLINEAR_BIND
+{
+    CSLINEAR l={0,0.0f,0}, t={0,0.0f,0}, r={0,1.0f,0}, b={0,1.0f,0};
+
+    /*CSLINEAR_BIND()
+        : l{0, 0.0f, 0}, t{0, 0.0f, 0}, r{0, 0.0f, 0}, b{0, 0.0f, 0}
+    {}
+
+    CSLINEAR_BIND(CSLINEAR left, CSLINEAR top, CSLINEAR right, CSLINEAR bottom)
+        : l(left), t(top), r(right), b(bottom)
+    {}
+
+    CSLINEAR_BIND(int lx, float la, int lb,
+                    int tx, float ta, int tb,
+                    int rx, float ra, int rb,
+                    int bx, float ba, int bb)
+        : l{lx, la, lb}, t{tx, ta, tb}, r{rx, ra, rb}, b{bx, ba, bb}
+    {}*/
+};
+
 typedef struct
 {
     vector<CSTEXT> paragraph;
@@ -277,6 +328,13 @@ typedef struct
     RECT marg;
     bool updateGASize;
     bool view;
+    CSLINEAR_BIND bind;
+    CSGRAPHIC_CONTEXT gContext;
+
+    bool bindNone()
+    {
+        return bind.l.isNull() && bind.t.isNull() && bind.r.isNull() && bind.b.isNull();
+    }
     
 }CSDYNAMIC_TEXT;
 
@@ -498,12 +556,6 @@ typedef struct
     bool centered;
 }CSAPP_ICON;
 
-typedef struct 
-{
-    int x;
-    float a;
-    int b;
-}CSLINEAR;
 
 template<class T> vector<T> newVector()
 {
@@ -623,6 +675,29 @@ typedef struct
 }CSTEXT_PARAGRAPH;
 
 
+typedef struct CSAPP_STRING_DATA
+{
+    wchar_t* originalText;
+    wchar_t** viewedText;
+    wchar_t* translationContext;
+    wchar_t* guideExpression;
+    wchar_t* translatedText;
+
+    CSAPP_STRING_DATA();
+    bool setText(wchar_t** str, wchar_t* _translationContext, wchar_t* _guideExpression);
+    bool clear();
+};
+
+typedef struct CSAPP_STRINGS
+{
+    vector<CSAPP_STRING_DATA> asd;
+    long count = 0;
+    void newString(wchar_t** str, wchar_t* _translationContext=0, wchar_t* _guideExpression=0);
+    bool removeString(wchar_t** str);
+};
+
+
 typedef CSIMAGE_GRADIENT CSMOUSE_HOVER_EFFECT;
 typedef BOOL_RECT CSRESIZE_EDGE;
+
 #endif // CSTYPES_H

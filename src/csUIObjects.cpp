@@ -2,6 +2,7 @@
 #include "readwfile.h"
 #include "csArithmetic/csArithUtils.h"
 #include "csStrUtils.h"
+#include "windows.h"
 
 using namespace CSSTRUTILS;
 
@@ -27,7 +28,7 @@ int TIPS_POPUP;
 extern float geomCoef;
 void smoothScrolling(CSARGS Args);
 
-CSSCROLLBAR CSUIOBJECTS::addHScrollBar(int* idp, int* idClient, int* idMask, int thick, RECT geometry, int autoHideIntensity)
+CSSCROLLBAR CSUIOBJECTS::addHScrollBar(int* idp, int* idClient, int* idMask, int thick, RECT geometry, int autoHideIntensity, wchar_t* iconPrefixPath)
 {
     RECT r = RECTCL[*idp];
     int*idc = idClient;
@@ -40,7 +41,7 @@ CSSCROLLBAR CSUIOBJECTS::addHScrollBar(int* idp, int* idClient, int* idMask, int
                 (geometry.bottom ? geometry.bottom : thick)
             };*/
 
-    CSSCROLLBAR hscroll(*idp, thick, geometry);
+    CSSCROLLBAR hscroll(*idp, thick, geometry, CS_SBAR_SURFACE, CS_SBAR_HORIZONTAL, iconPrefixPath);
 
     if(idMask)
     {
@@ -58,7 +59,7 @@ CSSCROLLBAR CSUIOBJECTS::addHScrollBar(int* idp, int* idClient, int* idMask, int
     return hscroll;
 }
 
-CSSCROLLBAR CSUIOBJECTS::addVScrollBar(int* idp, int* idClient, int* idMask, int thick, RECT geometry, int autoHideIntensity)
+CSSCROLLBAR CSUIOBJECTS::addVScrollBar(int* idp, int* idClient, int* idMask, int thick, RECT geometry, int autoHideIntensity, wchar_t* iconPrefixPath)
 {
     RECT r = RECTCL[*idp];
     int*idc = idClient;
@@ -72,7 +73,7 @@ CSSCROLLBAR CSUIOBJECTS::addVScrollBar(int* idp, int* idClient, int* idMask, int
     
              };*/
 
-    CSSCROLLBAR vscroll(*idp, thick, geometry, 1, CS_SBAR_VERTICAL);
+    CSSCROLLBAR vscroll(*idp, thick, geometry, 1, CS_SBAR_VERTICAL, (wchar_t*)(iconPrefixPath));
 
     if(idMask)
     {
@@ -195,9 +196,9 @@ CSSYSCOMMAND_SECTION CSUIOBJECTS::addSysCommand(int& id, POINT pos)
     CSSYSCOMMAND_SECTION sc;
     int width = (GetSystemMetrics(SM_CYCAPTION)-2);
     if(geomCoef < 1.5)
-        sc.SYSCOMMAND_SECTION = CSSECMAN::createSection(id, {RECTCL[id].right/geomCoef-3*width-2-6,pos.y,3*width+3,width},  RGB(5,5,5), {0,0,0,0});
+        sc.SYSCOMMAND_SECTION = CSSECMAN::createSection(id, {(RECTCL[id].right-3*width-2-6)/geomCoef,pos.y,(3*width+3)/geomCoef,width/geomCoef+2},  RGB(5,5,5), {0,0,0,0});
     else
-        sc.SYSCOMMAND_SECTION = CSSECMAN::createSection(id, {RECTCL[id].right/geomCoef-3*width-2,pos.y,3*width,width},  RGB(5,5,5), {0,0,0,0});
+        sc.SYSCOMMAND_SECTION = CSSECMAN::createSection(id, {(RECTCL[id].right-3*width-2)/geomCoef,pos.y,(3*width)/geomCoef,width/geomCoef+2},  RGB(5,5,5), {0,0,0,0});
     CSBIND_GEOM_PARAMS bd = {sc.SYSCOMMAND_SECTION, {-1,0,1,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
     CSSECMAN::bindGeometry(id, bd);
     CSSECMAN::setBorderColorAndThick(sc.SYSCOMMAND_SECTION, RGB(20,20,20), 1);
@@ -206,15 +207,57 @@ CSSYSCOMMAND_SECTION CSUIOBJECTS::addSysCommand(int& id, POINT pos)
     if(geomCoef < 1.5)
     {
         width+=3;
-        sc.SYS_MIN = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/min20.bmp\0", "resources/img/min20.bmp\0", {-1,-1,width,width});
-        sc.SYS_MAX = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/max20.bmp\0", "resources/img/max20.bmp\0", {-1+width,-1,width,width});
-        sc.SYS_CLOSE = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/close20.bmp\0", "resources/img/close20.bmp\0", {-1+width*2,-1,width,width});
+        sc.SYS_MIN = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/min20.bmp\0", "resources/img/min20.bmp\0", {-1,-1,width/geomCoef,width/geomCoef});
+        sc.SYS_MAX = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/max20.bmp\0", "resources/img/max20.bmp\0", {-1+width/geomCoef,-1,width/geomCoef,width/geomCoef});
+        sc.SYS_CLOSE = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/close20.bmp\0", "resources/img/close20.bmp\0", {-1+width*2/geomCoef,-1,width/geomCoef,width/geomCoef});
     }
     else
     {
-        sc.SYS_MIN = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/_min02.bmp\0", "resources/img/_min01.bmp\0", {1,1,width,width});
-        sc.SYS_MAX = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/_max02.bmp\0", "resources/img/_max01.bmp\0", {1+width,1,width,width});
-        sc.SYS_CLOSE = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/_close02.bmp\0", "resources/img/_close01.bmp\0", {1+width*2,1,width,width});
+        sc.SYS_MIN = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/_min02.bmp\0", "resources/img/_min01.bmp\0", {1,1,width/geomCoef,width/geomCoef});
+        sc.SYS_MAX = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/_max02.bmp\0", "resources/img/_max01.bmp\0", {1+width/geomCoef,1,width/geomCoef,width/geomCoef});
+        sc.SYS_CLOSE = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, "resources/img/_close02.bmp\0", "resources/img/_close01.bmp\0", {1+width*2/geomCoef,1,width/geomCoef,width/geomCoef});
+    }
+    CSSECMAN::setAsMinButton(sc.SYS_MIN, id);
+    CSSECMAN::setAsMaxButton(sc.SYS_MAX, id);
+    CSSECMAN::setAsCloseButton(sc.SYS_CLOSE, id);
+
+    return sc;
+}
+
+extern int CAPTION_AREA_SIZE;
+extern float xdimFact;
+extern float ydimFact;
+
+CSSYSCOMMAND_SECTION CSUIOBJECTS::addSysCommand(int& id, POINT pos, const char* iconPrefixPath)
+{
+    CSSYSCOMMAND_SECTION sc;
+    
+    int width = 21;
+    int dx = GetSystemMetrics(SM_CXFRAME);
+    cout<<"width: "<<width<<endl;
+    if(geomCoef < 1.5)
+        sc.SYSCOMMAND_SECTION = CSSECMAN::createSection(id, {(RECTCL[id].right/geomCoef-3*width),pos.y,(3*width),width+2},  RGB(5,5,5), {0,0,0,0});
+    else
+        sc.SYSCOMMAND_SECTION = CSSECMAN::createSection(id, {(RECTCL[id].right/geomCoef-3*width),pos.y,(3*width),width+2},  RGB(5,5,5), {0,0,0,0});
+    CSBIND_GEOM_PARAMS bd = {sc.SYSCOMMAND_SECTION, {-1,0,1,0}, {BIND_DEST_LEFT_EDGE,0,BIND_DEST_LEFT_EDGE,0}};
+    CSSECMAN::bindGeometry(id, bd);
+    CSSECMAN::setBorderColorAndThick(sc.SYSCOMMAND_SECTION, RGB(20,20,20), 1);
+
+    //width -= 2;
+    if(geomCoef < 1.5)
+    {
+        width+=3;
+        sc.SYS_MIN = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, (char*)(string(iconPrefixPath) + "min20.bmp\0").c_str(), (char*)(string(iconPrefixPath) + "min20.bmp\0").c_str(), {-1,-1,width,width});
+        sc.SYS_MAX = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, (char*)(string(iconPrefixPath) + "max20.bmp\0").c_str(), (char*)(string(iconPrefixPath) + "max20.bmp\0").c_str(), {-1+width,-1,width,width});
+        sc.SYS_CLOSE = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, (char*)(string(iconPrefixPath) + "close20.bmp\0").c_str(), (char*)(string(iconPrefixPath) + "close20.bmp\0").c_str(), {-1+width*2,-1,width,width});
+    }
+    else
+    {
+        //float w = (width);
+        float w = 16;
+        sc.SYS_MIN = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, (char*)(string(iconPrefixPath) + "_min02.bmp\0").c_str(), (char*)(string(iconPrefixPath) + "_min01.bmp\0").c_str(), {1,1,w,w});
+        sc.SYS_MAX = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, (char*)(string(iconPrefixPath) + "_max02.bmp\0").c_str(), (char*)(string(iconPrefixPath) + "_max01.bmp\0").c_str(), {1+w,1,w,w});
+        sc.SYS_CLOSE = CSUIOBJECTS::iconButton01(sc.SYSCOMMAND_SECTION, (char*)(string(iconPrefixPath) + "_close02.bmp\0").c_str(), (char*)(string(iconPrefixPath) + "_close01.bmp\0").c_str(), {1+(w)*2,1,w,w});
     }
     CSSECMAN::setAsMinButton(sc.SYS_MIN, id);
     CSSECMAN::setAsMaxButton(sc.SYS_MAX, id);
@@ -868,10 +911,15 @@ bool CS_STRING_INCREMENTER_PARAMS::removeItem(int idItem)
     return 0;
 }
 
-CS_STRING_INCREMENTER_PARAMS* CSUIOBJECTS::stringIncrementer(int idp, RECT r, wchar_t* value, long step, bool loopStyle, COEFS4 bindCoefs, FLAGS4 bindFlags)
+CS_STRING_INCREMENTER_PARAMS* CSUIOBJECTS::stringIncrementer(int idp, RECT r, wchar_t* value, long step, bool loopStyle, COEFS4 bindCoefs, FLAGS4 bindFlags, const char* iconPrefixPath)
 {
     CS_STRING_INCREMENTER_PARAMS sip = {0};
     sip.idSection = CSSECMAN::createSection(idp, r,  RGB(30,30,30), {0,0,0,0});
+    int c = 2*geomCoef;
+    int l = (r.bottom-4);
+    sip.idText = csCreateRichEdit(sip.idSection, {(2+l+2)*geomCoef,c,(2+l+2)*geomCoef,c}, (const wchar_t*)value, 0, 0);
+    csSetRichEditFormat(sip.idText, INPUT_FORMAT_POSITIVE_INTERGER);
+
     sip.newItem((const wchar_t*)value, 1);
     sip.step = step;
     sip.currentItem = 0;
@@ -879,25 +927,26 @@ CS_STRING_INCREMENTER_PARAMS* CSUIOBJECTS::stringIncrementer(int idp, RECT r, wc
     CSBIND_GEOM_PARAMS bd;
     bd = {sip.idSection, bindCoefs, bindFlags};
     CSSECMAN::bindGeometry(idp, bd);
-    int l = (r.bottom-4);
 
     CSSECMAN::setBorderThick(sip.idSection, 2);
     CSSECMAN::setTitle(sip.idSection, CSTEXT{.Text=L"\0", .Font=L"Arial", .FontSize=10, .Italic=1, .Bold=FW_BOLD, .Color={100,100,100},
                                    .Marging={0,0}, .Align = CS_TA_CENTER, .Show=1, .ShowEntierText=1});
 
-    sip.idUp = CSUIOBJECTS::iconButton02(sip.idSection, "resources/img/next2.bmp\0", "resources/img/next.bmp\0", {r.right-l-2,2,l,l});
-    sip.idDown = CSUIOBJECTS::iconButton02(sip.idSection, "resources/img/back2.bmp\0", "resources/img/back.bmp\0", {2,2,l,l});
+    sip.idUp = CSUIOBJECTS::iconButton02(sip.idSection, (char*)(string(iconPrefixPath) + "next2.bmp\0").c_str(), (char*)(string(iconPrefixPath) + "next.bmp\0").c_str(), {r.right-l-2,2,l,l});
+    sip.idDown = CSUIOBJECTS::iconButton02(sip.idSection, (char*)(string(iconPrefixPath) + "back2.bmp\0").c_str(), (char*)(string(iconPrefixPath) + "back.bmp\0").c_str(), {2,2,l,l});
 
-
-    int c = 2*geomCoef;
-    sip.idText = csCreateRichEdit(sip.idSection, {(2+l+2)*geomCoef,c,(2+l+2)*geomCoef,c}, (const wchar_t*)value, 0, 0);
-    csSetRichEditFormat(sip.idText, INPUT_FORMAT_POSITIVE_INTERGER);
 
     sip.loopStyle = loopStyle;
+
+    wchar_t*& text = TITLE[sip.idSection].Text;
+    int t;
+    text = (wchar_t*)realloc(text, (t = wcslen(sip.item[0].c_str())+1)*sizeof(wchar_t));
+    wcscpy_s(text, t,  sip.item[0].c_str());
 
     bool*titleAutoRepos = csAlloc<bool>(1,0);
     CS_STRING_INCREMENTER_PARAMS* psip = new CS_STRING_INCREMENTER_PARAMS;
     *psip = sip;
+
 
     CSSECMAN::addAction(sip.idUp, strIncrementFunction, 2, psip, titleAutoRepos);
     CSSECMAN::addAction(sip.idDown, strDecrementFunction, 2, psip, titleAutoRepos);

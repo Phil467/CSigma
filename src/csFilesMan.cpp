@@ -539,37 +539,37 @@ void CSFILESMAN::__saveAppTips(wchar_t* path)
         int m = TipsPopupParams[i].text.size();
         
         wstring tmp= (to_wstring(m)+L" ");
-        strStruct.insertTableAt((wchar_t*)tmp.c_str(), strStruct.size(), tmp.size());
+        strStruct.placeTableAt((wchar_t*)tmp.c_str(), strStruct.size(), tmp.size());
         for(int j=0; j<m; j++)
         {
             int o = TipsPopupParams[i].text[j].paragraph.size();
             wstring tmp= (to_wstring(o)+L" ");
-            strStruct.insertTableAt((wchar_t*)tmp.c_str(), strStruct.size(), tmp.size());
+            strStruct.placeTableAt((wchar_t*)tmp.c_str(), strStruct.size(), tmp.size());
             int pos = 0;
             for(int k=0; k<o; k++)
             {
                 wchar_t* t = TipsPopupParams[i].text[j].paragraph[k].Text;
-                str.insertTableAt(t, str.size(), wcslen(t));
-                str.insertEnd('|');
+                str.placeTableAt(t, str.size(), wcslen(t));
+                str.placeBack('|');
 
             }
         }
         strStruct.deleteEnd();
-        strStruct.insertEnd(L'|');
+        strStruct.placeBack(L'|');
     }
     str.deleteEnd();
     strStruct.deleteEnd();
     
-    str.insertEnd('\0');
-    strStruct.insertEnd('\n');
-    strStruct.insertEnd('\0');
+    str.placeBack('\0');
+    strStruct.placeBack('\n');
+    strStruct.placeBack('\0');
     
     wstring tmp=(to_wstring(strStruct.size())+L"\n");
     fwrite((tmp).c_str(), sizeof(wchar_t), tmp.size(), f);
-    fwrite(strStruct.getTable(), sizeof(wchar_t), strStruct.size()-1, f);
+    fwrite(strStruct.getData(), sizeof(wchar_t), strStruct.size()-1, f);
     tmp = (to_wstring(str.size())+L"\n");
     fwrite((tmp).c_str(), sizeof(wchar_t), tmp.size(), f);
-    fwrite(str.getTable(), sizeof(wchar_t), str.size()-1, f);
+    fwrite(str.getData(), sizeof(wchar_t), str.size()-1, f);
 
     str.clear();
     strStruct.clear();

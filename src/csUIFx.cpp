@@ -412,9 +412,9 @@ void CSUIFX::_mouseHoverLeave(HWND hwnd, UINT msg, int id)
         }*/
     }
 
-    else if (msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN)
+    else if (msg == WM_LBUTTONDOWN || msg == WM_RBUTTONDOWN || msg == WM_NCLBUTTONDOWN || msg == WM_NCRBUTTONDOWN)
     {
-        if(IsWindowVisible(SECTION[TIPS_POPUP]))
+        if(TIPS_POPUP && IsWindowVisible(SECTION[TIPS_POPUP]))
         {
             ShowWindow(SECTION[TIPS_POPUP], 0);
         }
@@ -539,6 +539,8 @@ bool ptInSecRect(vector<int> v)
     return 0;
 }
 
+HWND lastFocus;
+
 void CSUIFX::_mouseHover_movePopup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam, int id)
 {
     if(msg == WM_TIMER)
@@ -578,7 +580,7 @@ void CSUIFX::_mouseHover_movePopup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                         {
                             RECT rp = RECTWND[j];
                             //RECT rp = CSUTILS::rectInParentRef(j);
-
+                            
                             SetWindowPos(w,0,rp.left,rp.top,r1.right, r1.bottom,SWP_SHOWWINDOW);
                             InvalidateRect(w,0,1);
                             AutoTransform[j].InitialRect=rp;
@@ -601,6 +603,7 @@ void CSUIFX::_mouseHover_movePopup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                             cv.cp[j]->AutoAlphaFade.ShowHide = 1;
                             cv.cp[j]->AutoAlphaFade.State = CS_AAF_SHOW_CNTR;
                             cv.cp[j]->AutoAlphaFade.Activate = 1;*/
+                            lastFocus = GetFocus();
                             SetWindowPos(w,0,L,T,r1.right,r1.bottom,SWP_SHOWWINDOW);
                         }
                         
@@ -637,6 +640,7 @@ void CSUIFX::_mouseHover_movePopup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                 }
                 if(TipsPopupParams[id].MouseLeaveCount==1)
                 {
+                    SetFocus(lastFocus);
                     POINT p = TIMER_POINT;
                     for(int i = 0; i<m.Ids.size(); i++)
                     {
@@ -659,6 +663,7 @@ void CSUIFX::_mouseHover_movePopup(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lP
                             }
                         }
                             //cv.cp[m.Ids[i]]->Show = 0;
+
                     }
                 }
                 TipsPopupParams[id].MouseLeaveCount--;

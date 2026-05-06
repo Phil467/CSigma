@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#050505"/>
+  <rect x="28" y="28" width="456" height="456" fill="none" stroke="#7f8387" stroke-width="8"/>
+  <rect x="60" y="60" width="392" height="392" fill="none" stroke="#6c7075" stroke-width="3"/>
+  <path d="M336 146
+           C303 118, 247 108, 198 130
+           C136 159, 112 232, 133 294
+           C155 361, 230 398, 300 377
+           C324 370, 345 357, 360 341"
+        fill="none" stroke="#cfd3d7" stroke-width="28" stroke-linecap="round"/>
+  <line x1="300" y1="252" x2="394" y2="252" stroke="#21c8d8" stroke-width="16" stroke-linecap="round"/>
+  <text x="256" y="452" fill="#b9bfc6" font-size="42" font-family="Segoe UI, Arial, sans-serif" text-anchor="middle" letter-spacing="5">COMPTA</text>
+</svg>

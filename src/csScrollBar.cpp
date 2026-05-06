@@ -1,4 +1,7 @@
 #include "csScrollBar.h"
+#include "minwindef.h"
+#include "windef.h"
+#include "windows.h"
 
 extern vector<HWND> SECTION;
 extern vector<int> PARID;
@@ -51,6 +54,8 @@ int IDCAPTURE;
 extern vector<CSZOOM_PARAMS> zoomParams;
 extern void delay(int del);
 
+
+int frequency = 5;
 
 int SCROLLBAR_AUTO_REPOS_TIMER_ID = 1;
 
@@ -154,9 +159,9 @@ void parentResize(CSARGS Args)
     }
 }
 
-CSSCROLLBAR::CSSCROLLBAR(int idp, int thick, RECT geometry, int sctype, bool orientation)
+CSSCROLLBAR::CSSCROLLBAR(int idp, int thick, RECT geometry, int sctype, bool orientation, wchar_t* iconPrefixPath)
 {
-    init(idp, thick ,geometry, sctype, orientation);
+    init(idp, thick ,geometry, sctype, orientation, iconPrefixPath);
 }
 
 void CSSCROLLBAR::update()
@@ -212,7 +217,36 @@ void CSSCROLLBAR::setEdge(int edge)
         *vEdge = edge;
 }
 
-void CSSCROLLBAR::init(int _idp, int _thick, RECT geometry, int _sctype, bool orientation)
+
+void CSSCROLLBAR::setScrollingClientFunction(void (*function)(CSARGS), CSARGS* args)
+{
+    args->setHwnd(&SECTION[idp]);
+    args->setId(&idp);
+    scrollingClientFunction = function;
+    scrollingClientArgs = args;
+}
+
+void CSSCROLLBAR::setScrollingClientFunction(void (*function)(CSARGS), int argCount, ...)
+{
+    scrollingClientFunction = function;
+    scrollingClientArgs = csAlloc<CSARGS>(1);
+    scrollingClientArgs->init(argCount);
+    va_list arg;
+    va_start(arg, argCount);
+    
+    for(int i = 0; i < argCount; i++)
+    {
+        scrollingClientArgs->setArg(i, va_arg(arg, void*));
+    }
+    va_end(arg);
+    
+    scrollingClientArgs->setHwnd(&SECTION[idp]);
+    scrollingClientArgs->setId(&idp);
+
+    
+}
+
+void CSSCROLLBAR::init(int _idp, int _thick, RECT geometry, int _sctype, bool orientation, wchar_t* iconPrefixPath)
 {
     idp = _idp;
     id = csAlloc<int>(1,0);
@@ -239,11 +273,13 @@ void CSSCROLLBAR::init(int _idp, int _thick, RECT geometry, int _sctype, bool or
     hEdge = csAlloc(1,0);
     geom = csAlloc<RECT>(1, geometry);
     bSize = 0;
-    updateClient = csAlloc<bool>(1,0);
-    
+    updateFrequencyCount = csAlloc<int>(1,0);
+    antiFlickeringCount = csAlloc<int>(1,frequency);
     rcs = new vector<RECT>;
     colors = new vector<vector<CSRGBA>>;
     cloths = new vector<vector<HDC>>;
+    scrollingClientFunction = nullptr;
+    scrollingClientArgs = nullptr;
     
 
     //if(orientation == CS_SBAR_HORIZONTAL)
@@ -344,19 +380,19 @@ void CSSCROLLBAR::init(int _idp, int _thick, RECT geometry, int _sctype, bool or
         hdBmpExt[*id] = CreateCompatibleBitmap(hdcontext[_idp], GetSystemMetrics(SM_CXSCREEN), thick);
         SelectBitmap(hdcontextExt[*id], hdBmpExt[*id]);
 
-        CSGRAPHIC_CONTEXT gc01 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/back.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc01 = csGraphics::createGraphicContextResizedFromFileW((wchar_t*)(wstring(iconPrefixPath) + L"back.bmp").c_str(), {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc01.hbmp);
         (*cloths)[0].push_back(gc01.dc);
-        CSGRAPHIC_CONTEXT gc02 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/back2.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc02 = csGraphics::createGraphicContextResizedFromFileW((wchar_t*)(wstring(iconPrefixPath) + L"back2.bmp").c_str(), {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc02.hbmp);
         (*cloths)[0].push_back(gc02.dc);
         (*cloths)[0].push_back(gc02.dc);
         (*cloths)[0].push_back(gc01.dc);
 
-        CSGRAPHIC_CONTEXT gc11 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/next.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc11 = csGraphics::createGraphicContextResizedFromFileW((wchar_t*)(wstring(iconPrefixPath) + L"next.bmp").c_str(), {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc11.hbmp);
         (*cloths)[4].push_back(gc11.dc);
-        CSGRAPHIC_CONTEXT gc12 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/next2.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc12 = csGraphics::createGraphicContextResizedFromFileW((wchar_t*)(wstring(iconPrefixPath) + L"next2.bmp").c_str(), {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc12.hbmp);
         (*cloths)[4].push_back(gc12.dc);
         (*cloths)[4].push_back(gc12.dc);
@@ -380,19 +416,19 @@ void CSSCROLLBAR::init(int _idp, int _thick, RECT geometry, int _sctype, bool or
         hdBmpExt[*id] = CreateCompatibleBitmap(hdcontext[_idp], thick, GetSystemMetrics(SM_CYSCREEN));
         SelectBitmap(hdcontextExt[*id], hdBmpExt[*id]);
         
-        CSGRAPHIC_CONTEXT gc01 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/up.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc01 = csGraphics::createGraphicContextResizedFromFileW((wchar_t*)(wstring(iconPrefixPath) + L"up.bmp").c_str(), {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc01.hbmp);
         (*cloths)[0].push_back(gc01.dc);
-        CSGRAPHIC_CONTEXT gc02 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/up2.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc02 = csGraphics::createGraphicContextResizedFromFileW((wchar_t*)(wstring(iconPrefixPath) + L"up2.bmp").c_str(), {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc02.hbmp);
         (*cloths)[0].push_back(gc02.dc);
         (*cloths)[0].push_back(gc02.dc);
         (*cloths)[0].push_back(gc01.dc);
 
-        CSGRAPHIC_CONTEXT gc11 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/down.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc11 = csGraphics::createGraphicContextResizedFromFileW((wchar_t*)(wstring(iconPrefixPath) + L"down.bmp").c_str(), {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc11.hbmp);
         (*cloths)[4].push_back(gc11.dc);
-        CSGRAPHIC_CONTEXT gc12 = csGraphics::createGraphicContextResizedFromFileW(L"resources/img/down2.bmp", {t2-*hmarg,t2-*vmarg});
+        CSGRAPHIC_CONTEXT gc12 = csGraphics::createGraphicContextResizedFromFileW((wchar_t*)(wstring(iconPrefixPath) + L"down2.bmp").c_str(), {t2-*hmarg,t2-*vmarg});
         DeleteBitmap(gc12.hbmp);
         (*cloths)[4].push_back(gc12.dc);
         (*cloths)[4].push_back(gc12.dc);
@@ -404,12 +440,13 @@ void CSSCROLLBAR::init(int _idp, int _thick, RECT geometry, int _sctype, bool or
     //SetTimer(SECTION[*id], SCROLLBAR_AUTO_REPOS_TIMER_ID, 10, 0); // timer pour redimensionnement automatique du scrollbar
 
     bool*block = csAlloc<bool>(1,0);
+    int* bclicks = csAlloc<int>(1,0);
 
-    Args.init(28);
+    Args.init(32);
     Args.regArg(rcs, colors, value, value0, hmarg, vmarg, 
                     width, szzoom, orient, tLength, rectSelect, mhId, scval, idc, 
                     scType, idMask, block, oldClientPos, oldClientSize, CX, CY, cloths, 
-                    threadBool, mhId0, hEdge, vEdge, geom, updateClient);
+                    threadBool, mhId0, hEdge, vEdge, geom, updateFrequencyCount, antiFlickeringCount, bclicks, &scrollingClientFunction, &scrollingClientArgs);
     
     CSSECMAN::addAction(*id, groupMsg, Args);
     //CSSECMAN::addAction(idp, parentResize, 9, idc, id, &hEdge, &vEdge, &CX, &CY, &bSize, orient, &idp);
@@ -422,6 +459,11 @@ int CSSCROLLBAR::getId()
 int* CSSCROLLBAR::getIdPtr()
 {
     return id;
+}
+
+float CSSCROLLBAR::getPositionRatio()
+{
+    return *value;
 }
 
 void CSSCROLLBAR::setPositionRatio(float posRatio)
@@ -512,11 +554,6 @@ void CSSCROLLBAR::setClient(int _idc, int _idMask)
     }
 }
 
-void CSSCROLLBAR::updateClientWhenResizeScrollBar(bool update)
-{
-    *updateClient = update;
-}
-
 void CSSCROLLBAR::updateViewArea()
 {
     if(*orient == CS_SBAR_HORIZONTAL)
@@ -560,15 +597,14 @@ void resize(CSARGS Args)
     SIZE* szzoom = (SIZE*)Args[7];
     bool orientation = *(bool*)Args[8];
     float *scval = (float*)Args[12];
-
+    int *updateFrequencyCount = (int*)Args[27];
+    int *antiFlickeringCount = (int*)Args[28];
     
     int idc = *(int*)Args[13];
     int scType = *(int*)Args[14];
     int idMask = *(int*)Args[15];
     bool *block = (bool*)Args[16]; // bloque une partie du code pour des receptions venant wm_mouseMouve
     vector<vector<HDC>> cloths = *(vector<vector<HDC>>*)Args[21];
-
-    bool updateClient = *(bool*)Args[27];
 
     SIZE sz={0};
     RECT r = RECTCL[id];
@@ -609,7 +645,15 @@ void resize(CSARGS Args)
                     else hdcontextExtInPos[idc].x = 0.5*hiddenPart/hZoom[idc];
                     //InvalidateRect(SECTION[idc],&r,1);
                     cx = (totalLengthScrollable-visiblePart + diff);
-                    //hdcontextExtInPos[idc] = {pos.x+diff, pos.y};
+                    //hdcontextExtInPos[idc] = {pos.x+diff, pos.y};  
+                    
+                    *antiFlickeringCount = frequency*2+1; // rafraichissement instantané de l'affichage (en mouvement, pour eviter la zone noire excedente)
+                    
+                    
+                }
+                else {
+                    
+                    *antiFlickeringCount = 2*frequency; // eviter les clignotements
                 }
 
                 //if(totalLengthScrollable < visiblePart)
@@ -673,6 +717,11 @@ void resize(CSARGS Args)
                         hdcontextExtInPos[idc].y = hiddenPart*1.0/vZoom[idc];
                     else hdcontextExtInPos[idc].y = 0.5*hiddenPart/vZoom[idc];
                     //InvalidateRect(SECTION[idc],&r,1);
+                    *antiFlickeringCount = frequency*2+1; // rafraichissement instantané de l'affichage (en mouvement, pour eviter la zone noire excedente)
+                }
+                else {
+                
+                    *antiFlickeringCount = 2*frequency; // eviter les clignotements
                 }
                 if(cy <= 0)
                 {
@@ -725,14 +774,23 @@ void resize(CSARGS Args)
         }
     }
 
-    InvalidateRect(HWND(Args), 0,1);
+    InvalidateRect(HWND(Args), 0,1); 
     
     bool threadBool = *(bool*)Args[22];
 
-    if(!threadBool && updateClient) // evite les conflits de mises a jour entre idc et id, et ameliore la fluidite
+    if(!threadBool)
     {
-        InvalidateRect(SECTION[idc], &bltRect[idc], 1);
-        //cout<<"ooooo\n";
+        int* bclicks = (int*)Args[29];
+        if(*bclicks == 0)
+            *updateFrequencyCount = *antiFlickeringCount;
+        else
+        {
+            *updateFrequencyCount = 0; // eviter le retard de rafraichissement si le click renvoie wm_size
+            InvalidateRect(SECTION[idc], &bltRect[idc], 1);
+            *bclicks = 0;
+        }
+        
+        PostMessage(HWND(Args), WM_TIMER, 0, 0);
     }
 
     *(vector<RECT>*)Args[0] = rcs;
@@ -741,7 +799,6 @@ void resize(CSARGS Args)
 
 void autoRepos(CSARGS Args)
 {
-    //if(UINT(Args) == WM_TIMER)
     int idp = PARID[int(Args)];
 
     int cx = *(int*)Args[19];
@@ -757,7 +814,6 @@ void autoRepos(CSARGS Args)
         int idc = *(int*)Args[13];
         int id = (int)Args;
         RECT r = *(RECT*)Args[26];
-        //cout<<"pr = "<<r.left<<"\n";
 
         if(orientation == CS_SBAR_HORIZONTAL)
         {
@@ -833,7 +889,10 @@ void autoRepos_parentContext(CSARGS Args)
     }
 }
 
-extern void delay(int del);
+inline void delay(int del = 10)
+{
+    std::this_thread::sleep_for(std::chrono::microseconds(del));
+}
 
 void lbtnDown(CSARGS Args)
 {
@@ -953,6 +1012,7 @@ void mouseMove(CSARGS Args)
             if(*value>1.0) *value = 1.0;
 
             _apply(Args);
+
         }
     }
     //PostMessage(HWND(Args),WM_SIZE,0,0);
@@ -1074,6 +1134,8 @@ void _apply(CSARGS Args)
     float* value0 = (float*)Args[3];
     bool orientation = *(bool*)Args[8];
     POINT*oldClientPos = (POINT*)Args[17];
+    int* bclicks = (int*)Args[29];
+    *bclicks = 1;
 
     int idc = *(int*)Args[13];
     int scType = *(int*)Args[14];
@@ -1115,7 +1177,15 @@ void _apply(CSARGS Args)
         }
     }
 
+
     PostMessage(HWND(Args),WM_SIZE,0,0);
+
+    CSARGS* scrollingClientArgs = *(CSARGS**)Args[31];
+    void (*scrollingClientFunction)(CSARGS) = *(void (**)(CSARGS))Args[30];
+    
+    if(scrollingClientFunction)
+        scrollingClientFunction(*scrollingClientArgs);
+
 }
 
 
@@ -1145,6 +1215,17 @@ void timer_(CSARGS Args)
     SIZE*oldClientSize = (SIZE*)Args[18];
     //int idMask = *(int*)Args[15];
     //bool *block = (bool*)Args[16];
+    int *updateFrequencyCount = (int*)Args[27];
+
+    if(*updateFrequencyCount > 0)
+    {
+        (*updateFrequencyCount)--;
+    }
+
+    if(*updateFrequencyCount != 0 && *updateFrequencyCount % frequency == 0)
+    {
+        InvalidateRect(SECTION[idc], &bltRect[idc], 1);
+    }
 
     if(scType == CS_SBAR_SURFACE)
     {
@@ -1155,6 +1236,13 @@ void timer_(CSARGS Args)
             {
                 oldClientPos->x = hdcontextExtInPos[idc].x;
                 PostMessage((HWND)Args,WM_SIZE,0,0);
+
+
+                CSARGS* scrollingClientArgs = *(CSARGS**)Args[31];
+                void (*scrollingClientFunction)(CSARGS) = *(void (**)(CSARGS))Args[30];
+                
+                if(scrollingClientFunction)
+                    scrollingClientFunction(*scrollingClientArgs);
             }
             else if(oldClientSize->cx != hdcontextExtSize[idc].cx)
             {
@@ -1174,6 +1262,7 @@ void timer_(CSARGS Args)
                 hdcontextExtInPos[idc].x = 0;
                 InvalidateRect(SECTION[idc], &bltRect[idc], 1);
                 PostMessage((HWND)Args, WM_SIZE, 0,0);
+                
             }
         }
         else if(orientation == CS_SBAR_VERTICAL)
@@ -1182,6 +1271,11 @@ void timer_(CSARGS Args)
             {
                 oldClientPos->y = hdcontextExtInPos[idc].y;
                 PostMessage((HWND)Args,WM_SIZE,0,0);
+                
+                CSARGS* scrollingClientArgs = *(CSARGS**)Args[31];
+                void (*scrollingClientFunction)(CSARGS) = *(void (**)(CSARGS))Args[30];
+                if(scrollingClientFunction)
+                    scrollingClientFunction(*scrollingClientArgs);
             }
             else if(oldClientSize->cy != hdcontextExtSize[idc].cy) // superflux, modifer
             {   //std::cout<<"hey00000\n";

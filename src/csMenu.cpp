@@ -131,16 +131,16 @@ extern vector<vector<CSARGS>> GROUPED_EVENTS_ARGS;
 
 int CSMENU::newlbm(int* idp, int* idSec, int nbItem, wchar_t*defltTitle)
 {
-    lbm.push_back(newUniformlListBoxPtr(idp, 100, 1000));
+    lbm.push_back(newUniformlListBoxPtr(idp, 1000, CS_ALIGN_VERTICAL));
     csLIST<RECT> lr;
     lbmItemRectLock.push_back(lr);
     int l = lbm.size()-1;
     
-    lbmItemRectLock[l].insertEnd(RECT{0,10,100,100});
+    lbmItemRectLock[l].placeBack(RECT{0,10,100,100});
     CSPARAARGS* pargs = csAlloc<CSPARAARGS>(1);
     lpargs.push_back(pargs);
     pargs->init();
-    pargs->regArg(3,lbmItemRectLock[l].getTable(), csAlloc(1,lbmItemRectLock[l].size()), csAlloc(1,*idSec));
+    pargs->regArg(3,lbmItemRectLock[l].getData(), csAlloc(1,lbmItemRectLock[l].size()), csAlloc(1,*idSec));
     lbm[l]->addExternalFunction(hideMenuContainer, pargs);
 
     initLbm(lbm[l], nbItem, defltTitle);
@@ -157,7 +157,6 @@ int CSMENU::newlbm(int* idp, int* idSec, int nbItem, wchar_t*defltTitle)
 void initLbm(CSUNIFORMLISTBOX*& lbm, int nbItem, wchar_t*defltTitle)
 {
     lbm->setDefaultFont(L"calibri",{12,0});
-    lbm->setItemAlign(CS_ALIGN_VERTICAL);
     lbm->setMarging({8,8});
     lbm->setOffset({0,1});
     lbm->setDefaultSize({150*geomCoef, 15*geomCoef});

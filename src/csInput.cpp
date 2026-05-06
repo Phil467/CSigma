@@ -2,6 +2,11 @@
 #include "csUtils.h"
 #include "csStrUtils.h"
 #include "csUIObjects.h"
+#include "string.h"
+#include "uxtheme.h"
+#include "windef.h"
+#include "windows.h"
+#include <vector>
 
 using namespace csGraphics;
 using namespace CSSTRUTILS;
@@ -18,6 +23,10 @@ extern vector<SIZE> hdcSize;
 extern vector<COLORREF> backgroundColor;
 extern vector<COLORREF> borderColor;
 extern vector<vector<CSARGS>> GROUPED_EVENTS_ARGS;
+extern CSAPP_STRINGS appStrings;
+extern bool loadStrings;
+
+extern vector<RECT> bltRect;
 
 typedef CSLINEAR CSL;
 
@@ -48,14 +57,206 @@ void CSINPUT::init(int*idp)
     groupId = HIDEGROUPMSG[*idp].size();
     //HIDEGROUPMSG[*idp].push_back(0);
     updateStackDC();
+    actionParams.count = 0;
+    actionParams.hcount = 0;
+    actionParams.count_ = 0;
+    actionParams.count_sizeMove = 0;
+    actionParams.pmouse = {0,0};
+    actionParams.psave = {0,0};
+    actionParams.r_sizeMove = {0,0,0,0};
 
     xmarging = 3;
     ymarging = 3;
-    titleFont = CreateFontW(14, 0, 0, 1,FW_BOLD,1, 0,0,0,0,0,0,0, (LPCWSTR)"Book Antiqua");
-    textFont = CreateFontW(14, 0, 0, 1,0,0, 0,0,0,0,0,0,0, (LPCWSTR)"Arial");
+    titleFont = CreateFontW(14, 0, 0, 1,FW_BOLD,1, 0,0,0,0,0,CLEARTYPE_QUALITY,
+        DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)"Book Antiqua");
+    textFont = CreateFontW(14, 0, 0, 1,0,0, 0,0,0,0,0,CLEARTYPE_QUALITY,
+        DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)"Arial");
     checkCount = 0;
     startChecking = 0;
     ctxRect = {INT_MAX, INT_MAX, 0, 0};
+    logSection = nullptr;
+    globalModifiable = true;
+}
+
+bool CSINPUT::isMouseHoveringNoNameButton(int idInput)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    return ip[idInput]->btnNoNameOn;
+}
+
+void CSINPUT::setSwitchable(int idInput, bool state)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->switchableState = state;
+}
+
+bool CSINPUT::getSwitchable(int idInput)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    return ip[idInput]->switchableState;
+}
+
+void CSINPUT::setNoNameButtonVariableState(int idInput, bool state)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->noNameButtonVariableState = state;
+}
+
+void CSINPUT::setNoNameButtonState(bool state)
+{
+    globalNoNameButtonState = state;
+}
+void CSINPUT::setNoNameButtonVariableState(bool state)
+{
+    globalNoNameButtonVariableState = state;
+}
+
+void CSINPUT::setTitle(int idInput, wchar_t* title)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    free(ip[idInput]->title);
+    ip[idInput]->title = makeWString(title);
+}
+
+void CSINPUT::setTitleColors(int idInput, CSRGBA colorNormal, CSRGBA colorHover, CSRGBA colorActive, CSRGBA colorDisabled)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->colorNormal_title = colorNormal;
+    ip[idInput]->colorHover_title = colorHover;
+    ip[idInput]->colorActive_title = colorActive;
+    ip[idInput]->colorDisabled_title = colorDisabled;
+
+    if(idInput == idActive)
+    {
+        switchInputState();
+    }
+}
+
+void CSINPUT::setTitleFrameColors(int idInput, CSRGBA colorNormal, CSRGBA colorHover, CSRGBA colorActive, CSRGBA colorDisabled)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->colorNormal_titleFrame = colorNormal;
+    ip[idInput]->colorHover_titleFrame = colorHover;
+    ip[idInput]->colorActive_titleFrame = colorActive;
+    ip[idInput]->colorDisabled_titleFrame = colorDisabled;
+
+    if(idInput == idActive)
+    {
+        switchInputState();
+    }
+}
+void CSINPUT::setTitleFrameBorderColors(int idInput, CSRGBA colorNormal, CSRGBA colorHover, CSRGBA colorActive, CSRGBA colorDisabled)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->colorNormal_titleFrameBorder = colorNormal;
+    ip[idInput]->colorHover_titleFrameBorder = colorHover;
+    ip[idInput]->colorActive_titleFrameBorder = colorActive;
+    ip[idInput]->colorDisabled_titleFrameBorder = colorDisabled;
+
+    if(idInput == idActive)
+    {
+        switchInputState();
+    }
+}
+
+void CSINPUT::setTextColors(int idInput, CSRGBA colorNormal, CSRGBA colorHover, CSRGBA colorActive, CSRGBA colorDisabled)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->colorNormal_text = colorNormal;
+    ip[idInput]->colorHover_text = colorHover;
+    ip[idInput]->colorActive_text = colorActive;
+    ip[idInput]->colorDisabled_text = colorDisabled;
+
+    if(idInput == idActive)
+    {
+        switchInputState();
+    }
+}
+
+void CSINPUT::setFrameColors(int idInput, CSRGBA colorNormal, CSRGBA colorHover, CSRGBA colorActive, CSRGBA colorDisabled)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->colorNormal_frame = colorNormal;
+    ip[idInput]->colorHover_frame = colorHover;
+    ip[idInput]->colorActive_frame = colorActive;
+    ip[idInput]->colorDisabled_frame = colorDisabled;
+
+    if(idInput == idActive)
+    {
+        switchInputState();
+    }
+}
+
+void CSINPUT::setFrameBorderColors(int idInput, CSRGBA colorNormal, CSRGBA colorHover, CSRGBA colorActive, CSRGBA colorDisabled)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->colorNormal_frameBorder = colorNormal;
+    ip[idInput]->colorHover_frameBorder = colorHover;
+    ip[idInput]->colorActive_frameBorder = colorActive;
+    ip[idInput]->colorDisabled_frameBorder = colorDisabled;
+
+    if(idInput == idActive)
+    {
+        switchInputState();
+    }
+}
+
+CSINPUT::CSINPUT_ENTITY_COLORS CSINPUT::getTitleColors(int idInput)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    return {ip[idInput]->colorNormal_title, ip[idInput]->colorHover_title, ip[idInput]->colorActive_title, ip[idInput]->colorDisabled_title};
+}
+
+bool CSINPUT::getNoNameButtonState(int idInput)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    return ip[idInput]->noNameButtonState;
+}
+
+void CSINPUT::setTextRectLeftMargin(int idInput, int margin)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->textRectLeftMargin = margin;
+    ip[idInput]->textRectLeftMargin2 = margin;
+}
+
+void CSINPUT::setTextAlign(int idInput, int align)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->textAlign = align;
+}
+
+void CSINPUT::setTextFontSizeCoef(int idInput, float coef)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    CSINPUT::CSINPUT_PARAMS* inp = ip[idInput];
+    inp->textFontSizeCoef = coef;
+    inp->charHeight = (inp->rsize.cy-2*ymarging)*inp->textFontSizeCoef-3;
+    inp->textFont = CreateFontW(inp->charHeight, 0, 0, 10,FW_MEDIUM,0, 0,0,0,0,0,CLEARTYPE_QUALITY,
+        DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)"Arial");
+    inp->textNoteFont = CreateFontW(inp->charHeight-1, 0, 0, 10,FW_MEDIUM,1, 0,0,0,0,0,CLEARTYPE_QUALITY,
+        DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)"Arial");
+    
+}
+void CSINPUT::setTitleFontSizeCoef(int idInput, float coef)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    CSINPUT::CSINPUT_PARAMS* inp = ip[idInput];
+    inp->titleFontSizeCoef = coef;
+    inp->titleHeight = (inp->rsize.cy-2*ymarging)*inp->titleFontSizeCoef-3;
+    inp->titleFont = CreateFontW(inp->titleHeight, 0, 0, 10,FW_BOLD,1, 0,0,0,0,0,CLEARTYPE_QUALITY,
+        DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)"Century Gothic");
+
+    LPSIZE lps = textExtentW(*parent, inp->titleFont, inp->title);
+    inp->titleWidth = lps->cx;
+    delete lps;
+    
+}
+
+void CSINPUT::setTitleAlign(int idInput, int align)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->titleAlign = align;
 }
 
 void CSINPUT::__getEventsGroup()
@@ -74,26 +275,34 @@ void CSINPUT::show()
     CSSECMAN::updateSection(*parent);
 }
 
-void CSINPUT::newInput(wchar_t*title, wchar_t*defaultText, RECT geometry, int style, int titleRectWidth, int titleRectHeight)
+
+void CSINPUT::newInput(wchar_t*title, wchar_t*textNote, RECT geometry, int style, int titleRectWidth, int titleRectHeight)
 {
     CSINPUT::CSINPUT_PARAMS ipp;
 
-    ipp.textChar.init(2,15);
-    ipp.textCharGeometry.init(2,15);
+    idLastActive = idActive;
+    idActive = ip.size();
     ipp.buttonMarging = 2;
     ipp.textRectEnd = geometry.right + geometry.left - xmarging;
     ipp.title = makeWString(title);
-    ipp.defaultText = makeWString(defaultText);
+    ipp.textNote = makeWString(textNote);
+    
     ipp.style = style;
     ipp.rect = {geometry.left, geometry.top, ipp.textRectEnd + xmarging, geometry.bottom+geometry.top};
     ipp.rsize = {geometry.right, geometry.bottom};
     ipp.titleRectWidth = titleRectWidth;
     ipp.titleRectHeight = titleRectHeight;
-    ipp.charHeight = (geometry.bottom-2*ymarging)-3;
-    
-    ipp.titleFont = CreateFontW(ipp.charHeight, 0, 0, 10,FW_MEDIUM,0, 0,0,0,0,0,0,0, (LPCWSTR)"Book Antiqua");
-    ipp.textFont = CreateFontW(ipp.charHeight, 0, 0, 10,FW_MEDIUM,0, 0,0,0,0,0,0,0, (LPCWSTR)"Arial");
-
+    ipp.textFontSizeCoef = 1.0f;
+    ipp.charHeight = (geometry.bottom-2*ymarging)*ipp.textFontSizeCoef-3;
+    ipp.editable = globalModifiable;
+    ipp.titleFont = CreateFontW(ipp.charHeight, 0, 0, 10,FW_BOLD,0, 0,0,0,0,0,CLEARTYPE_QUALITY,
+        DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)"Book Antiqua");
+    ipp.textFont = CreateFontW(ipp.charHeight, 0, 0, 10,FW_MEDIUM,0, 0,0,0,0,0,CLEARTYPE_QUALITY,
+        DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)"Arial");
+    ipp.textNoteFont = CreateFontW(ipp.charHeight-1, 0, 0, 10,FW_MEDIUM,1, 0,0,0,0,0,CLEARTYPE_QUALITY,
+        DEFAULT_PITCH|FF_DONTCARE, (LPCWSTR)"Arial");
+    ipp.noNameButtonState = globalNoNameButtonState;
+    ipp.noNameButtonVariableState = globalNoNameButtonVariableState;
     //cout<<"how \n";
 
     wchar_t* str = L"A\0";
@@ -102,8 +311,19 @@ void CSINPUT::newInput(wchar_t*title, wchar_t*defaultText, RECT geometry, int st
     ipp.charHeight = lps->cy;
     delete lps;
 
-    ipp.titleFont = titleFont;
+    if(textNote)
+    {
+        LPSIZE lps = textExtentW(*parent, ipp.textFont, textNote);
+        ipp.textNoteExtend = lps->cx;
+        delete lps;
+    }
+
     ipp.textDc = CreateCompatibleDC(parentDC);
+
+    lps = textExtentW(*parent, ipp.titleFont, ipp.title);
+    ipp.titleHeight = lps->cy;
+    ipp.titleWidth = lps->cx;
+    delete lps;
 
     RECT r = ipp.rect;
     int bmarg = ipp.buttonMarging;
@@ -126,11 +346,13 @@ void CSINPUT::newInput(wchar_t*title, wchar_t*defaultText, RECT geometry, int st
 
     ctxRect = {std::min(ctxRect.left, r.left), std::min(ctxRect.top, r.top), 
                std::max(ctxRect.right, r.right), std::max(ctxRect.bottom, r.bottom)};
+
+    switchInputState();
 }
 
 void CSINPUT::textCharGeometryCorrection(int from)
 {
-    csLIST<RECT>& r = ip[idActive]->textCharGeometry;
+    vector<RECT>& r = ip[idActive]->textCharGeometry;
 
     int n = r.size();
     int d;
@@ -142,11 +364,50 @@ void CSINPUT::textCharGeometryCorrection(int from)
     }
 }
 
-void CSINPUT::addChar(wchar_t chr)
+int CSINPUT::addChar(wchar_t chr)
 {
-
     CSINPUT::CSINPUT_PARAMS* inp = ip[idActive];
-    HDC& hdc = ip[idActive]->cntDc;
+
+    if(!inp->editable)
+    {
+        if(logSection)
+        {
+            CSSECMAN::setTitle(*logSection, CSTEXT{.Text=L"Ce champ n'est pas editable"}, 1);
+            InvalidateRect(sHandle(*logSection), 0, 1);
+        }
+        return 0;
+    }
+
+    if(inp->forbiddenChars.size() > 0)
+    {
+        if(inp->forbiddenChars.find(chr) != wstring::npos)
+        {
+            return 0;
+        }
+    }
+    else if(inp->allowedChars.size() > 0)
+    {
+        if(inp->allowedChars.find(chr) == wstring::npos)
+        {
+            return 0;
+        }
+    }
+    else if(globalForbiddenChars.size() > 0)
+    {
+        if(globalForbiddenChars.find(chr) != wstring::npos)
+        {
+            return 0;
+        }
+    }
+    else if(globalAllowedChars.size() > 0)
+    {
+        if(globalAllowedChars.find(chr) == wstring::npos)
+        {
+            return 0;
+        }
+    }
+
+    HDC& hdc = ip[idActive]->frameDc;
 
     int pos = ip[idActive]->caretPos;
 
@@ -157,9 +418,9 @@ void CSINPUT::addChar(wchar_t chr)
     inp->charWidth = lps->cx;
     
     RECT r = pos > 0 ? inp->textCharGeometry[pos-1] : (RECT){2,0,2,0};
-    inp->textCharGeometry.insertAt({r.right, r.top, r.right+lps->cx, lps->cy}, pos);
+    inp->textCharGeometry.insert(inp->textCharGeometry.begin() + pos, {r.right, r.top, r.right+lps->cx, lps->cy});
     textCharGeometryCorrection(pos+1);
-    inp->textChar.insertAt(chr, pos);
+    inp->textChar.insert(inp->textChar.begin() + pos, chr);
     ip[idActive]->caretPos++;
     
     delete lps;
@@ -168,34 +429,66 @@ void CSINPUT::addChar(wchar_t chr)
     DeleteBitmap(inp->textBmp);
     inp->textDcWidth += inp->charWidth;
     inp->textDc = CreateCompatibleDC(parentDC);
-    inp->textBmp = CreateCompatibleBitmap(parentDC, inp->textDcWidth,  inp->charHeight);
+    int prefixLength = inp->prefix ? wcslen(inp->prefix) : 0;
+    int suffixLength = inp->suffix ? wcslen(inp->suffix) : 0;
+    inp->textBmp = CreateCompatibleBitmap(parentDC, inp->textDcWidth+(prefixLength+suffixLength)*inp->charWidth,  inp->charHeight);
 
     SelectBitmap(inp->textDc, inp->textBmp);
     SelectFont(inp->textDc, inp->textFont);
     //RECT rt = inp->textRect;
-    //drawGdiRectangle(inp->textDc, inp->bkgColor1, inp->borderColor1, {0,0,inp->textDcWidth,inp->charHeight});
-
-    SetTextColor(inp->textDc, RGB(inp->textColor1.r,inp->textColor1.g,inp->textColor1.b));
-    SetBkColor(inp->textDc,RGB(inp->bkgColor1.r,inp->bkgColor1.g,inp->bkgColor1.b));
+    //drawGdiRectangle(inp->textDc, inp->colorNormal_titleFrame, inp->colorNormal_titleFrameBorder, {0,0,inp->textDcWidth,inp->charHeight});
+    
+    SetTextColor(inp->textDc, RGB(inp->colorNormal_text.r,inp->colorNormal_text.g,inp->colorNormal_text.b));
+    SetBkColor(inp->textDc,RGB(inp->colorNormal_frame.r,inp->colorNormal_frame.g,inp->colorNormal_frame.b));
     //SetBkMode(inp->textDc, TRANSPARENT);
 
-    wchar_t*str = inp->textChar.toStringW(0,inp->textChar.size()-1);
+    //wchar_t*_str = inp->textChar.toStringW(0,inp->textChar.size()-1);
+    const wchar_t*_str = inp->textChar.c_str();
 
-    SetTextCharacterExtra(inp->textDc, inp->charSpacing);
-    TextOutW(inp->textDc, 0, 0, str, wcslen(str));
-    //wcout<<str<<" \n";
-    free(str);
+    if(inp->prefix || inp->suffix)
+    {
+        wstring _strCopy;
+        
+        if(inp->prefix)
+        {
+            _strCopy.insert(0, inp->prefix);
+        }
+        _strCopy.insert(inp->textChar.size(), _str);
+        if(inp->suffix)
+        {
+            _strCopy.insert(inp->textChar.size(), inp->suffix);
+        }
+        //wchar_t*str = strList.toStringW(0, strList.size()-1);
+        const wchar_t*str = _strCopy.c_str();
+        SetTextCharacterExtra(inp->textDc, inp->charSpacing);
+        TextOutW(inp->textDc, 0, 0, str, _strCopy.size());
+    }
+    else
+    {   
+        SetTextCharacterExtra(inp->textDc, inp->charSpacing);
+        TextOutW(inp->textDc, 0, 0, _str, inp->textChar.size());
+    }
 
     //section to view in textRect
     updateText(idActive);
 
+    return inp->charWidth;
 }
 
-void CSINPUT::deleteChar(bool frontCaret)
+int CSINPUT::deleteChar(bool frontCaret)
 {
 
     CSINPUT::CSINPUT_PARAMS* inp = ip[idActive];
-    HDC& hdc = ip[idActive]->cntDc;
+    if(!inp->editable)
+    {
+        if(logSection)
+        {
+            CSSECMAN::setTitle(*logSection, CSTEXT{.Text=L"Ce champ n'est pas editable."}, 1);
+            InvalidateRect(sHandle(*logSection), 0, 1);
+        }
+        return 0;
+    }
+    HDC& hdc = ip[idActive]->frameDc;
     wchar_t _chr[2];
     RECT rchar;
     if(frontCaret)
@@ -206,8 +499,8 @@ void CSINPUT::deleteChar(bool frontCaret)
         rchar = r;
         inp->charWidth = r.right-r.left;
 
-        inp->textChar.deleteAt(pos);
-        inp->textCharGeometry.deleteAt(pos);
+        inp->textChar.erase(inp->textChar.begin() + pos);
+        inp->textCharGeometry.erase(inp->textCharGeometry.begin() + pos);
         if(pos>0)
         {
             inp->activeCharRect = getFrontEndCharRect(idActive, pos-1);
@@ -224,8 +517,8 @@ void CSINPUT::deleteChar(bool frontCaret)
         rchar = r;
         inp->charWidth = r.right-r.left;
 
-        inp->textChar.deleteAt(pos);
-        inp->textCharGeometry.deleteAt(pos);
+        inp->textChar.erase(inp->textChar.begin() + pos);
+        inp->textCharGeometry.erase(inp->textCharGeometry.begin() + pos);
         inp->activeCharRect = getFrontEndCharRect(idActive, pos-1);
         textCharGeometryCorrection(pos);
         
@@ -238,113 +531,158 @@ void CSINPUT::deleteChar(bool frontCaret)
         DeleteDC(inp->textDc);
         DeleteBitmap(inp->textBmp);
         inp->textDc = CreateCompatibleDC(parentDC);
-        inp->textBmp = CreateCompatibleBitmap(parentDC, inp->textDcWidth,  inp->charHeight);
+        int prefixLength = inp->prefix ? wcslen(inp->prefix) : 0;
+        int suffixLength = inp->suffix ? wcslen(inp->suffix) : 0;
+        inp->textBmp = CreateCompatibleBitmap(parentDC, inp->textDcWidth+(prefixLength+suffixLength)*inp->charWidth,  inp->charHeight);
 
         SelectBitmap(inp->textDc, inp->textBmp);
         SelectFont(inp->textDc, inp->textFont);
         //RECT rt = inp->textRect;
-        //drawGdiRectangle(inp->textDc, inp->bkgColor1, inp->borderColor1, {0,0,inp->textDcWidth,inp->charHeight});
+        //drawGdiRectangle(inp->textDc, inp->colorNormal_titleFrame, inp->colorNormal_titleFrameBorder, {0,0,inp->textDcWidth,inp->charHeight});
     
-        SetTextColor(inp->textDc, RGB(inp->textColor1.r,inp->textColor1.g,inp->textColor1.b));
-        SetBkColor(inp->textDc,RGB(inp->bkgColor1.r,inp->bkgColor1.g,inp->bkgColor1.b));
+        SetTextColor(inp->textDc, RGB(inp->colorNormal_text.r,inp->colorNormal_text.g,inp->colorNormal_text.b));
+        SetBkColor(inp->textDc,RGB(inp->colorNormal_frame.r,inp->colorNormal_frame.g,inp->colorNormal_frame.b));
         //SetBkMode(inp->textDc, TRANSPARENT);
 
-        wchar_t*str = inp->textChar.toStringW(0,inp->textChar.size()-1);
+        const wchar_t*_str = inp->textChar.c_str();
         
-        //updateActiveTextBkg();
-        SetTextCharacterExtra(inp->textDc, inp->charSpacing);
-        TextOutW(inp->textDc, 0, 0, str, wcslen(str));
-
-
-        free(str);
-        //inp->textChar.printAll(L"text : ");
+        if(inp->prefix || inp->suffix)
+        {
+            wstring _strCopy;
+            
+            if(inp->prefix)
+            {
+                _strCopy.insert(0, inp->prefix);
+            }
+            _strCopy.insert(inp->textChar.size(), _str);
+            if(inp->suffix)
+            {
+                _strCopy.insert(inp->textChar.size(), inp->suffix);
+            }
+            const wchar_t*str = _strCopy.c_str();
+            SetTextCharacterExtra(inp->textDc, inp->charSpacing);
+            TextOutW(inp->textDc, 0, 0, str, wcslen(str));
+        }
+        else
+        {
+            SetTextCharacterExtra(inp->textDc, inp->charSpacing);
+            TextOutW(inp->textDc, 0, 0, _str, wcslen(_str));
+        }
         
 
         RECT r = inp->rect;
         SIZE s = inp->rsize;
         BitBlt(parentDC, r.left, r.top, s.cx, s.cy, hdc, 0,0,SRCCOPY);
 
-        r = inp->textRect;
+       /* r = inp->textRect;
         BitBlt(parentDC, r.left+2, r.top, r.right-r.left-4, r.bottom-r.top, inp->textDc, 0,0,SRCCOPY);
-        //InvalidateRect(sHandle(*parent), &inp->textRect, 1);
+        //InvalidateRect(sHandle(*parent), &inp->textRect, 1);*/
 
         updateText(idActive);
     }
     else
     {
         updateActiveTextBkg(); // erase last wchar_t on the textDc
+        viewTextNote(idActive);
     }
+
+    return inp->charWidth;
 }
 
 void CSINPUT::updateText(int idInput)
 {
     CSINPUT::CSINPUT_PARAMS* inp = ip[idInput];
-
-    int cx = inp->textRect.right - inp->textRect.left - 4;
-    
     RECT r = inp->textRect;
-    //POINT p = {csGraphics::getGraphicAreaInXPos(*parent), csGraphics::getGraphicAreaInYPos(*parent)};
-    POINT p = {0,0};
+
+    r.top += (r.bottom - r.top - inp->charHeight) / 2;
+    if(inp->textAlign == CS_INPUT_TA_LEFT)
+    {
+        inp->textRectLeftMargin = inp->textRectLeftMargin2;
+    }
+    else if(inp->textAlign == CS_INPUT_TA_CENTER)
+    {
+        inp->textRectLeftMargin = (r.right - r.left - 4 - inp->textDcWidth) / 2;
+        if(inp->textRectLeftMargin < 0) inp->textRectLeftMargin = inp->textRectLeftMargin2;
+    }
+    else if(inp->textAlign == CS_INPUT_TA_RIGHT)
+    {
+        inp->textRectLeftMargin = (r.right - r.left - 4 - (inp->textDcWidth));
+        if(inp->textRectLeftMargin < 0) inp->textRectLeftMargin = inp->textRectLeftMargin2;
+    }
+
+    int cx = r.right - (r.left + inp->textRectLeftMargin) - 4;
+    
     int delta = inp->textDcWidth - cx;
     if(delta < 0) 
     {
-        BitBlt(parentDC, r.left+2+p.x, r.top+p.y, inp->textDcWidth, inp->charHeight, inp->textDc, 0,0, SRCCOPY);
+        BitBlt(parentDC, r.left+2+inp->textRectLeftMargin, r.top, inp->textDcWidth, inp->charHeight, inp->textDc, 0,0, SRCCOPY);
         inp->showedSectionRect = {0,0,inp->textDcWidth, inp->charHeight};
     }
     else
-    {
-        BitBlt(parentDC, r.left+2+p.x, r.top+p.y, inp->textDcWidth, inp->charHeight, inp->textDc, delta,0, SRCCOPY);
+    {//cout<<"delta < 0\n";
+        BitBlt(parentDC, r.left+2+inp->textRectLeftMargin, r.top, inp->textDcWidth, inp->charHeight, inp->textDc, delta,0, SRCCOPY);
         inp->showedSectionRect = {delta,0, inp->textDcWidth, inp->charHeight};
     }
 }
 
-void CSINPUT::highlightActiveChar(RECT r, bool state)
+void CSINPUT::highlightActiveChar(bool state)
 {
     
     CSINPUT::CSINPUT_PARAMS* inp = ip[idActive];
-    //if(r.right < inp->textRect.right && r.left > inp->textRect.left)
+    if(!inp->editable) return;
+    if(inp->textChar.size() == 0) return;
     {
-        //r = getFrontEndCharRect(idActive, i);
-        int left = r.left;
-        if(left > inp->textRect.right || left < inp->textRect.left)
-            return;
 
         wchar_t _str[2];
-        updateText(idActive);
-        updateText(idLastActive);
         SelectFont(parentDC, inp->textFont);
-        inp->activeCharRect = r;
         
-        if(!state)
+        if(state)
         {
             SetTextColor(parentDC, RGB(inp->activeCharColor.r,inp->activeCharColor.g,inp->activeCharColor.b));
             SetBkColor(parentDC, RGB(inp->activeCharBkgColor.r,inp->activeCharBkgColor.g,inp->activeCharBkgColor.b));
         }
         else
         {
-            SetTextColor(parentDC, RGB(inp->textColor1.r,inp->textColor1.g,inp->textColor1.b));
-            SetBkColor(parentDC, RGB(inp->bkgColor1.r,inp->bkgColor1.g,inp->bkgColor1.b));
+            SetTextColor(parentDC, RGB(inp->colorNormal_text.r,inp->colorNormal_text.g,inp->colorNormal_text.b));
+            SetBkColor(parentDC, RGB(inp->colorNormal_titleFrame.r,inp->colorNormal_titleFrame.g,inp->colorNormal_titleFrame.b));
         }
 
-        //RECT r1;
-        if(inp->caretPos > 1)
+        int pos = inp->caretPos-1;
+
+        RECT textRect = inp->textRect;
+        textRect.left += inp->textRectLeftMargin;
+        RECT r = inp->textCharGeometry[pos];
+
+        int cx = (textRect.right-textRect.left);
+        int dx = inp->textCharGeometry[inp->textCharGeometry.size()-1].right - cx;
+        if(dx > 0)
         {
-            int i = inp->caretPos-1;
-            wsprintf(_str, L"%c\0", inp->textChar[i]);
-            TextOutW(parentDC, left-2, inp->textRect.top, _str, 1);
-            //r1 = inp->activeCharRect;
+            r.left = textRect.right - (inp->textCharGeometry[inp->textCharGeometry.size()-1].right - r.left);
+            r.right = textRect.right - (inp->textCharGeometry[inp->textCharGeometry.size()-1].right - r.right);
+        }
+        else
+        {
+            r.left += textRect.left;
+            r.right += textRect.left;
+        }
+        r.top += textRect.top;
+        r.bottom += textRect.top;
+
+        r.top += (textRect.bottom - textRect.top - inp->charHeight) / 2;
+
+        if(pos>=0)
+        {
+            wsprintf(_str, L"%c\0", inp->textChar[pos]);
+            TextOutW(parentDC, r.left, r.top, _str, 1);
         }
 
-        RECT r2;
-        if(inp->caretPos < inp->textChar.size())
+        pos = inp->caretPos;
+        if(pos < inp->textChar.size())
         {
-            int i = inp->caretPos;
-            wsprintf(_str, L"%c\0", inp->textChar[i]);
-            TextOutW(parentDC, r.right-2, inp->textRect.top, _str, 1);
-            r2 = inp->activeCharRect;
+            wsprintf(_str, L"%c\0", inp->textChar[pos]);
+            TextOutW(parentDC, r.right, r.top, _str, 1);
         }
-        RECT rh = {left-3, inp->textRect.top, r2.right+r2.left, inp->textRect.bottom};
-        InvalidateRect(sHandle(*parent), &rh, 1);
+        InvalidateRect(sHandle(*parent), &textRect, 1);
     }
     
 }
@@ -506,7 +844,7 @@ void CSINPUT::addUnrollButton(int _idInput, wchar_t*path11, wchar_t*path12, wcha
     
 }
 
-void CSINPUT::addOpenFolderButton(int _idInput, wchar_t*path11, wchar_t*path12, wchar_t*path13, wchar_t*path14)
+void CSINPUT::addNoNameButton(int _idInput, wchar_t*path11, wchar_t*path12, wchar_t*path13, wchar_t*path14)
 {
     int idInput = (_idInput < 0) ? ip.size()+_idInput : _idInput;
 
@@ -525,13 +863,13 @@ void CSINPUT::addOpenFolderButton(int _idInput, wchar_t*path11, wchar_t*path12, 
             inp->textRectEnd -= (bmarg + buttonWidth);
             inp->titleRect = {r.left + xmarging, r.top + ymarging, r.left+xmarging+titleRectWidth, r.bottom-ymarging};
             inp->textRect = {inp->titleRect.right + bmarg, r.top + ymarging, inp->textRectEnd, r.bottom-ymarging};
-            inp->openFolderRect = {inp->textRectEnd + bmarg, r.top + ymarging, inp->textRectEnd + bmarg + buttonWidth, r.top + ymarging + buttonWidth};
+            inp->noNameRect = {inp->textRectEnd + bmarg, r.top + ymarging, inp->textRectEnd + bmarg + buttonWidth, r.top + ymarging + buttonWidth};
             break;
         case 1:
             inp->textRectEnd -= (bmarg + buttonWidth);
             inp->titleRect = {r.left + xmarging, r.top + ymarging, r.left+xmarging+titleRectWidth, r.top+ymarging+titleRectHeight};
             inp->textRect = {r.left + xmarging, inp->titleRect.bottom + bmarg, inp->textRectEnd, r.bottom-ymarging};
-            inp->openFolderRect = {inp->textRectEnd + bmarg, inp->titleRect.bottom + bmarg, inp->textRectEnd + bmarg + buttonWidth, r.top + ymarging + buttonWidth};
+            inp->noNameRect = {inp->textRectEnd + bmarg, inp->titleRect.bottom + bmarg, inp->textRectEnd + bmarg + buttonWidth, r.top + ymarging + buttonWidth};
             break;
     }
 
@@ -539,17 +877,17 @@ void CSINPUT::addOpenFolderButton(int _idInput, wchar_t*path11, wchar_t*path12, 
     wchar_t* p13 = (path13 == 0) ? path11 : path13;
     wchar_t* p14 = (path14 == 0) ? path11 : path14;
     
-    SIZE sz = {inp->openFolderRect.right-inp->openFolderRect.left,inp->openFolderRect.bottom-inp->openFolderRect.top};
+    SIZE sz = {inp->noNameRect.right-inp->noNameRect.left,inp->noNameRect.bottom-inp->noNameRect.top};
     
-    inp->openFolderImage1 = createGraphicContextResizedFromFileW(path11, sz);
-    inp->openFolderImage2 = createGraphicContextResizedFromFileW(p12, sz);
-    inp->openFolderImage3 = createGraphicContextResizedFromFileW(p13, sz);
-    inp->openFolderImage4 = createGraphicContextResizedFromFileW(p14, sz);
+    inp->noNameImage1 = createGraphicContextResizedFromFileW(path11, sz);
+    inp->noNameImage2 = createGraphicContextResizedFromFileW(p12, sz);
+    inp->noNameImage3 = createGraphicContextResizedFromFileW(p13, sz);
+    inp->noNameImage4 = createGraphicContextResizedFromFileW(p14, sz);
 
     
 }
 
-CSINPUT::CSLINEAR_BIND* CSINPUT::CSLINEAR_BIND_PTR(CSLINEAR_BIND lb)
+CSLINEAR_BIND* CSINPUT::CSLINEAR_BIND_PTR(CSLINEAR_BIND lb)
 {
     return new CSLINEAR_BIND(lb);
 }
@@ -572,7 +910,7 @@ void CSINPUT::setGBP(int _idInput, int bindLeft, int bindTop, int bindRight, int
                                   ((bindBottom == 2) ? (CSL){float(r.bottom)-inp->rect.bottom,1,0} : (CSL){0,0,inp->rect.bottom});
 
     
-    inp->gbpCnt = CSLINEAR_BIND_PTR({left,top,right,bottom});
+    inp->gbpFrame = CSLINEAR_BIND_PTR({left,top,right,bottom});
 
     left = (bindLeft == 1) ? (CSL){0,inp->textRect.left/float(r.right),0} : 
                                   ((bindLeft == 2) ? (CSL){float(r.right)-inp->textRect.left,1,0} : (CSL){0,0,inp->textRect.left});
@@ -676,20 +1014,40 @@ void CSINPUT::setGBP(int _idInput, int bindLeft, int bindTop, int bindRight, int
         inp->gbpUnroll = CSLINEAR_BIND_PTR({left,top,right,bottom});
     }
 
-    if(inp->openFolderRect.right)
+    if(inp->noNameRect.right)
     {
-        left = (bindRight == 1) ? (CSL){0,inp->openFolderRect.left/float(r.right),0} : 
-                                  ((bindRight == 2) ? (CSL){float(r.right)-inp->openFolderRect.left,1,0} : (CSL){0,0,inp->openFolderRect.left});
-        top = (bindTop == 1) ? (CSL){0,inp->openFolderRect.top/float(r.bottom),0} : 
-                                    ((bindTop == 2) ? (CSL){float(r.bottom)-inp->openFolderRect.top,1,0} : (CSL){0,0,inp->openFolderRect.top});
-        right = (bindRight == 1) ? (CSL){0,inp->openFolderRect.right/float(r.right),0} : 
-                                    ((bindRight == 2) ? (CSL){float(r.right)-inp->openFolderRect.right,1,0} : (CSL){0,0,inp->openFolderRect.right});
-        bottom = (bindBottom == 1) ? (CSL){0,inp->openFolderRect.bottom/float(r.bottom),0} : 
-                                    ((bindBottom == 2) ? (CSL){float(r.bottom)-inp->openFolderRect.bottom,1,0} : (CSL){0,0,inp->openFolderRect.bottom});
+        left = (bindRight == 1) ? (CSL){0,inp->noNameRect.left/float(r.right),0} : 
+                                  ((bindRight == 2) ? (CSL){float(r.right)-inp->noNameRect.left,1,0} : (CSL){0,0,inp->noNameRect.left});
+        top = (bindTop == 1) ? (CSL){0,inp->noNameRect.top/float(r.bottom),0} : 
+                                    ((bindTop == 2) ? (CSL){float(r.bottom)-inp->noNameRect.top,1,0} : (CSL){0,0,inp->noNameRect.top});
+        right = (bindRight == 1) ? (CSL){0,inp->noNameRect.right/float(r.right),0} : 
+                                    ((bindRight == 2) ? (CSL){float(r.right)-inp->noNameRect.right,1,0} : (CSL){0,0,inp->noNameRect.right});
+        bottom = (bindBottom == 1) ? (CSL){0,inp->noNameRect.bottom/float(r.bottom),0} : 
+                                    ((bindBottom == 2) ? (CSL){float(r.bottom)-inp->noNameRect.bottom,1,0} : (CSL){0,0,inp->noNameRect.bottom});
 
-        inp->gbpOpenFolder = CSLINEAR_BIND_PTR({left,top,right,bottom});
+        inp->gbpNoName = CSLINEAR_BIND_PTR({left,top,right,bottom});
     }
 
+
+
+
+    r = inp->textRect;
+
+    r.top += (r.bottom - r.top - inp->charHeight) / 2;
+    if(inp->textAlign == CS_INPUT_TA_LEFT)
+    {
+        inp->textRectLeftMargin = inp->textRectLeftMargin2;
+    }
+    else if(inp->textAlign == CS_INPUT_TA_CENTER)
+    {
+        inp->textRectLeftMargin = (r.right - r.left - 4 - inp->textDcWidth) / 2;
+        if(inp->textRectLeftMargin < 0) inp->textRectLeftMargin = inp->textRectLeftMargin2;
+    }
+    else if(inp->textAlign == CS_INPUT_TA_RIGHT)
+    {
+        inp->textRectLeftMargin = (r.right - r.left - 4 - (inp->textDcWidth));
+        if(inp->textRectLeftMargin < 0) inp->textRectLeftMargin = inp->textRectLeftMargin2;
+    }
     
 }
 
@@ -726,6 +1084,8 @@ RECT CSINPUT::getFrontEndCharRect(int idInput, int idChar)
 RECT CSINPUT::placeCaret(POINT p)
 {
     CSINPUT::CSINPUT_PARAMS* inp = ip[idActive];
+    if(!inp->editable)
+        return {0};
     int n = inp->textCharGeometry.size();
     RECT r={-1000,-1000};
     if(n)
@@ -735,13 +1095,12 @@ RECT CSINPUT::placeCaret(POINT p)
             r = inp->textCharGeometry[i];
             r.left -= inp->showedSectionRect.left;
             r.right -= inp->showedSectionRect.left;
-            r.left += inp->textRect.left+2;
-            r.right += inp->textRect.left +2;
+            r.left += inp->textRect.left+2+inp->textRectLeftMargin;
+            r.right += inp->textRect.left +2+inp->textRectLeftMargin;
 
             r.top += inp->textRect.top;
             r.bottom += inp->textRect.top;
 
-            //cout<<r.left<<" "<<r.right<<"  ;  "<<p.x, 
             if(PtInRect(&r, p))
             {
                 inp->caretPos = i+1;
@@ -756,19 +1115,19 @@ RECT CSINPUT::placeCaret(POINT p)
         else if(p.x < inp->textCharGeometry[0].left)
         {
             inp->caretPos = 0; 
-            r = inp->textCharGeometry[0];
+            /*r = inp->textCharGeometry[0];
             r.left -= inp->showedSectionRect.left;
             r.right -= inp->showedSectionRect.left;
             r.left += inp->textRect.left+2;
             r.right += inp->textRect.left +2;
 
             r.top += inp->textRect.top;
-            r.bottom += inp->textRect.top;
+            r.bottom += inp->textRect.top;*/
         }
-        else
+        /*else
         {
             r={-1000,-1000};
-        }
+        }*/
     }
     return r;
 }
@@ -789,16 +1148,16 @@ RECT CSINPUT::updateRect(int idInput, CSLINEAR_BIND*lb)
         r.bottom = r.top + (inp->rsize.cy-lb->b.x)*lb->b.a + lb->b.b;
         return r;
     }
-
+    return {0, 0, 0, 0};
 }
 
 void CSINPUT::_updateGeometry(int idInput)
 {
     CSINPUT::CSINPUT_PARAMS* inp = ip[idInput];
 
-    if(inp->gbpCnt)
+    if(inp->gbpFrame)
     {
-        CSLINEAR_BIND*lb = inp->gbpCnt;
+        CSLINEAR_BIND*lb = inp->gbpFrame;
         RECT* r = &inp->rect;
         RECT rp = sRectClient(*parent);
         r->left = (rp.right-lb->l.x)*lb->l.a + lb->l.b;
@@ -877,10 +1236,10 @@ void CSINPUT::_updateGeometry(int idInput)
             r->bottom = (rp.bottom-lb->b.x)*lb->b.a + lb->b.b;
         }
 
-        lb = inp->gbpOpenFolder;
+        lb = inp->gbpNoName;
         if(lb)
         {
-            r = &inp->openFolderRect;
+            r = &inp->noNameRect;
             r->left = (rp.right-lb->l.x)*lb->l.a + lb->l.b;
             r->top = (rp.right-lb->t.x)*lb->t.a + lb->t.b;
             r->right = (rp.right-lb->r.x)*lb->r.a + lb->r.b;
@@ -929,33 +1288,60 @@ void CSINPUT::updateBackground()
 void CSINPUT::updateActiveTextBkg()
 {
     RECT r = ip[idActive]->textRect;
-    CSRGBA bcol = ip[idActive]->bkgColor2;
-    CSRGBA brdcol = ip[idActive]->borderColor2;
-    //drawGdiRectangle(ip[idActive]->cntDc, brdcol, bcol, r);
+    r.left += ip[idActive]->textRectLeftMargin+2;
+    CSRGBA bcol = ip[idActive]->colorNormal_frame;
+    CSRGBA brdcol = ip[idActive]->colorNormal_frameBorder;
     drawGdiRectangle(parentDC, brdcol, bcol, r);
+
 }
+void CSINPUT::viewTextNote(int id)
+{
+    CSINPUT::CSINPUT::CSINPUT_PARAMS* inp = ip[id];
+    RECT r = inp->textRect;
+    r.left += inp->textRectLeftMargin+2;
+
+    if(inp->textAlign == CS_INPUT_TA_CENTER)
+    {
+        r.left -= (inp->textNoteExtend) / 2 + 2;
+    }
+    else if(inp->textAlign == CS_INPUT_TA_RIGHT)
+    {
+        r.left -= inp->textNoteExtend + 2;
+    }
+
+    r.top += (r.bottom - r.top - inp->charHeight) / 2;
+
+    CSRGBA c = inp->textNoteColor;
+    SetBkMode(inp->frameDc, TRANSPARENT);
+    SetTextColor(inp->frameDc, RGB(c.r,c.g,c.b));
+    SelectFont(inp->frameDc, inp->textNoteFont);
+    
+    RECT rt = csRectContextualized(r, inp->rect);
+    DrawTextW(inp->frameDc, ip[id]->textNote, wcslen(ip[id]->textNote), &rt, DT_WORD_ELLIPSIS);
+}
+
 void CSINPUT::updateActiveTextBkg(RECT rchar)
 {
-    CSRGBA bcol = ip[idActive]->bkgColor2;
-    CSRGBA brdcol = ip[idActive]->borderColor2;
+    CSRGBA bcol = ip[idActive]->colorHover_titleFrame;
+    CSRGBA brdcol = ip[idActive]->colorHover_titleFrameBorder;
     RECT r = ip[idActive]->textRect;
-    drawGdiRectangle(ip[idActive]->cntDc, brdcol, bcol, {rchar.left+r.left, rchar.top+1, rchar.right+r.left, rchar.bottom-1});
+    drawGdiRectangle(ip[idActive]->frameDc, brdcol, bcol, {rchar.left+r.left, rchar.top+1, rchar.right+r.left, rchar.bottom-1});
     //drawGdiRectangle(parentDC, brdcol, bcol, rchar);
 }
 
 void CSINPUT::createContext(int idInput)
 {
     CSINPUT::CSINPUT::CSINPUT_PARAMS* ipp = ip[idInput];
-    if(ipp->cntDc)
+    if(ipp->frameDc)
     {
-        DeleteDC(ipp->cntDc);
-        DeleteBitmap(ipp->cntBmp);
+        DeleteDC(ipp->frameDc);
+        DeleteBitmap(ipp->frameBmp);
     }
     parentDC = csGraphics::getGraphicAreaContext(*parent);
-    ipp->cntDc = CreateCompatibleDC(parentDC);
+    ipp->frameDc = CreateCompatibleDC(parentDC);
     //std::cout<<ipp->rsize.cx<<" "<<ipp->rsize.cy<<"\n";
-    ipp->cntBmp = CreateCompatibleBitmap(parentDC, ipp->rsize.cx, ipp->rsize.cy);
-    SelectBitmap(ipp->cntDc, ipp->cntBmp);
+    ipp->frameBmp = CreateCompatibleBitmap(parentDC, ipp->rsize.cx, ipp->rsize.cy);
+    SelectBitmap(ipp->frameDc, ipp->frameBmp);
     
     /*RECT r = ipp->upRect;
     CSGRAPHIC_CONTEXT dc = ipp->incUpImage2;
@@ -964,16 +1350,16 @@ void CSINPUT::createContext(int idInput)
         int cx = r.right-r.left;
         int cy = r.bottom-r.top;
         //cout<<dc.sz.width<<"  "<<dc.sz.height<<" -- \n";
-        StretchBlt(ipp->cntDc, r.left-ctxRect.left, r.top-ctxRect.top, cx, cy, dc.dc, 0,0,dc.sz.width,dc.sz.height, SRCCOPY);
-        //StretchBlt(parentDC, ctxRect.left, ctxRect.top, cx, cy, ipp->cntDc, 0,0,dc.sz.width,dc.sz.height, SRCCOPY);
+        StretchBlt(ipp->frameDc, r.left-ctxRect.left, r.top-ctxRect.top, cx, cy, dc.dc, 0,0,dc.sz.width,dc.sz.height, SRCCOPY);
+        //StretchBlt(parentDC, ctxRect.left, ctxRect.top, cx, cy, ipp->frameDc, 0,0,dc.sz.width,dc.sz.height, SRCCOPY);
         //InvalidateRect(sHandle(*parent), &r, 1);
     }
-    drawImage(ipp->cntDc, ipp->incUpImage2, ipp->upRect);
-    drawImage(ipp->cntDc, ipp->incDownImage2, ipp->downRect);
-    drawImage(ipp->cntDc, ipp->undoImage2, ipp->undoRect);
-    drawImage(ipp->cntDc, ipp->redoImage2, ipp->redoRect);
-    drawImage(ipp->cntDc, ipp->unrollImage2, ipp->unrollRect);
-    drawImage(ipp->cntDc, ipp->openFolderImage2, ipp->openFolderRect);*/
+    drawImage(ipp->frameDc, ipp->incUpImage2, ipp->upRect);
+    drawImage(ipp->frameDc, ipp->incDownImage2, ipp->downRect);
+    drawImage(ipp->frameDc, ipp->undoImage2, ipp->undoRect);
+    drawImage(ipp->frameDc, ipp->redoImage2, ipp->redoRect);
+    drawImage(ipp->frameDc, ipp->unrollImage2, ipp->unrollRect);
+    drawImage(ipp->frameDc, ipp->noNameImage2, ipp->noNameRect);*/
 
 
 }
@@ -987,22 +1373,46 @@ void CSINPUT::_updateVisual_state1(int idInput, bool noRedrawActiveChar)
 {
     CSINPUT::CSINPUT_PARAMS* inp = ip[idInput];
     RECT r = inp->rect;
-    CSRGBA bcol = inp->cntColor1;
-    CSRGBA brdcol = inp->cntBorderColor1;
-    drawGdiRectangle(inp->cntDc, brdcol, bcol, csRectContextualized(r,r));
+    CSRGBA bcol = inp->colorNormal_frame;
+    CSRGBA brdcol = inp->colorNormal_frameBorder;
+    drawGdiRectangle(inp->frameDc, brdcol, bcol, csRectContextualized(r,r));
+    if(inp->textChar.size() == 0)
+    {
+        viewTextNote(idInput);
+    }
+    //updateActiveTextBkg(csRectContextualized(inp->textRect, r));
     
-    bcol = inp->bkgColor1;
-    brdcol = inp->borderColor1;
-    drawGdiRectangle(inp->cntDc, brdcol, bcol, csRectContextualized(inp->titleRect,r));
-    drawGdiText(inp->cntDc, inp->title, inp->titleFont, inp->titleColor1, csRectContextualized(inp->titleRect,r));
+    bcol = inp->colorNormal_titleFrame;
+    brdcol = inp->colorNormal_titleFrameBorder;
+    drawGdiRectangle(inp->frameDc, brdcol, bcol, csRectContextualized(inp->titleRect,r));
 
-    drawImage(inp->cntDc, inp->incUpImage2, csRectContextualized(inp->upRect, r));
-    drawImage(inp->cntDc, inp->incDownImage2, csRectContextualized(inp->downRect, r));
-    drawImage(inp->cntDc, inp->undoImage2, csRectContextualized(inp->undoRect, r));
-    drawImage(inp->cntDc, inp->redoImage2, csRectContextualized(inp->redoRect, r));
-    drawImage(inp->cntDc, inp->unrollImage2, csRectContextualized(inp->unrollRect, r));
-    drawImage(inp->cntDc, inp->openFolderImage2, csRectContextualized(inp->openFolderRect, r));
-//cout<<inp->cntDc<<" "<<r.top<<"\n";
+    RECT trect = csRectContextualized(inp->titleRect,r);
+
+    if(inp->titleAlign == CS_INPUT_TA_LEFT)
+    {
+        trect.left += 2;
+    }
+    if(inp->titleAlign == CS_INPUT_TA_CENTER)
+    {
+        trect.left = (trect.right - inp->titleWidth) / 2;
+    }
+    else if(inp->titleAlign == CS_INPUT_TA_RIGHT)
+    {
+        trect.left = trect.right - inp->titleWidth;
+    }
+
+    RECT rtext = inp->textRect;
+    trect.top += (rtext.bottom - rtext.top - inp->titleHeight) / 2;
+
+    drawGdiText(inp->frameDc, inp->title, inp->titleFont, inp->colorNormal_title, trect);
+
+    drawImage(inp->frameDc, inp->incUpImage2, csRectContextualized(inp->upRect, r));
+    drawImage(inp->frameDc, inp->incDownImage2, csRectContextualized(inp->downRect, r));
+    drawImage(inp->frameDc, inp->undoImage2, csRectContextualized(inp->undoRect, r));
+    drawImage(inp->frameDc, inp->redoImage2, csRectContextualized(inp->redoRect, r));
+    drawImage(inp->frameDc, inp->unrollImage2, csRectContextualized(inp->unrollRect, r));
+    drawImage(inp->frameDc, inp->noNameImage2, csRectContextualized(inp->noNameRect, r));
+//cout<<inp->frameDc<<" "<<r.top<<"\n";
 }
 
 
@@ -1012,10 +1422,10 @@ void CSINPUT::updateVisual_state1(int idInput, bool noRedrawActiveChar)
     CSINPUT::CSINPUT_PARAMS* inp = ip[idInput];
     RECT r = inp->rect;
     SIZE s = inp->rsize;
-    BitBlt(parentDC, r.left, r.top, s.cx, s.cy, inp->cntDc, 0,0,SRCCOPY);
+    BitBlt(parentDC, r.left, r.top, s.cx, s.cy, inp->frameDc, 0,0,SRCCOPY);
     updateText(idInput);
-    if(!noRedrawActiveChar)
-        highlightActiveChar(ip[idActive]->activeCharRect);
+    /*if(!noRedrawActiveChar)
+        highlightActiveChar();*/
     //if(r.left == s.cx || r.top == s.cy) cout<<" less than zero !\n";
     //InvalidateRect(sHandle(*parent), &r, 1);
 }
@@ -1026,22 +1436,41 @@ void CSINPUT::_updateVisual_state2(int idInput, bool noRedrawActiveChar)
     CSINPUT::CSINPUT_PARAMS* inp = ip[idInput];
 
     RECT r = inp->rect;
-    CSRGBA bcol = inp->cntColor2;
-    CSRGBA brdcol = inp->cntBorderColor2;
-    drawGdiRectangle(inp->cntDc, brdcol, bcol, csRectContextualized(r,r));
+    CSRGBA bcol = inp->colorHover_frame;
+    CSRGBA brdcol = inp->colorHover_frameBorder;
+    drawGdiRectangle(inp->frameDc, brdcol, bcol, csRectContextualized(r,r));
     
-    bcol = inp->bkgColor2;
-    brdcol = inp->borderColor2;
-    drawGdiRectangle(inp->cntDc, brdcol, bcol, csRectContextualized(inp->titleRect,r));
-    drawGdiText(inp->cntDc, inp->title, inp->titleFont, inp->titleColor2, csRectContextualized(inp->titleRect,r));
+    bcol = inp->colorHover_titleFrame;
+    brdcol = inp->colorHover_titleFrameBorder;
+    drawGdiRectangle(inp->frameDc, brdcol, bcol, csRectContextualized(inp->titleRect,r));
+
+    RECT trect = csRectContextualized(inp->titleRect,r);
+
+    if(inp->titleAlign == CS_INPUT_TA_LEFT)
+    {
+        trect.left += 2;
+    }
+    if(inp->titleAlign == CS_INPUT_TA_CENTER)
+    {
+        trect.left = (trect.right - inp->titleWidth) / 2;
+    }
+    else if(inp->titleAlign == CS_INPUT_TA_RIGHT)
+    {
+        trect.left = trect.right - inp->titleWidth;
+    }
+    
+    RECT rtext = inp->textRect;
+    trect.top += (rtext.bottom - rtext.top - inp->titleHeight) / 2  - 2; // -2 ajoute un effet de mouvement sur le titre
+
+    drawGdiText(inp->frameDc, inp->title, inp->titleFont, inp->colorHover_title, trect);
 
 
-    drawImage(inp->cntDc, inp->incUpImage2, csRectContextualized(inp->upRect, r));
-    drawImage(inp->cntDc, inp->incDownImage2, csRectContextualized(inp->downRect, r));
-    drawImage(inp->cntDc, inp->undoImage2, csRectContextualized(inp->undoRect, r));
-    drawImage(inp->cntDc, inp->redoImage2, csRectContextualized(inp->redoRect, r));
-    drawImage(inp->cntDc, inp->unrollImage2, csRectContextualized(inp->unrollRect, r));
-    drawImage(inp->cntDc, inp->openFolderImage2, csRectContextualized(inp->openFolderRect, r));
+    drawImage(inp->frameDc, inp->incUpImage2, csRectContextualized(inp->upRect, r));
+    drawImage(inp->frameDc, inp->incDownImage2, csRectContextualized(inp->downRect, r));
+    drawImage(inp->frameDc, inp->undoImage2, csRectContextualized(inp->undoRect, r));
+    drawImage(inp->frameDc, inp->redoImage2, csRectContextualized(inp->redoRect, r));
+    drawImage(inp->frameDc, inp->unrollImage2, csRectContextualized(inp->unrollRect, r));
+    drawImage(inp->frameDc, inp->noNameImage2, csRectContextualized(inp->noNameRect, r));
 }
 
 void CSINPUT::updateVisual_state2(int idInput, bool noRedrawActiveChar)
@@ -1051,17 +1480,22 @@ void CSINPUT::updateVisual_state2(int idInput, bool noRedrawActiveChar)
     RECT r = inp->rect;
     SIZE s = inp->rsize;
     //BitBlt(parentDC, rv.left, rv.top, stackDC.sz.cx, stackDC.sz.cy, stackDC.dc, 0,0,SRCCOPY);
-    BitBlt(parentDC, r.left, r.top, s.cx, s.cy, inp->cntDc, 0,0,SRCCOPY);
+    BitBlt(parentDC, r.left, r.top, s.cx, s.cy, inp->frameDc, 0,0,SRCCOPY);
     updateText(idInput);
-    if(!noRedrawActiveChar)
-        highlightActiveChar(ip[idActive]->activeCharRect);
+    /*if(!noRedrawActiveChar)
+        highlightActiveChar();*/
+        
+    /*if(inp->textChar.size() == 0)
+    {
+        viewTextNote(idInput);
+    }*/
     //InvalidateRect(sHandle(*parent), &r, 1);
 }
 
 void CSINPUT::updateAll()
 {
     int n = ip.size();
-    CSINPUT::CSLINEAR_BIND* lb = gbpCtx;
+    CSLINEAR_BIND* lb = gbpCtx;
     RECT *r = &ctxRect;
     RECT rp = sRectClient(*parent);
     r->left = (rp.right-lb->l.x)*lb->l.a + lb->l.b;
@@ -1080,8 +1514,8 @@ void CSINPUT::updateAll()
         RECT r1 = ip[i]->rect;
         SIZE s = ip[i]->rsize;
     
-        //BitBlt(stackDC.dc, r1.left, r1.top, s.cx, s.cy, ip[i]->cntDc, 0,0,SRCCOPY);
-        BitBlt(parentDC, r1.left, r1.top, s.cx, s.cy, ip[i]->cntDc, 0,0,SRCCOPY);
+        //BitBlt(stackDC.dc, r1.left, r1.top, s.cx, s.cy, ip[i]->frameDc, 0,0,SRCCOPY);
+        BitBlt(parentDC, r1.left, r1.top, s.cx, s.cy, ip[i]->frameDc, 0,0,SRCCOPY);
    
     }
     
@@ -1091,15 +1525,122 @@ void CSINPUT::updateAll()
     //free(visualCtrl);
 }
 
+void CSINPUT::resetActiveInput()
+{
+    CSINPUT::CSINPUT_PARAMS* inp = ip[idMouseHover];
+    inp->frameOn = 0;
+    updateVisual_state1(idMouseHover);
+
+    //redraw buttons
+    inp->btnUpOn = 1;
+    inp->btnDownOn = 1;
+    inp->btnUndoOn = 1;
+    inp->btnRedoOn = 1;
+    inp->btnUnrollOn = 1;
+    inp->btnNoNameOn = 1;
+}
+
+void CSINPUT::switchNoNameButtonState(int idInput)
+{
+    CSINPUT::CSINPUT_PARAMS* inp = ip[idInput];
+    if(inp->noNameButtonVariableState && inp->btnNoNameOn)
+    {
+        if(inp->noNameButtonState)
+        {
+            inp->noNameButtonState = 0;
+        }
+        else
+        {
+            inp->noNameButtonState = 1;
+        }
+        CSGRAPHIC_CONTEXT noNameImage = inp->noNameImage2;
+        inp->noNameImage2 = inp->noNameImage3;
+        inp->noNameImage3 = noNameImage;
+        RECT r = inp->rect;
+        drawImage(inp->frameDc, inp->noNameImage2, csRectContextualized(inp->noNameRect, r));
+        updateVisual_state1(idInput);
+        updateVisual_state2(idInput);
+        InvalidateRect(sHandle(*parent), &inp->noNameRect, 1);
+        
+    }
+}
+
+void CSINPUT::switchInputState()
+{
+    CSINPUT::CSINPUT_PARAMS* inp = ip[idActive];
+    if(inp->switchableState && inp->frameOn)
+    {
+        CSRGBA col = inp->colorActive_frame;
+        inp->colorActive_frame = inp->colorNormal_frame;
+        inp->colorNormal_frame = col;
+
+        col = inp->colorActive_frameBorder;
+        inp->colorActive_frameBorder = inp->colorNormal_frameBorder;
+        inp->colorNormal_frameBorder = col;
+        
+        col = inp->colorActive_titleFrame;
+        inp->colorActive_titleFrame = inp->colorNormal_titleFrame;
+        inp->colorNormal_titleFrame = col;
+        
+        col = inp->colorActive_titleFrameBorder;
+        inp->colorActive_titleFrameBorder = inp->colorNormal_titleFrameBorder;
+        inp->colorNormal_titleFrameBorder = col;
+        
+        
+        col = inp->colorActive_text;
+        inp->colorActive_text = inp->colorNormal_text;
+        inp->colorNormal_text = col;
+
+        col = inp->colorActive_title;
+        inp->colorActive_title = inp->colorNormal_title;
+        inp->colorNormal_title = col;
+
+        updateVisual_state1(idActive);
+
+        inp = ip[idLastActive];
+        if(ip.size() > 1 && inp->switchableState)
+        {
+            col = inp->colorActive_frame;
+            inp->colorActive_frame = inp->colorNormal_frame;
+            inp->colorNormal_frame = col;
+
+            col = inp->colorActive_frameBorder;
+            inp->colorActive_frameBorder = inp->colorNormal_frameBorder;
+            inp->colorNormal_frameBorder = col;
+            
+            col = inp->colorActive_titleFrame;
+            inp->colorActive_titleFrame = inp->colorNormal_titleFrame;
+            inp->colorNormal_titleFrame = col;
+            
+            col = inp->colorActive_titleFrameBorder;
+            inp->colorActive_titleFrameBorder = inp->colorNormal_titleFrameBorder;
+            inp->colorNormal_titleFrameBorder = col;
+            
+            
+            col = inp->colorActive_text;
+            inp->colorActive_text = inp->colorNormal_text;
+            inp->colorNormal_text = col;
+
+            col = inp->colorActive_title;
+            inp->colorActive_title = inp->colorNormal_title;
+            inp->colorNormal_title = col;
+
+            updateVisual_state1(idLastActive);
+        }
+
+        InvalidateRect(sHandle(*parent), 0, 1);
+    }
+}
+
 void CSINPUT::mouseMoveEvent(int idInput, POINT p)
 {
     CSINPUT::CSINPUT_PARAMS* inp = ip[idInput];
 
     if(PtInRect(&inp->rect, p))
     {
-        if(!inp->cntOn)
+        if(!inp->frameOn)
         {
-            inp->cntOn = 1;
+            inp->frameOn = 1;
             updateVisual_state2(idInput);
 
             idMouseHover = idInput;
@@ -1111,16 +1652,16 @@ void CSINPUT::mouseMoveEvent(int idInput, POINT p)
             inp->btnUndoOn = 0;
             inp->btnRedoOn = 0;
             inp->btnUnrollOn = 0;
-            inp->btnOpenFolderOn = 0;
+            inp->btnNoNameOn = 0;
             //return;
         }
         
     }
     else
     {
-        if(inp->cntOn)
+        if(inp->frameOn)
         {
-            inp->cntOn = 0;
+            inp->frameOn = 0;
             updateVisual_state1(idInput);
 
             //update();
@@ -1131,7 +1672,7 @@ void CSINPUT::mouseMoveEvent(int idInput, POINT p)
             inp->btnUndoOn = 1;
             inp->btnRedoOn = 1;
             inp->btnUnrollOn = 1;
-            inp->btnOpenFolderOn = 1;
+            inp->btnNoNameOn = 1;
             //return;
         }
     }
@@ -1263,12 +1804,13 @@ void CSINPUT::mouseMoveEvent(int idInput, POINT p)
         }
     }
 
-    if(PtInRect(&inp->openFolderRect, p))
+    if(PtInRect(&inp->noNameRect, p))
     {
-        if(!inp->btnOpenFolderOn)
+        if(!inp->btnNoNameOn)
         {
-            inp->btnOpenFolderOn = 1;
-            drawImage(parentDC, inp->openFolderImage1, inp->openFolderRect);
+            inp->btnNoNameOn = 1;
+            if(!inp->noNameButtonState)
+                drawImage(parentDC, inp->noNameImage1, inp->noNameRect);// bug
             idMouseHover = idInput;
             //return;
         }
@@ -1276,11 +1818,13 @@ void CSINPUT::mouseMoveEvent(int idInput, POINT p)
     }
     else
     {
-        if(inp->btnOpenFolderOn)
+        if(inp->btnNoNameOn)
         {
-            inp->btnOpenFolderOn = 0;
-            drawImage(parentDC, inp->openFolderImage2, inp->openFolderRect);
+            inp->btnNoNameOn = 0;
+            if(!inp->noNameButtonState)
+                drawImage(parentDC, inp->noNameImage2, inp->noNameRect);
             //return;
+
         }
     }
 
@@ -1296,7 +1840,16 @@ void CSINPUT::update()
     InvalidateRect(sHandle(*parent), &r, 1);
     r = ip[idLastMouseHover]->rect;
     r.left -= 20; r.top -= 20; r.right += 20; r.bottom += 20;*/
-    InvalidateRect(sHandle(*parent), &r, 1);
+    InvalidateRect(sHandle(*parent), &r, 0);
+}
+
+void CSINPUT::update(int idInput)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    updateVisual_state1(idInput);
+    //RECT r = {ip[idInput]->rect.left, ip[idInput]->rect.top, ip[idInput]->rsize.cx, ip[idInput]->rsize.cy};
+    //InvalidateRect(sHandle(*parent), &r, 1);
+    InvalidateRect(sHandle(*parent), 0, 1);
 }
 
 void CSINPUT::drawGdiRectangle(HDC& dc, CSRGBA col, RECT rect)
@@ -1379,6 +1932,193 @@ void CSINPUT::setLastActive(int idInput)
     idLastActive = idInput;
 }
 
+void CSINPUT::setText(int idInput, wchar_t*value, bool update)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    CSINPUT::CSINPUT_PARAMS* inp = ip[idInput];
+    size_t size = wcslen(value);
+    inp->textChar.clear();
+    inp->textCharGeometry.clear();
+    inp->textDcWidth = 0;
+    inp->caretPos = 0;
+    setActive(idInput);
+    for(size_t i = 0; i < size; i++)
+    {
+        addChar(value[i]);
+    }
+    if(update)
+    {
+        updateVisual_state1(idInput, 1);
+        InvalidateRect(sHandle(*parent), 0, 1);
+    }
+}
+
+wstring CSINPUT::getText(int idInput)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    return ip[idInput]->textChar;
+}
+
+HFONT CSINPUT::getFont(int idInput)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    return ip[idInput]->textFont;
+}
+
+int CSINPUT::getActiveInputId()
+{
+    return idActive;
+}
+
+void CSINPUT::deleteValue(int idInput)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    size_t size = ip[idInput]->textChar.size();
+    setActive(idInput);
+    for(size_t i = size-1; i >= 0; i--)
+    {
+        ip[idInput]->caretPos = i;
+        deleteChar(i);
+    }
+}
+
+void CSINPUT::setAllowedChars(int idInput, wstring chars)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->allowedChars = chars;
+}
+void CSINPUT::replaceAllowedChar(int idInput, wchar_t oldChar, wchar_t newChar)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    int index = ip[idInput]->allowedChars.find(oldChar);
+    if(index != wstring::npos)
+    {
+        ip[idInput]->allowedChars[index] = newChar;
+    }
+}
+void CSINPUT::setForbiddenChars(int idInput, wstring chars)
+{   
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->forbiddenChars = chars;
+}
+
+void CSINPUT::setGlobalAllowedChars(wstring chars)
+{
+    globalAllowedChars = chars;
+}
+void CSINPUT::setGlobalForbiddenChars(wstring chars)
+{
+    globalForbiddenChars = chars;
+}
+
+void CSINPUT::setLogSection(int* logSection)
+{
+    this->logSection = logSection;
+}
+int* CSINPUT::getLogSection()
+{
+    return logSection;
+}
+
+void CSINPUT::setEditable(int idInput, bool editable)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->editable = editable;
+}
+void CSINPUT::setEditable(bool editable)
+{
+    globalModifiable = editable;
+}
+
+void CSINPUT::setPrefix(int idInput, wchar_t* prefix)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->prefix = _wcsdup(prefix);
+}
+void CSINPUT::setSuffix(int idInput, wchar_t* suffix)
+{
+    if(idInput<0) idInput = ip.size() + idInput;
+    ip[idInput]->suffix = _wcsdup(suffix);
+}
+void CSINPUT::setTitleRectWidth(int idInput, int width)
+{
+    ip[idInput]->titleRectWidth = width;
+    ip[idInput]->titleRect.right = ip[idInput]->titleRect.left + width;
+    ip[idInput]->textRect.left = ip[idInput]->titleRect.right + ip[idInput]->buttonMarging;
+}
+
+
+inline void moveRect(RECT& r, int x, int y)
+{
+    r.left += x;
+    r.top += y;
+    r.right += x;
+    r.bottom += y;
+}
+
+void CSINPUT::moveInput(int idInput, int x, int y, int gbpl, int gbpt, int gbpr, int gbpb)
+{
+    CSINPUT::CSINPUT_PARAMS* inp = ip[idInput];
+
+    if(inp->gbpFrame)
+    {
+        RECT& r = inp->rect;
+        moveRect(r, x, y);
+
+        if(inp->gbpBkg)
+        {
+            RECT& r = inp->textRect;
+            moveRect(r, x, y);
+        }
+
+        if(inp->gbpTitle)
+        {
+            RECT& r = inp->titleRect;
+            moveRect(r, x, y);
+        }
+
+        if(inp->gbpIncUp)
+        {
+            RECT& r = inp->upRect;
+            moveRect(r, x, y);
+        }
+
+        if(inp->gbpIncDown)
+        {
+            RECT& r = inp->downRect;
+            moveRect(r, x, y);
+        }
+
+        if(inp->gbpUndo)
+        {
+            RECT& r = inp->undoRect;
+            moveRect(r, x, y);
+        }
+
+        if(inp->gbpRedo)
+        {
+            RECT& r = inp->redoRect;
+            moveRect(r, x, y);
+        }
+
+        if(inp->gbpNoName)
+        {
+            RECT& r = inp->noNameRect;
+            moveRect(r, x, y);
+        }
+
+        if(inp->gbpUnroll)
+        {
+            RECT& r = inp->unrollRect;
+            moveRect(r, x, y);
+        }
+
+        updateVisual_state1(idInput, 1);
+        InvalidateRect(sHandle(*parent), &r, 1);
+        setGBP(idInput, gbpl, gbpt, gbpr, gbpb);
+    }
+}
+
 int CSINPUT::getActive()
 {
     return idActive;
@@ -1395,11 +2135,14 @@ int CSINPUT::getMouseHoverId()
 int CSINPUT::updateActiveInput()
 {
     InvalidateRect(sHandle(*parent),&ip[idActive]->rect,1);
+    return 0;
 }
-int CSINPUT::updateFormerInput()
+int CSINPUT::updateLastActiveInput()
 {
-    InvalidateRect(sHandle(*parent), &ip[idLastActive]->rect,1);
+    InvalidateRect(sHandle(*parent),&ip[idLastActive]->rect,1);
+    return 0;
 }
+
 void CSINPUT::blit()
 {
     BitBlt(parentDC, 0, 0, hdcSize[*parent].cx, hdcSize[*parent].cy, stackDC.dc, 0,0,SRCCOPY);
@@ -1421,14 +2164,11 @@ void typeString(CSARGS Args)
     UINT msg = (UINT)Args;
     WPARAM wp = (WPARAM)Args;
 
-    static int count = 0;
-    static POINT pmouse, psave;
-
     int idi = ipp->getActive();
     CSINPUT::CSINPUT::CSINPUT_PARAMS* ip = ipp->getInputParams(idi);
+    CSINPUT::ACTION_PARAMS* actionParams = &ipp->actionParams;
 
     static int timerId = 1;
-    static RECT rhlight = {0};
     
     if(msg == WM_MOUSEHOVER)
     {
@@ -1438,10 +2178,8 @@ void typeString(CSARGS Args)
     }
     if(msg == WM_MOUSELEAVE)
     {
-        
-        ipp->updateVisual_state1(ipp->getMouseHoverId());
-        InvalidateRect(HWND(Args),0,1);
-        //ipp->updateActiveInput();
+        ipp->resetActiveInput();
+        InvalidateRect(HWND(Args),&bltRect[ipp->getId()],1);
         ipp->startChecking = 0;
         KillTimer(HWND(Args), timerId);
         return;
@@ -1449,20 +2187,21 @@ void typeString(CSARGS Args)
 
     if(msg == WM_MOUSEMOVE)
     {
-        count = 15;
+        actionParams->count = 15;
     }
 
     
     if(msg == WM_TIMER && WPARAM(Args) == timerId)
     {
-        if(count == 0)
+        if(actionParams->count == 0)
         {
-            GetCursorPos(&pmouse);
+            GetCursorPos(&actionParams->pmouse);
         }
-        else count--;
+        else actionParams->count--;
 
-        if(ipp->startChecking == 1 && !(TIMER_POINT.x == pmouse.x && TIMER_POINT.y == pmouse.y))
+        if(ipp->startChecking == 1 && !(TIMER_POINT.x == actionParams->pmouse.x && TIMER_POINT.y == actionParams->pmouse.y))
         {
+            
             POINT p = TIMER_POINT;
             ScreenToClient(sHandle(int(Args)), &p);
 
@@ -1470,9 +2209,11 @@ void typeString(CSARGS Args)
             p.x += csGraphics::getGraphicAreaInXPos(i) - csGraphics::getGraphicAreaXPos(i);
             p.y += csGraphics::getGraphicAreaInYPos(i) - csGraphics::getGraphicAreaYPos(i);
 
-            psave = p;
+            actionParams->psave = p;
             for(int i = 0; i<ipp->getInputsNumber(); i++)
+            {
                 ipp->mouseMoveEvent(i, p);
+            }
             
         
         }
@@ -1480,24 +2221,21 @@ void typeString(CSARGS Args)
     }
 
     
-    static int hcount = 0;
-    if(msg == WM_TIMER && WPARAM(Args) == 0)
+    if(msg == WM_TIMER && WPARAM(Args) == 0 && GetFocus() == HWND(Args))
     {
-        if(hcount == 40)
+        if(actionParams->hcount == 40)
         {
-            ipp->highlightActiveChar(rhlight, 0);
-            //InvalidateRect((HWND)Args, &rhlight, 1);
+            ipp->highlightActiveChar(0);
         }
-        if(hcount == 80)
+        if(actionParams->hcount == 80)
         {
-            ipp->highlightActiveChar(rhlight, 1);
-            //InvalidateRect((HWND)Args, &rhlight, 1);
-            hcount = 0;
+            ipp->highlightActiveChar(1);
+            actionParams->hcount = 0;
         }
-        hcount++;
+        actionParams->hcount++;
     }
 
-    if(msg == WM_LBUTTONDOWN)
+    if(msg == WM_LBUTTONDOWN || msg == WM_LBUTTONDBLCLK)
     {
         POINT p;
         GetCursorPos(&p);
@@ -1506,7 +2244,7 @@ void typeString(CSARGS Args)
         int i = ipp->getId();
         p.x += csGraphics::getGraphicAreaInXPos(i) - csGraphics::getGraphicAreaXPos(i);
         p.y += csGraphics::getGraphicAreaInYPos(i) - csGraphics::getGraphicAreaYPos(i);
-
+  
         int n = ipp->getInputsNumber();
         for(int i=0; i<n; i++)
         {
@@ -1518,8 +2256,18 @@ void typeString(CSARGS Args)
             }
         }
 
-        rhlight = ipp->placeCaret(p);  
-        //ipp->highlightActiveChar(rhlight);
+        ipp->switchInputState();
+
+        ipp->switchNoNameButtonState(ipp->getActive());
+
+        ipp->placeCaret(p);
+        ipp->updateText(ipp->getActive());
+        ipp->updateText(ipp->getLastActive());
+        ipp->updateActiveInput();
+        ipp->updateLastActiveInput();
+
+        //ipp->highlightActiveChar();
+
         
     }
     if(msg == WM_KEYDOWN)
@@ -1527,7 +2275,12 @@ void typeString(CSARGS Args)
         if(wp == VK_LEFT)
         {
             if(ip->caretPos > 0)
+            {
                 ip->caretPos--;
+                ipp->updateText(ipp->getActive());
+                ipp->highlightActiveChar(1);
+                ipp->updateActiveInput();
+            }
             return;
         }
         if(wp == VK_RIGHT)
@@ -1535,6 +2288,9 @@ void typeString(CSARGS Args)
             if(ip->caretPos < ipp->getActiveInputCharNumber())
             {
                 ip->caretPos++;
+                ipp->updateText(ipp->getActive());
+                ipp->highlightActiveChar(1);
+                ipp->updateActiveInput();
             }
             return;
         }
@@ -1542,7 +2298,8 @@ void typeString(CSARGS Args)
         {
             if(ip->caretPos > 0)
             {
-                ipp->deleteChar(1);
+                int w = ipp->deleteChar(1);
+                ipp->highlightActiveChar(1);
             }
             return;
         }
@@ -1551,6 +2308,7 @@ void typeString(CSARGS Args)
             if(ip->caretPos < ipp->getActiveInputCharNumber()-1)
             {
                 ipp->deleteChar(0);
+                ipp->highlightActiveChar(1);
             }
             return;
         }
@@ -1561,18 +2319,18 @@ void typeString(CSARGS Args)
     {
         if(wp != 8 && wp != 13)
         {
-            ipp->addChar(wp);
+            int w = ipp->addChar(wp);
+            ipp->highlightActiveChar(1);
         }
 
-        if((TIMER_POINT.x == pmouse.x && TIMER_POINT.y == pmouse.y))
-            ipp->mouseMoveEvent(ipp->getActive(), psave);
+        if((TIMER_POINT.x == actionParams->pmouse.x && TIMER_POINT.y == actionParams->pmouse.y))
+            ipp->mouseMoveEvent(ipp->getActive(), actionParams->psave);
        
     }
 
-    static int count_ = 20;
     if(msg == WM_SIZE)
     {
-        int n = ipp->getInputsNumber();
+        /*int n = ipp->getInputsNumber();
         ipp->updateVisibleBackground();
         RECT r = csGraphics::getGraphicAreaContextVisiblePart(ipp->getId());
         for(int i = 0; i<n; i++)
@@ -1581,30 +2339,70 @@ void typeString(CSARGS Args)
             if(!(r2.left > r.right || r2.top > r.bottom || r2.right < r.left || r2.bottom < r.top))
             ipp->updateGeometry(i);
         }
-        ipp->update();
+        ipp->update();*/
 
-        count_ = 20;
+        if(actionParams->count_ == 0)
+            actionParams->count_ = 20;
+        PostMessage(HWND(Args), WM_TIMER, 0, 0);
+        return;
+    }
+
+    if(msg == WM_CATCH_SIZEMOVE_INIT)
+    {
+        actionParams->r_sizeMove = CSSECMAN::sRectClient(ipp->getId());
+        return;
+    }
+
+    if(msg == WM_CATCH_SIZEMOVE_EXIT || msg == WM_CATCH_ROOT_RESTORED || msg == WM_CATCH_ROOT_MAXIMIZED)
+    {
+        actionParams->count_sizeMove = 20;
+        SendMessage(HWND(Args), WM_TIMER, 0, 0);
         return;
     }
 
     if(msg == WM_TIMER && WPARAM(Args) == 0)
     {
-        
-        if(count_ != 0)
-        count_--;
-
-        if(count_ == 2)
+        if(actionParams->count_ % 4 == 0 && actionParams->count_ != 0)
         {
             int n = ipp->getInputsNumber();
-            ipp->updateBackground();
+            ipp->updateVisibleBackground();
+            //csGraphics::updateGraphicArea(ipp->getId(), 1);
+            RECT r = csGraphics::getGraphicAreaContextVisiblePart(ipp->getId());
+            int margin = 200; // marge de securité pour eviter les erreurs de positionnement lors des changements brusques de taille de la fenetre
             for(int i = 0; i<n; i++)
             {
                 RECT r2 = ipp->getInputParams(i)->rect;
-                ipp->updateGeometry(i);
+                if(!(r2.left-margin > r.right || r2.top-margin > r.bottom || r2.right+margin < r.left || r2.bottom+margin < r.top))
+                    ipp->updateGeometry(i);
             }
             ipp->update();
-            count_ = 0;
         }
+
+        if(actionParams->count_ > 0)
+        actionParams->count_--;
+
+        if(actionParams->count_sizeMove % 4 == 0 && actionParams->count_sizeMove != 0)
+        {
+            RECT r = CSSECMAN::sRectClient(ipp->getId());
+            //if(r.right != actionParams->r_sizeMove.right || r.bottom != actionParams->r_sizeMove.bottom)
+            {
+                int n = ipp->getInputsNumber();
+                ipp->updateBackground();
+                for(int i = 0; i<n; i++)
+                {
+                    RECT r2 = ipp->getInputParams(i)->rect;
+                    ipp->updateGeometry(i);
+                }
+                ipp->update();
+                actionParams->r_sizeMove = r; // important lorsque wm_catch_size_move_init n'est pas envoyé
+            }
+            //actionParams->count_ = 0;
+            //cout<<"actionParams->count_sizeMove = "<<actionParams->count_sizeMove<<"\n";
+        }
+
+        if(actionParams->count_sizeMove > 0)
+            actionParams->count_sizeMove--;
+
     }
 
 }
@@ -1670,7 +2468,7 @@ void updateGeometryThread(CSARGS Args)
                                 ip->updateGeometry(i);
                             }
                             //ip->blit();
-                            InvalidateRect(sHandle(ip->getId()), 0,1);
+                            InvalidateRect(sHandle(ip->getId()), &bltRect[ip->getId()],1);
                         } 
                         //free(ip);
                     }
@@ -1695,8 +2493,8 @@ CSINPUT* csNewInputContext(int*id)
 void templateInput(CSINPUT*& inp, RECT geometry)
 {
     
-    inp->newInput((wchar_t*)(wstring(L"input ")+to_wstring(inp->getInputsNumber()+1)).c_str(),L"0",geometry, 0, 50, 10);
-    inp->addOpenFolderButton(-1,L"resources/img/Folder.bmp",L"resources/img/Folder2.bmp",0,0);
+    inp->newInput((wchar_t*)(wstring(L"input ")+to_wstring(inp->getInputsNumber()+1)).c_str(),L"Type a text line here...",geometry, 0, 50, 10);
+    inp->addNoNameButton(-1,L"resources/img/Folder.bmp",L"resources/img/Folder2.bmp",0,0);
     inp->addUnrollButton(-1,L"resources/img/Hide.bmp",L"resources/img/Hide2.bmp",0,0);
     //inp->addUndoRedoButtons(-1,L"resources/img/ArrPrev.bmp",L"resources/img/ArrPrev2.bmp",0,0, L"resources/img/ArrNext.bmp",L"resources/img/ArrNext2.bmp",0,0);
     //inp->addIncrementButtons(-1,L"resources/img/ArrUp.bmp",L"resources/img/ArrUp2.bmp",0,0, L"resources/img/ArrDown.bmp",L"resources/img/ArrDown2.bmp",0,0);
@@ -1719,7 +2517,7 @@ CSINPUT* inputContextExample(int idp)
     vscrollAbout.setViewFrameRightMarging(20);*/
 
     csGraphics::setGraphicAreaPosition(idp, {2,5});
-    csGraphics::setGraphicAreaColor(idp, {25,25,25}, {30,30,30});
+    csGraphics::setGraphicAreaColor(idp, {30,30,30}, {35,35,35});
     csGraphics::setGraphicAreaSize(idp, {GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN)*2.5});
     csGraphics::updateGraphicArea(idp, 1);
     csGraphics::setMouseWheelPreference(idp, CS_MOUSEWHEEL_VSCROLL);

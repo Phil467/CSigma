@@ -59,6 +59,10 @@ void catchEventsGroup(int id, int idEvents, bool b);
 int createSection(int id, RECT geom,  COLORREF color, CSRESIZE_EDGE edgeResize, bool show=1, bool rootStyle=0, bool attach=1);
 int addAction(int id, void(*f)(CSARGS), CSARGS& args);
 int addAction(int id, void(*f)(CSARGS), int nbArgs, ...);
+int addEventSpy(void(*f)(CSARGS), CSARGS& args); // intercepter les evenements d'autres sections
+int addEventSpy(void(*f)(CSARGS), int nbArgs, ...);
+int removeEventSpy(int idEventSpy);
+bool removeLastEventSpy();
 bool removeAction(int id, int idAction);
 bool removeLastAction(int id);
 int setIcon(int id, wchar_t*pathSmallIcon, wchar_t*pathBigIcon, RECT rectSmall = {2,2,0,0});
@@ -71,7 +75,7 @@ RECT sRectParentContextStatic(int id);
 RECT sRectClient(int id);
 POINT sDeltaPos(int id);
 SIZE sDeltaSize(int id);
-void setTitle(int id, CSTEXT title, bool textOnly=0);
+void setTitle(int id, CSTEXT title, bool textOnly=0, wchar_t* _translationContext=0, wchar_t* _guideExpression=0);
 const wchar_t* getTitleText(int id);
 CSRGBA getTitleColor(int id);
 void setTitleColor(int id, CSRGBA color);
@@ -103,7 +107,9 @@ template<typename ..._Args> void bindGeometry(int id, CSBIND_GEOM_PARAMS bgp, _A
     bindGeometry(id, Args, n);
     free(Args);
 };
-
+int getCxScreen();
+int getCyScreen();
+float getDisplayScale();
 void _drawTitle(int id, HDC dc);
 
 void setAsCloseButton(int id, int& id_close);
@@ -138,6 +144,12 @@ int detach(int id);
 
 bool isSectionVisible(int id);
 void setVisible(int id, int showType);
+int   getCurrentResizingSectionId();
+SIZE  getCurrentDeltaSize();
+POINT  getCurrentDeltaPos();
+int   getCurrentSizingArea();
+int   getBorderSize(int id);
+void  setBorderSize(int id, int size);
 }
 
 namespace CSUTILS

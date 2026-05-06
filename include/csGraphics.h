@@ -14,6 +14,7 @@ using namespace std;
 
 namespace csGraphics
 {
+void updateWhenGetResizing(int id);
 vector<CSGRAPHIC_CONTEXT> getImageGradient(CSIMAGE_GRADIENT mhg, CSRGBA bkgColor);
 CSGRAPHIC_CONTEXT createGraphicContextFromFile(char*path);
 CSGRAPHIC_CONTEXT createGraphicContextFromFileW(wchar_t*path);
@@ -77,6 +78,7 @@ CSRGBA getDynamicTextParagraphColor(int id, int idParag);
 int  getDynamicTextParagraphPos(int id, int idParag);
 int getDynamicTextParagraphsNumber(int id);
 void removeDynamicTextParagraph(int id, int idParag);
+SIZE updateDynamicTextVisual(int id, CSDYNAMIC_TEXT* dt);
 
 POINT getViewAreaPos(int id);
 long getViewAreaXPos(int id);
