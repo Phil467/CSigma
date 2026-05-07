@@ -25,6 +25,9 @@ wchar_t* makeWString(const char* _str);
 
 std::wstring utf8_to_utf16(const std::string& utf8) ;
 std::string utf16_to_utf8(const std::wstring& utf16) ;
+
+wchar_t* getStrNumericFormat(long double value, const wchar_t* unit, unsigned int precision=2, unsigned int grouping=3, wchar_t separator=L' ', int maxDigits=100);
+long double parseNumericWide(const wstring& text);
 }
 
 #endif // CSSTRUTILS_H

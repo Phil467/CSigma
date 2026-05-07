@@ -101,7 +101,7 @@ class CSINPUT
                 , gbpNoName(0)
                 , gbpUnroll(0)
                 , frameOn(false)
-                , bkgOn(false)
+                , titleFrameOn(false)
                 , btnUpOn(false)
                 , btnDownOn(false)
                 , btnUndoOn(false)
@@ -113,6 +113,8 @@ class CSINPUT
                 , noNameButtonVariableState(false)
                 , switchableState(false)
                 , prefix(0), suffix(0)
+                , incUpFunc(nullptr), incDownFunc(nullptr), undoFunc(nullptr), redoFunc(nullptr), unrollFunc(nullptr), noNameFunc(nullptr)
+                , incUpArgs(nullptr), incDownArgs(nullptr), undoArgs(nullptr), redoArgs(nullptr), unrollArgs(nullptr), noNameArgs(nullptr)
             {}
 
             // Constructeur de copie pour dupliquer les ressources
@@ -171,7 +173,7 @@ class CSINPUT
                 , gbpNoName(other.gbpNoName ? new CSLINEAR_BIND(*other.gbpNoName) : 0)
                 , gbpUnroll(other.gbpUnroll ? new CSLINEAR_BIND(*other.gbpUnroll) : 0)
                 , frameOn(other.frameOn)
-                , bkgOn(other.bkgOn)
+                , titleFrameOn(other.titleFrameOn)
                 , btnUpOn(other.btnUpOn)
                 , btnDownOn(other.btnDownOn)
                 , btnUndoOn(other.btnUndoOn)
@@ -218,6 +220,19 @@ class CSINPUT
                 prefix = other.prefix ? _wcsdup(other.prefix) : 0;
                 suffix = other.suffix ? _wcsdup(other.suffix) : 0;
                 switchableState = other.switchableState;
+
+                incUpFunc = other.incUpFunc;
+                incDownFunc = other.incDownFunc;
+                undoFunc = other.undoFunc;
+                redoFunc = other.redoFunc;
+                unrollFunc = other.unrollFunc;
+                noNameFunc = other.noNameFunc;
+                incUpArgs = other.incUpArgs;
+                incDownArgs = other.incDownArgs;
+                undoArgs = other.undoArgs;
+                redoArgs = other.redoArgs;
+                unrollArgs = other.unrollArgs;
+                noNameArgs = other.noNameArgs;
             }
 
             // Destructeur pour libérer les ressources dupliquées
@@ -307,7 +322,7 @@ class CSINPUT
             CSLINEAR_BIND* gbpUnroll;
 
             bool frameOn;
-            bool bkgOn;
+            bool titleFrameOn;
             bool btnUpOn;
             bool btnDownOn;
             bool btnUndoOn;
@@ -322,12 +337,25 @@ class CSINPUT
 
 
             wchar_t* prefix, *suffix;
+
+            void (*incUpFunc)(CSARGS Args);
+            void (*incDownFunc)(CSARGS Args);
+            void (*undoFunc)(CSARGS Args);
+            void (*redoFunc)(CSARGS Args);
+            void (*unrollFunc)(CSARGS Args);
+            void (*noNameFunc)(CSARGS Args);
+
+            CSARGS* incUpArgs;
+            CSARGS* incDownArgs;
+            CSARGS* undoArgs;
+            CSARGS* redoArgs;
+            CSARGS* unrollArgs;
+            CSARGS* noNameArgs;
         };
     
     bool startChecking = 0, startGBP=0;
     int checkCount = 0;
     void init(int*idp);
-    void createContext(int idInput);
     
     void newInput(wchar_t*title, wchar_t*textNote, RECT geometry, int style, int titleRectWidth, int titleRectHeight);
     void addIncrementButtons(int idInput, wchar_t*path11, wchar_t*path12, wchar_t*path13, wchar_t*path14,
@@ -341,22 +369,20 @@ class CSINPUT
     CSINPUT::CSINPUT_PARAMS* getInputParams(int idInput);
     void setActive(int idInput);
     void setLastActive(int idInput);
-    int getActive();
-    int getLastActive();
+    int getActiveInputId();
+    int getLastActiveInputId();
     void setText(int idInput, wchar_t*value, bool update=false);
     wstring getText(int idInput);
+    wchar_t* getTitle(int idInput);
     void deleteValue(int idInput);
     int getMouseHoverId();
-    vector<CSINPUT_PARAMS*> getInputParamsList();
+    vector<CSINPUT_PARAMS*>& getInputParamsList();
     int getInputsNumber();
     void mouseMoveEvent(int idInput, POINT p);
     RECT updateRect(int idInput, CSLINEAR_BIND*lb);
     void updateGeometry(int idInput);
-    void _updateGeometry(int idInputm);
     void updateVisual_state1(int idInput, bool noRedrawActiveChar=0);
     void updateVisual_state2(int idInput, bool noRedrawActiveChar=0);
-    void _updateVisual_state1(int idInput, bool noRedrawActiveChar=0);
-    void _updateVisual_state2(int idInput, bool noRedrawActiveChar=0);
     void updateAll();
     void updateVisibleBackground();
     void updateBackground();
@@ -372,8 +398,10 @@ class CSINPUT
     RECT getFrontEndCharRect(int idInput, int idChar);
     void highlightActiveChar(bool state=0);
     int getActiveInputCharNumber();
+    void setTitleFrameWidth(int idInput, int width);
+    void setTitleFrameHeight(int idInput, int height);
     int getId();
-    int getActiveInputId();
+    //int getActiveInputId();
     HFONT getFont(int idInput);
     void blit();
     void update();
@@ -394,6 +422,12 @@ class CSINPUT
     void setAllowedChars(int idInput, wstring chars);
     void replaceAllowedChar(int idInput, wchar_t oldChar, wchar_t newChar);
     bool isMouseHoveringNoNameButton(int idInput);
+    bool isMouseHoveringIncUpButton(int idInput);
+    bool isMouseHoveringIncDownButton(int idInput);
+    bool isMouseHoveringUndoButton(int idInput);
+    bool isMouseHoveringRedoButton(int idInput);
+    bool isMouseHoveringUnrollButton(int idInput);
+    bool isMouseHoveringTitleFrame(int idInput);
     void switchNoNameButtonState(int idInput);
     void setNoNameButtonState(bool state);
     void setNoNameButtonVariableState(int idInput, bool state);
@@ -418,19 +452,50 @@ class CSINPUT
     void switchInputState();
     void update(int idInput);
 
+    RECT& getContextRect();
+
     void moveInput(int idInput, int x, int y, int gbpl=0, int gbpt=0, int gbpr=0, int gbpb=0);
 
     CSINPUT_ENTITY_COLORS getTitleColors(int idInput);
     bool getNoNameButtonState(int idInput);
+    CSLINEAR_BIND* getGBP();
+    CSINPUT_PARAMS* getActiveInput();
+    CSINPUT_PARAMS* getLastActiveInput();
 
+    void setIncUpFunc(void (*func)(CSARGS Args), CSARGS* args);
+    void setIncDownFunc(void (*func)(CSARGS Args), CSARGS* args);
+    void setUndoFunc(void (*func)(CSARGS Args), CSARGS* args);
+    void setRedoFunc(void (*func)(CSARGS Args), CSARGS* args);
+    void setUnrollFunc(void (*func)(CSARGS Args), CSARGS* args);
+    void setNoNameFunc(void (*func)(CSARGS Args), CSARGS* args);
+
+    void setIncUpFunc(int idInput, void (*func)(CSARGS Args), CSARGS* args);
+    void setIncDownFunc(int idInput, void (*func)(CSARGS Args), CSARGS* args);
+    void setUndoFunc(int idInput, void (*func)(CSARGS Args), CSARGS* args);
+    void setRedoFunc(int idInput, void (*func)(CSARGS Args), CSARGS* args);
+    void setUnrollFunc(int idInput, void (*func)(CSARGS Args), CSARGS* args);
+    void setNoNameFunc(int idInput, void (*func)(CSARGS Args), CSARGS* args);
+
+    void (*getIncUpFunc(int idInput))(CSARGS Args);
+    void (*getIncDownFunc(int idInput))(CSARGS Args);
+    void (*getUndoFunc(int idInput))(CSARGS Args);
+    void (*getRedoFunc(int idInput))(CSARGS Args);
+    void (*getUnrollFunc(int idInput))(CSARGS Args);
+    void (*getNoNameFunc(int idInput))(CSARGS Args);
+
+    CSARGS* getIncUpArgs(int idInput);
+    CSARGS* getIncDownArgs(int idInput);
+    CSARGS* getUndoArgs(int idInput);
+    CSARGS* getRedoArgs(int idInput);
+    CSARGS* getUnrollArgs(int idInput);
+    CSARGS* getNoNameArgs(int idInput);
+
+    wstring getAllowedChars(int idInput);
+    bool isEditable(int idInput);
     ACTION_PARAMS actionParams;
 
     protected:
     CSLINEAR_BIND* CSLINEAR_BIND_PTR(CSLINEAR_BIND lb);
-    void drawGdiRectangle(HDC& hdc, CSRGBA col, RECT rect);
-    void drawGdiRectangle(HDC& hdc, CSRGBA brd, CSRGBA bkg, RECT rect);
-    void drawGdiText(HDC& hdc, wchar_t*text, HFONT hf, CSRGBA col, RECT rect);
-    void drawImage(HDC& hdc, CSGRAPHIC_CONTEXT dc, RECT r);
     void viewTextNote(int id);
 
     
@@ -456,6 +521,20 @@ class CSINPUT
     bool globalNoNameButtonVariableState = false;
 
     vector<CSINPUT_PARAMS*> ip;
+
+    void (*incUpFunc)(CSARGS Args);
+    void (*incDownFunc)(CSARGS Args);
+    void (*undoFunc)(CSARGS Args);
+    void (*redoFunc)(CSARGS Args);
+    void (*unrollFunc)(CSARGS Args);
+    void (*noNameFunc)(CSARGS Args);
+
+    CSARGS* incUpArgs;
+    CSARGS* incDownArgs;
+    CSARGS* undoArgs;
+    CSARGS* redoArgs;
+    CSARGS* unrollArgs;
+    CSARGS* noNameArgs;
 };
 
 CSINPUT* csNewInputContext(int*id);

@@ -1471,6 +1471,11 @@ void  CSSECMAN::setBorderSize(int id, int size)
 {
     borderSize[id] = size;
 }
+
+float CSSECMAN::getGeometryCoef()
+{
+    return geomCoef;
+}
 /**************************************************************************************************************** */
 
 int  CSUTILS::getAdjustedFontSizeXY(int size)

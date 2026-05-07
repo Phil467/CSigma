@@ -150,6 +150,7 @@ POINT  getCurrentDeltaPos();
 int   getCurrentSizingArea();
 int   getBorderSize(int id);
 void  setBorderSize(int id, int size);
+float   getGeometryCoef();
 }
 
 namespace CSUTILS

@@ -15,8 +15,14 @@
 #include <string>
 #include <cwchar>
 #include "csRuler.h"
+#include "csStrUtils.h"
 
 using namespace CSSECMAN;
+using namespace CSSTRUTILS;
+
+CSINPUT::CSINPUT_ENTITY_COLORS expensesSetterValidTitleColor = {{100, 255, 100, 255}, {100, 255, 100}, {100, 255, 100}, {0,0,0}};
+CSINPUT::CSINPUT_ENTITY_COLORS expensesSetterDefaultTitleColors = {{100, 100, 100, 255}, {110,110,110}, {100,100,100}, {0,0,0}};
+static constexpr int maxExpensesInputTitleFrameWidth = 90;
 
 struct TaxBracketRow
 {
@@ -247,11 +253,12 @@ static int g_payrollBandRateIds[kMaxPayrollBandUiRows];
 void calculate(CSARGS Args);
 void onRegionDependentFieldsRefresh(CSARGS Args);
 void scrollingClientFunction(CSARGS Args);
-void addExpensesFunction(CSARGS Args);
+void setExpensesSetterInputValue(CSARGS Args);
+void addAndRemoveExpensesFunction(CSARGS Args);
 void goToDateFunction(CSARGS Args);
-static long double parseNumericWide(const wstring& text);
 long double getValue(CSINPUT* input, int id);
-wchar_t* getStrNumericFormat(long double value, wchar_t* unit);
+void incUpFunction(CSARGS Args);
+void incDownFunction(CSARGS Args);
 
 static long double marginalIncomeTaxFromBrackets(long double taxableIncome, const vector<TaxBracketRow>& brackets)
 {
@@ -374,20 +381,22 @@ void calculate(CSARGS Args)
         for(int i=0; i<inputExpenses->getInputsNumber(); i++)
         {
             CSINPUT::CSINPUT_ENTITY_COLORS colors = inputExpenses->getTitleColors(i);
-            if(colors.normal.r == 100 && colors.normal.g == 255 && colors.normal.b == 100)
+            CSRGBA validColor = expensesSetterValidTitleColor.normal;
+            if(!(colors.normal.r == validColor.r && colors.normal.g == validColor.g && colors.normal.b == validColor.b))
+                continue;
+            
+            wstring text = inputExpenses->getText(i);
+            long double value = parseNumericWide(text);
+            if(inputExpenses->getNoNameButtonState(i))
             {
-                wstring text = inputExpenses->getText(i);
-                long double value = parseNumericWide(text);
-                if(inputExpenses->getNoNameButtonState(i))
-                {
-                    long double njs = getValue(accountingInput, WEEKLY_WORKING_DAYS_ID);
-                    long double npj = getValue(accountingInput, DAILY_SERVICES_ID);
-                    if(njs < 1e-12L)
-                        njs = 1e-12L;
-                    value *= 52.0L * njs * npj;
-                }
-                totalExpenses += value;
+                long double njs = getValue(accountingInput, WEEKLY_WORKING_DAYS_ID);
+                long double npj = getValue(accountingInput, DAILY_SERVICES_ID);
+                if(njs < 1e-12L)
+                    njs = 1e-12L;
+                value *= 52.0L * njs * npj;
             }
+            totalExpenses += value;
+            
         }
 
         long double cp = getValue(accountingInput, CP_ID);
@@ -547,6 +556,8 @@ void onRegionDependentFieldsRefresh(CSARGS Args)
 
 /**************************************************************** UI ****************************************************************/
 
+wchar_t* expensesSetterTextNote = L"Ajouter une charge...\0";
+wstring defaultExpensesTitle = wstring(L"Nouvelle charge\0");
 
 
 CSIGMA_MAIN_BEGIN(L"fr-fr", L"fr-fr", 0, 0)
@@ -721,15 +732,20 @@ SetTimer(sHandle(secExpensesPanel), 0, 12,0);
 CSINPUT* expensesInput = csNewInputContext(&secExpensesPanel);
 expensesInput->setNoNameButtonVariableState(true);
 
+CSARGS incArgs(1);
+incArgs.setArg(0, expensesInput);
+expensesInput->setIncUpFunc(incUpFunction, &incArgs);
+expensesInput->setIncDownFunc(incDownFunction, &incArgs);
+
 int inputLeftX = 5, rowHeight = 25, stackTopY = 10;
 for(int i=0; i<100; i++)
 {
-    templateInput(expensesInput, {inputLeftX, stackTopY + i * (rowHeight + 8), (r.right - 10), rowHeight + 4}, L"Nouvelle charge", 120);
+    templateInput(expensesInput, {inputLeftX, stackTopY + i * (rowHeight + 8), (r.right - 10), rowHeight + 4}, L"Nouvelle charge", maxExpensesInputTitleFrameWidth*geomCoef);
     expensesInput->setSwitchable(-1, true);
     expensesInput->setTextColors(-1, {200,200,200}, {220,220,220}, {200,200,200}, {0,0,0});
     expensesInput->setFrameColors(-1, {10,10,10}, {20,20,20}, {30,30,30}, {0,0,0});
     expensesInput->setFrameBorderColors(-1, {10,10,10}, {100,100,100}, {100,100,30}, {0,0,0});
-    expensesInput->setTitleColors(-1, {100,100,100}, {110,110,110}, {100,100,100}, {0,0,0});
+    expensesInput->setTitleColors(-1, expensesSetterDefaultTitleColors.normal, expensesSetterDefaultTitleColors.hover, expensesSetterDefaultTitleColors.active, expensesSetterDefaultTitleColors.disabled);
     expensesInput->setTitleFrameBorderColors(-1, {50,50,100}, {10,10,10}, {10,10,10}, {0,0,0});
     expensesInput->setTitleFontSizeCoef(-1, 0.81);
     expensesInput->setTextFontSizeCoef(-1, 0.81);
@@ -985,11 +1001,17 @@ nextFieldId++;
 len = (r.right-15)/2;
 int taxPanelRightColumnX = inputLeftX + len + 5;
 
+CSARGS incArgs2(1);
+incArgs2.setArg(0, accountingInput);
+
 templateAccountingInput(accountingInput, {inputLeftX,stackTopY+1*(rowHeight+2), len,rowHeight}, L"CP", 50);
 accountingInput->addIncrementButtons(-1,L"comptaResources/ArrUp.bmp",L"comptaResources/ArrUp2.bmp",0,0, L"comptaResources/ArrDown.bmp",L"comptaResources/ArrDown2.bmp",0,0);
 accountingInput->setGBP(nextFieldId, 1, 0, 1, 0);
 accountingInput->setTitleColors(nextFieldId, titleColor1, titleColor2);
 accountingInput->setText(nextFieldId, L"300 $");
+accountingInput->setAllowedChars(nextFieldId, L"1234567890. $");
+accountingInput->setIncUpFunc(nextFieldId, incUpFunction, &incArgs2);
+accountingInput->setIncDownFunc(nextFieldId, incDownFunction, &incArgs2);
 accountingInput->update(nextFieldId);
 CP_ID = nextFieldId++;
 templateAccountingInput(accountingInput, {taxPanelRightColumnX,stackTopY+1*(rowHeight+2), len-5,rowHeight}, L"CAJ", 50);
@@ -1002,6 +1024,9 @@ accountingInput->addIncrementButtons(-1,L"comptaResources/ArrUp.bmp",L"comptaRes
 accountingInput->setGBP(nextFieldId, 1, 0, 1, 0);
 accountingInput->setTitleColors(nextFieldId, titleColor1, titleColor2);
 accountingInput->setText(nextFieldId, L"1");
+accountingInput->setIncUpFunc(nextFieldId, incUpFunction, &incArgs2);
+accountingInput->setIncDownFunc(nextFieldId, incDownFunction, &incArgs2);
+accountingInput->setAllowedChars(nextFieldId, L"1234567890. ");
 accountingInput->update(nextFieldId);
 DAILY_SERVICES_ID = nextFieldId++;
 templateAccountingInput(accountingInput, {taxPanelRightColumnX,stackTopY+2*(rowHeight+2), len-5,rowHeight}, L"CAH", 50);
@@ -1014,6 +1039,9 @@ accountingInput->addIncrementButtons(-1,L"comptaResources/ArrUp.bmp",L"comptaRes
 accountingInput->setGBP(nextFieldId, 1, 0, 1, 0);
 accountingInput->setTitleColors(nextFieldId, titleColor1, titleColor2);
 accountingInput->setText(nextFieldId, L"5");
+accountingInput->setIncUpFunc(nextFieldId, incUpFunction, &incArgs2);
+accountingInput->setIncDownFunc(nextFieldId, incDownFunction, &incArgs2);
+accountingInput->setAllowedChars(nextFieldId, L"1234567890. ");
 accountingInput->update(nextFieldId);
 WEEKLY_WORKING_DAYS_ID = nextFieldId++;
 templateAccountingInput(accountingInput, {taxPanelRightColumnX,stackTopY+3*(rowHeight+2), len-5,rowHeight}, L"CAM", 50);
@@ -1148,13 +1176,13 @@ csGraphics::setMouseWheelPreference(secAddExpensestrip, CS_MOUSEWHEEL_VSCROLL);
 
 SetTimer(sHandle(secAddExpensestrip), 0, 12,0);
 
-CSINPUT* addExpenses = csNewInputContext(&secAddExpensestrip);
-addExpenses->newInput(L"Ajouter",L"Ajouter une charge...",{1,1,158*geomCoef,25*geomCoef}, 0, 2*geomCoef, 10);
-addExpenses->addUnrollButton(-1,L"comptaResources/minus12.bmp",L"comptaResources/minus11.bmp",L"comptaResources/minus1.bmp",L"comptaResources/minus1.bmp");
-addExpenses->addNoNameButton(-1,L"comptaResources/plus12.bmp",L"comptaResources/plus11.bmp",L"comptaResources/plus11.bmp",L"comptaResources/plus11.bmp");
-addExpenses->setGBP(-1,0,0,2,0);
-CSSECMAN::addAction(addExpenses->getId(), addExpensesFunction, 2, addExpenses, expensesInput);
-addExpenses->update(-1);
+CSINPUT* expensesSetterInput = csNewInputContext(&secAddExpensestrip);
+expensesSetterInput->newInput(L"Ajouter",expensesSetterTextNote,{1,1,158*geomCoef,25*geomCoef}, 0, 2*geomCoef, 10);
+expensesSetterInput->addUnrollButton(-1,L"comptaResources/minus12.bmp",L"comptaResources/minus11.bmp",L"comptaResources/minus1.bmp",L"comptaResources/minus1.bmp");
+expensesSetterInput->addNoNameButton(-1,L"comptaResources/plus12.bmp",L"comptaResources/plus11.bmp",L"comptaResources/plus11.bmp",L"comptaResources/plus11.bmp");
+expensesSetterInput->setGBP(-1,0,0,2,0);
+CSSECMAN::addAction(expensesSetterInput->getId(), addAndRemoveExpensesFunction, 2, expensesSetterInput, expensesInput);
+expensesSetterInput->update(-1);
 
 
 
@@ -1391,6 +1419,8 @@ hscrollTasks.setScrollingClientFunction(scrollingClientFunction, 2, monthListBox
 
 addAction(monthPickerSection, goToDateFunction, 3, monthListBox, taskGridListBox, &hscrollTasks);
 addAction(secCalculateButton, calculate, 3, expensesInput, accountingInput, regionPicker);
+addAction(expensesInput->getId(), setExpensesSetterInputValue, 2, expensesSetterInput, expensesInput);
+
 
 csGraphics::setGraphicAreaPosition(secChartCanvas, {30, 30});
 csGraphics::setGraphicAreaColor(secChartCanvas, _bg4, {35,35,35});
@@ -1398,43 +1428,115 @@ csGraphics::setGraphicAreaSize(secChartCanvas, {2000, 1200});
 csGraphics::updateGraphicArea(secChartCanvas, 1);
 csGraphics::setMouseWheelPreference(secChartCanvas, CS_MOUSEWHEEL_VSCROLL);
 
-CSRULER* rulerX = csNewRuler(secChartCanvas, {30, 0}, {2000, 30}, CS_RULER_TEXT_UNDER, -100, 5, METER, 5, 5);
+CSRULER* rulerX = csNewRuler(secChartCanvas, {30, 0}, {2000, 30}, CS_RULER_TEXT_UNDER, -100, 10, METER, 5, 5);
 rulerX->setColors({25,25,25}, {30,30,30}, {100,100,100}, {150,150,150}, {100,100,100});
 rulerX->update();
  
-CSRULER* rulerY = csNewRuler(secChartCanvas, {0, 30}, {30, 1200}, CS_RULER_TEXT_UNDER, -100, 5, METER, 5, 5);
+CSRULER* rulerY = csNewRuler(secChartCanvas, {0, 30}, {30, 1200}, CS_RULER_TEXT_UNDER, -100, 10, METER, 5, 5);
 rulerY->setColors({25,25,25}, {30,30,30}, {100,100,100}, {150,150,150}, {100,100,100});
 rulerY->update();
 
+
+expensesInput->updateAll();
+expensesSetterInput->updateAll();
+accountingInput->updateAll();
 
 CSIGMA_MAIN_END()
 
 
 
-/****************************************************************** Utilities ************************************************************************* */
+/****************************************************************** UI ACTIONS ************************************************************************* */
 
 
 
-void addExpensesFunction(CSARGS Args)
+void addAndRemoveExpensesFunction(CSARGS Args)
 {
-    CSINPUT* sourceInput = (CSINPUT*)Args[0];
-    CSINPUT* targetInput = (CSINPUT*)Args[1];
+    
 
     if((UINT)Args == WM_LBUTTONDOWN)
     {
-        if(sourceInput->isMouseHoveringNoNameButton(0) && sourceInput->getActiveInputCharNumber() > 0)
+        CSINPUT* expensesSetterInput = (CSINPUT*)Args[0];
+        CSINPUT* expensesInput = (CSINPUT*)Args[1];
+
+        if(expensesSetterInput->isMouseHoveringNoNameButton(0) && expensesSetterInput->getActiveInputCharNumber() > 0)
         {
-            wstring value = sourceInput->getText(0);
-            int targetFieldId = targetInput->getActiveInputId();
-            int pxLength = CSUTILS::textExtentW(targetInput->getId(), targetInput->getFont(targetFieldId), (wchar_t*)(value.c_str()))->cx;
-            targetInput->setTitleRectWidth(targetFieldId, pxLength + 15);
-            targetInput->setGBP(targetFieldId, 0, 0, 2, 0);
-            targetInput->setTitle(targetFieldId, (wchar_t*)(value.c_str()));
-            targetInput->setTitleColors(targetFieldId, {100,255,100}, {100,255,100}, {100,255,100}, {0,0,0});
-            targetInput->setEditable(targetFieldId, true);
-            targetInput->update(targetFieldId);
+            wstring value = expensesSetterInput->getText(0);
+            int targetFieldId = expensesInput->getActiveInputId();
+            int pxLength = CSUTILS::textExtentW(expensesInput->getId(), expensesInput->getFont(targetFieldId), (wchar_t*)(value.c_str()))->cx;
+            expensesInput->setTitleRectWidth(targetFieldId, pxLength + 15);
+            expensesInput->setGBP(targetFieldId, 0, 0, 2, 0);
+            expensesInput->setTitle(targetFieldId, (wchar_t*)(value.c_str()));
+            expensesInput->setTitleColors(targetFieldId, expensesSetterValidTitleColor.normal, expensesSetterValidTitleColor.hover, expensesSetterValidTitleColor.active, expensesSetterValidTitleColor.disabled);
+            expensesInput->setEditable(targetFieldId, true);
+            expensesInput->setTitleRectWidth(targetFieldId, maxExpensesInputTitleFrameWidth*CSSECMAN::getGeometryCoef());
+            expensesInput->setGBP(targetFieldId, 0, 0, 2, 0);
+            expensesInput->update(targetFieldId);
+        }
+        else if(expensesSetterInput->isMouseHoveringUnrollButton(0))
+        {
+            
+            int targetFieldId = expensesInput->getActiveInputId();
+            CSINPUT::CSINPUT_ENTITY_COLORS colors = expensesInput->getTitleColors(targetFieldId);
+            CSRGBA validColor = expensesSetterValidTitleColor.normal;
+            CSINPUT::CSINPUT_ENTITY_COLORS defaultColor = expensesSetterDefaultTitleColors;
+            if(colors.normal.r == validColor.r && colors.normal.g == validColor.g && colors.normal.b == validColor.b)
+            {
+                expensesSetterInput->setText(0, 0);
+                expensesSetterInput->update(0);
+                expensesInput->setTitleColors(targetFieldId, defaultColor.normal, defaultColor.hover, defaultColor.active, defaultColor.disabled);
+                expensesInput->setEditable(targetFieldId, false);
+                expensesInput->setTitle(targetFieldId, (wchar_t*)(defaultExpensesTitle.c_str()));
+                expensesInput->setTitleRectWidth(targetFieldId, maxExpensesInputTitleFrameWidth*CSSECMAN::getGeometryCoef());
+                expensesInput->setGBP(targetFieldId, 0, 0, 2, 0);
+                expensesInput->update(targetFieldId);
+            }
         }
     }
+}
+
+void incUpFunction(CSARGS Args)
+{
+    CSINPUT* input = (CSINPUT*)Args[0];
+    int idInput = input->getActiveInputId();
+    if(!input->isEditable(idInput))
+        return;
+    wstring text = input->getText(idInput);
+    long double value = parseNumericWide(text);
+    value++;
+    wchar_t* output;
+    wstring allowedChars = input->getAllowedChars(idInput);
+    if(allowedChars.find(L"$") != wstring::npos)
+        output = getStrNumericFormat(value, L"$");
+    else if(allowedChars.find(L"%") != wstring::npos)
+        output = getStrNumericFormat(value, L"%");
+    else
+        output = getStrNumericFormat(value, L"");
+    input->setText(idInput, output);
+    free(output);
+    input->update(idInput);
+}
+
+void incDownFunction(CSARGS Args)
+{
+    CSINPUT* input = (CSINPUT*)Args[0];
+    int idInput = input->getActiveInputId();
+
+    if(!input->isEditable(idInput))
+        return;
+    wstring text = input->getText(idInput);
+    long double value = parseNumericWide(text);
+    value--;
+    wchar_t* output;
+    wstring allowedChars = input->getAllowedChars(idInput);
+    if(allowedChars.find(L"$") != wstring::npos)
+        output = getStrNumericFormat(value, L"$");
+    else if(allowedChars.find(L"%") != wstring::npos)
+        output = getStrNumericFormat(value, L"%");
+    else
+        output = getStrNumericFormat(value, L"");
+    input->setText(idInput, output);
+    free(output);
+    input->update(idInput);
 }
 
 void goToDateFunction(CSARGS Args)
@@ -1492,107 +1594,33 @@ void scrollingClientFunction(CSARGS Args)
     }
 }
 
-wchar_t* getStrNumericFormat(long double value, wchar_t* unit)
+
+void setExpensesSetterInputValue(CSARGS Args)
 {
-    wchar_t raw[100] = {0};
-    constexpr size_t kMoneyStrChars = 100;
-    if((long long)(value * 100) % 100 == 0)
-        swprintf(raw, kMoneyStrChars, L"%lld", static_cast<long long>(value));
-    else
-        swprintf(raw, kMoneyStrChars, L"%.2Lf", value);
+    CSINPUT* expensesSetterInput = (CSINPUT*)Args[0];
+    CSINPUT* expensesInput = (CSINPUT*)Args[1];
 
-    wstring number(raw);
-    bool isNegative = false;
-    if(!number.empty() && number[0] == L'-')
+    if(UINT(Args) == WM_LBUTTONDOWN)    
     {
-        isNegative = true;
-        number.erase(0, 1);
+        
+        CSINPUT::CSINPUT_ENTITY_COLORS colors = expensesInput->getTitleColors(expensesInput->getActiveInputId());
+        CSRGBA validColor = expensesSetterValidTitleColor.normal;
+        if(!(colors.normal.r == validColor.r && colors.normal.g == validColor.g && colors.normal.b == validColor.b))
+        {
+            expensesSetterInput->setText(0, 0);
+            expensesSetterInput->update(0);
+            return;
+        }
+        wchar_t* title = expensesInput->getTitle(expensesInput->getActiveInputId());
+        expensesSetterInput->setText(0, title);
+        expensesSetterInput->update(0);
     }
-
-    size_t dotPos = number.find(L'.');
-    wstring integerPart = (dotPos == wstring::npos) ? number : number.substr(0, dotPos);
-    wstring fractionalPart = (dotPos == wstring::npos) ? L"" : number.substr(dotPos);
-
-    wstring grouped;
-    grouped.reserve(integerPart.size() + integerPart.size() / 3 + 4);
-    if(isNegative)
-        grouped.push_back(L'-');
-
-    for(size_t i = 0; i < integerPart.size(); ++i)
-    {
-        grouped.push_back(integerPart[i]);
-        size_t remaining = integerPart.size() - i - 1;
-        if(remaining > 0 && remaining % 3 == 0)
-            grouped.push_back(L' ');
-    }
-
-    wstring outputStr = grouped + fractionalPart + L" " + wstring(unit);
-    wchar_t* output = csAlloc<wchar_t>(outputStr.size() + 1);
-    wcscpy(output, outputStr.c_str());
-    return output;
 }
 
-/** Parses a number from UI text (spaces, currency, grouping, FR/US separators). */
-static long double parseNumericWide(const wstring& text)
-{
-    wstring raw;
-    raw.reserve(text.size());
-    for(wchar_t c : text)
-    {
-        if(c == L' ' || c == L'\t' || c == L'\u00A0' || c == L'\u202F')
-            continue;
-        if(c >= L'0' && c <= L'9')
-            raw.push_back(c);
-        else if(c == L'-' && raw.empty())
-            raw.push_back(c);
-        else if(c == L'.' || c == L',')
-            raw.push_back(c);
-    }
-    if(raw.empty() || raw == L"-")
-        return 0.0L;
 
-    const bool hasDot = raw.find(L'.') != wstring::npos;
-    size_t commaCount = 0;
-    for(wchar_t c : raw)
-    {
-        if(c == L',')
-            commaCount++;
-    }
-    if(hasDot)
-    {
-        wstring t;
-        for(wchar_t c : raw)
-        {
-            if(c != L',')
-                t.push_back(c);
-        }
-        raw.swap(t);
-    }
-    else if(commaCount == 1)
-    {
-        for(size_t i = 0; i < raw.size(); ++i)
-        {
-            if(raw[i] == L',')
-                raw[i] = L'.';
-        }
-    }
-    else if(commaCount > 1)
-    {
-        wstring t;
-        for(wchar_t c : raw)
-        {
-            if(c != L',')
-                t.push_back(c);
-        }
-        raw.swap(t);
-    }
+/********************************************************************* Utilities ******************************************************** */
 
-    wchar_t* endPtr = nullptr;
-    const long double v = std::wcstold(raw.c_str(), &endPtr);
-    if(endPtr == raw.c_str())
-        return 0.0L;
-    return v;
-}
+
 
 long double getValue(CSINPUT* input, int id)
 {
